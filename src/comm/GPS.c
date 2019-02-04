@@ -8,7 +8,7 @@
 #endif
 
 /**
-* The scanner to parse the nema code
+* The scanner to parse the NEMA code
 */
 typedef struct Scanner {
   int index;
@@ -35,4 +35,8 @@ int scanner_getNext(Scanner *scanner){
 
 int scanner_hasNext(Scanner *scanner){
   return scanner->index < scanner->length;
+}
+
+void decodeNEMA(char* nema, GPSInfo *gpsInfo, GPSDebug *gpsDebug){
+
 }

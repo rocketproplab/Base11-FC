@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 project(Base11FC_tests)
 
-include_directories(${BASE11_FC_HEADERS_DIR})
+include_directories(${BASE11_FC_HEADERS_DIR} ${PROJECT_SOURCE_DIR}/test/)
 
 set(SOURCE_FILES test_main.c)
 

@@ -1,5 +1,8 @@
 #include "TestGPS.c"
 
-void testComm(){
-  
+int testComm(){
+  int retVal = 0;
+  retVal |= testGPS();
+
+  return retVal;
 }

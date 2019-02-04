@@ -10,6 +10,6 @@ typedef struct GPSDebug {
   double accuracy;
 } GPSDebug;
 
-// void decodeNEMA(char* nema, &GPSInfo gpsInfo, &GPSDebug gpsDebug);
+void decodeNEMA(char* nema, GPSInfo *gpsInfo, GPSDebug *gpsDebug);
 
 #endif
