@@ -12,5 +12,3 @@ link_directories(/usr/lib/)
 set_target_properties (Base11FC_tests PROPERTIES LINK_FLAGS "-Wall")
 
 target_link_libraries(Base11FC_tests -lcunit)
-
-add_test (test_lib ${EXECUTABLE_OUTPUT_PATH}/test_fc)

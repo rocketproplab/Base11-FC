@@ -15,3 +15,6 @@ include_directories(${BASE11_FC_HEADERS_DIR})
 
 add_subdirectory(src)
 add_subdirectory(test)
+
+enable_testing()
+add_test (NAME all COMMAND Base11FC_tests)
