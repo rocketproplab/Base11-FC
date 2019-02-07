@@ -11,4 +11,11 @@ link_directories(/usr/lib/)
 
 set_target_properties (Base11FC_tests PROPERTIES LINK_FLAGS "-Wall")
 
-target_link_libraries(Base11FC_tests -lcunit)
+set(LIBSERIALPORT_DIR ${PROJECT_SOURCE_DIR}/../libserialport)
+
+target_link_libraries(Base11FC_tests
+  -lcunit
+  ${LIBSERIALPORT_DIR}/serialport.o
+  ${LIBSERIALPORT_DIR}/linux.o
+  ${LIBSERIALPORT_DIR}/linux_termios.o
+)

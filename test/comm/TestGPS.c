@@ -27,6 +27,18 @@ void test_decodeNEMA(){
   CU_ASSERT_EQUAL(12, debug.sVCount);
 }
 
+void test_isNEMAAvalaible(){
+  GPS_Internal gpsState = {0};
+  strcpy((char *) &gpsState.nemaMessage, (char *) "Not a full nema");
+
+  CU_ASSERT_FALSE(isNEMAAvaliable(&gpsState));
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F\0");
+
+  CU_ASSERT_TRUE(isNEMAAvaliable(&gpsState));
+}
+
 
 int testGPS(){
   CU_pSuite pSuite = NULL;
@@ -44,6 +56,11 @@ int testGPS(){
 
   /* add the tests to the suite */
   if(NULL == CU_add_test(pSuite, "Test Decode NEMA", test_decodeNEMA)){
+    CU_cleanup_registry();
+    return CU_get_error();
+  }
+
+  if(NULL == CU_add_test(pSuite, "Test NEMA Avalaible", test_isNEMAAvalaible)){
     CU_cleanup_registry();
     return CU_get_error();
   }

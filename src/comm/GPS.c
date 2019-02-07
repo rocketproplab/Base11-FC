@@ -1,6 +1,7 @@
 #include "GPS.h"
 #include <string.h>
 #include <stdlib.h>
+#include <libserialport.h>
 
 #ifndef TRUE
 #define TRUE 1
@@ -10,6 +11,16 @@
 #endif
 
 #define NEMA_DELIM ","
+#define NEMA_MAX_SIZE 1024
+
+typedef struct GPS_Internal {
+  struct sp_port * serialport;
+  char nemaMessage[NEMA_MAX_SIZE];
+  int currentNemaPos;
+} GPS_Internal;
+
+static GPSInfo currentInfo   = {0};
+static GPSDebug currentDebug = {0};
 
 void grabNext(char ** string);
 
@@ -62,3 +73,34 @@ void decodeNEMA(char *nema, GPSInfo *gpsInfo, GPSDebug *gpsDebug){
 
   free(nemaCopy);
 }
+
+/*
+ * Tries to read the serial port for the NEMA string
+ *
+ * @param gpsState the internal state containing the NEMA string and port
+ *
+ * @return bytes read or negative on error
+ */
+int trySerialRead(GPS_Internal * gpsState){
+  char * nemaBuf;
+  int maxReadLen = NEMA_MAX_SIZE;
+
+  nemaBuf     = ((char *) &gpsState->nemaMessage ) + gpsState->currentNemaPos;
+  maxReadLen -= gpsState->currentNemaPos;
+
+  return sp_nonblocking_read(gpsState->serialport, nemaBuf, maxReadLen);
+}
+
+/*
+ * Checks if a full NEMA string has been read by the serial port
+ *
+ * @param gpsState used to read the nema string out of
+ *
+ * @return 0 if no NEMA is avaliable, otherwies positive.
+ */
+int isNEMAAvaliable(GPS_Internal * gpsState){
+  return FALSE;
+}
+
+
+void GPSReadTask(){}
