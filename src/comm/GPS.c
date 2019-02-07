@@ -9,50 +9,56 @@
 #define FALSE 0
 #endif
 
+#define NEMA_DELIM ","
+
+void grabNext(char ** string);
+
+/*
+ * Reads the next double from the string tokenizer
+ *
+ * @param string the string which is to be read from after running through
+ *        tokenizer
+ *
+ * @return the double representation of the number inputted
+ */
+double grabDouble(char ** string){
+  grabNext(string);
+  return strtod(*string, NULL);
+}
+
+/*
+ * advances the string tokenizer one forward, modifies the *string ptr
+ *
+ * @param string the string to advance through the tokenizer
+ */
+void grabNext(char ** string){
+  *string = strtok(0, NEMA_DELIM);
+}
+
+/*
+ * decodes the NEMA string specified and places the data into the two structs
+ * as appropriote. See
+ * https://www.trimble.com/oem_receiverhelp/v4.44/en/nmea-0183messages_gga.html
+ * for NEMA GGA spec.
+ *
+ * @param nema the NEMA GGA string to decode
+ * @param gpsInfo the gps info to write to
+ * @param gpsDebug the gps debug info to write to
+ */
 void decodeNEMA(char *nema, GPSInfo *gpsInfo, GPSDebug *gpsDebug){
-  printf("%s\n", nema);
-  int len = strlen(nema);
-  char * nemaCopy = malloc(len);
-  strncpy(nemaCopy, nema, len);
+  char *nemaCopy = strdup(nema);
   nema = nemaCopy;
 
-  nema = strtok(nema, ",");
-  nema = strtok(0, ",");
-  char* time = strdup(nema);
-  nema = strtok(0, ",");
-  char* lat = strdup(nema);
-  nema = strtok(0, ",");
-  char* latDir = strdup(nema);
-  nema = strtok(0, ",");
-  char* lon = strdup(nema);
-  nema = strtok(0, ",");
-  char* lonDir = strdup(nema);
-  nema = strtok(0, ",");
-  char* qual = strdup(nema);
-  nema = strtok(0, ",");
-  char* sVCount = strdup(nema);
-  nema = strtok(0, ",");
-  char* dop = strdup(nema);
-  nema = strtok(0, ",");
-  char* alt = strdup(nema);
-  nema = strtok(0, ",");
-  char* altUnits = strdup(nema);
-
-  gpsInfo->alt = strtod(alt, NULL);
-  gpsInfo->lat = strtod(lat, NULL);
-  gpsInfo->lon = strtod(lon, NULL);
-  gpsInfo->t_b = strtod(time, NULL);
-  gpsDebug->sVCount = strtod(sVCount, NULL);
+  nema = strtok(nema, NEMA_DELIM);
+  gpsInfo->t_b       = grabDouble(&nema);
+  gpsInfo->lat       = grabDouble(&nema);
+  grabNext(&nema);
+  gpsInfo->lon       = grabDouble(&nema);
+  grabNext(&nema);
+  gpsDebug->accuracy = grabDouble(&nema);
+  gpsDebug->sVCount  = grabDouble(&nema);
+  grabNext(&nema);
+  gpsInfo->alt       = grabDouble(&nema);
 
   free(nemaCopy);
-  free(time);
-  free(lat);
-  free(latDir);
-  free(lon);
-  free(lonDir);
-  free(qual);
-  free(sVCount);
-  free(dop);
-  free(alt);
-  free(altUnits);
 }

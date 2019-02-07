@@ -11,8 +11,20 @@ void test_decodeNEMA(){
     "$GPGGA,172814.0,3723.46587704,N,12202.26957864,W,2,6,1.2,18.893,M,-25.669,M,2.0,0031*4F\0";
 
   decodeNEMA(nema, &info, &debug);
-  printf("time = %lf\n", info.t_b);
   CU_ASSERT_DOUBLE_EQUAL(172814, info.t_b, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(3723.46587704, info.lat, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(12202.26957864, info.lon, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(18.893, info.alt, EPSILON);
+  CU_ASSERT_EQUAL(6, debug.sVCount);
+
+  nema = "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F\0";
+
+  decodeNEMA(nema, &info, &debug);
+  CU_ASSERT_DOUBLE_EQUAL(420, info.t_b, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(-32, info.lat, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(7, info.lon, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(100000, info.alt, EPSILON);
+  CU_ASSERT_EQUAL(12, debug.sVCount);
 }
 
 
