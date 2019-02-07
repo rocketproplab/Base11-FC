@@ -8,9 +8,10 @@ void test_decodeNEMA(){
   GPSInfo info   = {0};
   GPSDebug debug = {0};
   char* nema     =
-    "$GPGGA,172814.0,3723.46587704,N,12202.26957864,W,2,6,1.2,18.893,M,-25.669,M,2.0,0031*4F";
+    "$GPGGA,172814.0,3723.46587704,N,12202.26957864,W,2,6,1.2,18.893,M,-25.669,M,2.0,0031*4F\0";
 
   decodeNEMA(nema, &info, &debug);
+  printf("time = %lf\n", info.t_b);
   CU_ASSERT_DOUBLE_EQUAL(172814, info.t_b, EPSILON);
 }
 
