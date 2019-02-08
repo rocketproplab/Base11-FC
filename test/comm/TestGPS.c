@@ -29,7 +29,7 @@ void test_decodeNEMA(){
 
 void test_isNEMAAvalaible(){
   GPS_Internal gpsState = {0};
-  strcpy((char *) &gpsState.nemaMessage, (char *) "Not a full nema");
+  strcpy((char *) &gpsState.nemaMessage, (char *) "Not a full nema\0");
 
   CU_ASSERT_FALSE(isNEMAAvaliable(&gpsState));
 
@@ -37,6 +37,36 @@ void test_isNEMAAvalaible(){
          (char *) "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F\0");
 
   CU_ASSERT_TRUE(isNEMAAvaliable(&gpsState));
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F\0");
+
+  CU_ASSERT_FALSE(isNEMAAvaliable(&gpsState));
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.66\0");
+
+  CU_ASSERT_FALSE(isNEMAAvaliable(&gpsState));
+}
+
+void test_findNEMA(){
+  GPS_Internal gpsState = {0};
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "a$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FBlaasdfasd\0");
+
+  CU_ASSERT_STRING_EQUAL(findNEMA(
+                           &gpsState),
+                         "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "**************asdfasdf**$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FB$**$$$$");
+  CU_ASSERT_STRING_EQUAL(findNEMA(
+                           &gpsState),
+                         "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "2.0,0031*4FB**$$$$");
+  CU_ASSERT_EQUAL(findNEMA(&gpsState),  NULL);
 }
 
 
@@ -61,6 +91,11 @@ int testGPS(){
   }
 
   if(NULL == CU_add_test(pSuite, "Test NEMA Avalaible", test_isNEMAAvalaible)){
+    CU_cleanup_registry();
+    return CU_get_error();
+  }
+
+  if(NULL == CU_add_test(pSuite, "Test Find NEMA", test_findNEMA)){
     CU_cleanup_registry();
     return CU_get_error();
   }

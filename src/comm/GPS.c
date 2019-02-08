@@ -12,10 +12,14 @@
 
 #define NEMA_DELIM ","
 #define NEMA_MAX_SIZE 1024
+#define NEMA_START_CHAR '$'
+#define NEMA_CHECKSUM_CHAR '*'
+#define NULL_TERMINATOR_SIZE 1
+#define NEMA_CHECKSUM_SIZE 2
 
 typedef struct GPS_Internal {
   struct sp_port * serialport;
-  char nemaMessage[NEMA_MAX_SIZE];
+  char nemaMessage[NEMA_MAX_SIZE + NULL_TERMINATOR_SIZE];
   int currentNemaPos;
 } GPS_Internal;
 
@@ -91,6 +95,8 @@ int trySerialRead(GPS_Internal * gpsState){
   return sp_nonblocking_read(gpsState->serialport, nemaBuf, maxReadLen);
 }
 
+
+
 /*
  * Checks if a full NEMA string has been read by the serial port
  *
@@ -99,7 +105,50 @@ int trySerialRead(GPS_Internal * gpsState){
  * @return 0 if no NEMA is avaliable, otherwies positive.
  */
 int isNEMAAvaliable(GPS_Internal * gpsState){
-  return FALSE;
+  char * startIndex;
+  char * endIndex;
+  char * nema = (char *) gpsState->nemaMessage;
+
+  startIndex = strchr(nema, NEMA_START_CHAR);
+  if(startIndex == NULL){
+    return FALSE;
+  }
+
+  endIndex = strchr(startIndex, NEMA_CHECKSUM_CHAR);
+  return endIndex != NULL;
+}
+
+/*
+ * Locates the NEMA string within the currently read buffer, returns null if
+ * no string can be found.
+ *
+ * @param gpsState the internal GPS state
+ *
+ * @return a new string on the heap containing only the nema string
+ */
+char * findNEMA(GPS_Internal * gpsState){
+  char * startIndex;
+  char * endIndex;
+  char * nema = (char *) gpsState->nemaMessage;
+  char * returnStr;
+  int returnStrSize;
+
+  startIndex = strchr(nema, NEMA_START_CHAR);
+  if(startIndex == NULL){
+    return NULL;
+  }
+
+  endIndex = strchr(startIndex, NEMA_CHECKSUM_CHAR);
+  if(endIndex == NULL){
+    return NULL;
+  }
+
+  returnStrSize  = endIndex - startIndex + 1;
+  returnStrSize += NULL_TERMINATOR_SIZE + NEMA_CHECKSUM_SIZE;
+  returnStr      = malloc(returnStrSize);
+  strncpy(returnStr, startIndex, returnStrSize - NULL_TERMINATOR_SIZE);
+  returnStr[returnStrSize - 1] = NULL;
+  return returnStr;
 }
 
 
