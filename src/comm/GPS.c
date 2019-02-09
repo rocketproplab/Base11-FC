@@ -151,5 +151,25 @@ char * findNEMA(GPS_Internal * gpsState){
   return returnStr;
 }
 
+void parseNEMA(GPS_Internal *gpsState, GPSInfo * gpsInfo, GPSDebug * gpsDebug){
+  char * nema;
+  int nemaLen;
 
-void GPSReadTask(){}
+  if(!isNEMAAvaliable(gpsState)){
+    return;
+  }
+
+  nema = findNEMA(gpsState);
+  nemaLen = strlen(nema);
+
+  decodeNEMA(nema, gpsInfo, gpsDebug);
+
+  free(nema);
+}
+
+
+void GPSReadTask(){
+  while(TRUE){
+
+  }
+}

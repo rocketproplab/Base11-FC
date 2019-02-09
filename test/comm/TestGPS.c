@@ -51,24 +51,64 @@ void test_isNEMAAvalaible(){
 
 void test_findNEMA(){
   GPS_Internal gpsState = {0};
+  char * nemaFound;
+
   strcpy((char *) &gpsState.nemaMessage,
          (char *) "a$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FBlaasdfasd\0");
 
-  CU_ASSERT_STRING_EQUAL(findNEMA(
-                           &gpsState),
+  nemaFound = findNEMA(&gpsState);
+
+  CU_ASSERT_STRING_EQUAL(nemaFound,
                          "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+  free(nemaFound);
 
   strcpy((char *) &gpsState.nemaMessage,
          (char *) "**************asdfasdf**$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FB$**$$$$");
-  CU_ASSERT_STRING_EQUAL(findNEMA(
-                           &gpsState),
+  nemaFound = findNEMA(&gpsState);
+  CU_ASSERT_STRING_EQUAL(nemaFound,
                          "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+  free(nemaFound);
 
   strcpy((char *) &gpsState.nemaMessage,
          (char *) "2.0,0031*4FB**$$$$");
   CU_ASSERT_EQUAL(findNEMA(&gpsState),  NULL);
 }
 
+void test_parseNEMA(){
+  GPSInfo info   = {0};
+  GPSDebug debug = {0};
+  GPS_Internal gpsState = {0};
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "a$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FBlaasdfasd\0");
+
+  parseNEMA(&gpsState, &info, &debug);
+
+  CU_ASSERT_STRING_EQUAL(&gpsState, "Blaasdfasd");
+  CU_ASSERT_DOUBLE_EQUAL(420, info.t_b, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(-32, info.lat, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(7, info.lon, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(100000, info.alt, EPSILON);
+  CU_ASSERT_EQUAL(12, debug.sVCount);
+
+  memset(&info, 0, sizeof( GPSInfo ));
+  memset(&debug, 0, sizeof( GPSDebug ));
+  memset(&gpsState, 0, sizeof( GPS_Internal ));
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FBlaasdfasd\0");
+
+  parseNEMA(&gpsState, &info, &debug);
+
+  CU_ASSERT_STRING_EQUAL(&gpsState.nemaMessage,
+                         "GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FBlaasdfasd\0");
+  CU_ASSERT_DOUBLE_EQUAL(0, info.t_b, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(0, info.lat, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(0, info.lon, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(0, info.alt, EPSILON);
+  CU_ASSERT_EQUAL(0, debug.sVCount);
+
+}
 
 int testGPS(){
   CU_pSuite pSuite = NULL;
@@ -96,6 +136,11 @@ int testGPS(){
   }
 
   if(NULL == CU_add_test(pSuite, "Test Find NEMA", test_findNEMA)){
+    CU_cleanup_registry();
+    return CU_get_error();
+  }
+
+  if(NULL == CU_add_test(pSuite, "Test Parse NEMA", test_parseNEMA)){
     CU_cleanup_registry();
     return CU_get_error();
   }
