@@ -5,6 +5,8 @@
 //Need 3 dimensions of data and time
 double velocityFromAltitude(/* TODO */) {
 
+
+  /* TODO need to make this compile @@atmartorana
   double deltaX = x2 - x1;
   double deltaY = y2 - y1;
   double deltaZ = z2 - z1;
@@ -16,5 +18,5 @@ double velocityFromAltitude(/* TODO */) {
 
   double velocity = sqrt(pow(velocityX,SQUARED) + pow(velocityY,SQUARED) + pow(velocityZ,SQUARED));
 
-  return velocity;
+  return velocity; */
 }
