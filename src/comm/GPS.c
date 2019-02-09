@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libserialport.h>
+#include <stdio.h>
 
 #include "GPS.h"
 #include "Coroutines.h"
@@ -26,8 +27,8 @@ typedef struct GPS_Internal {
   int currentNemaPos;
 } GPS_Internal;
 
-static GPSInfo currentInfo   = {0};
-static GPSDebug currentDebug = {0};
+static GPSInfo currentInfo        = {0};
+static GPSDebug currentDebug      = {0};
 static GPS_Internal internalState = {0};
 
 void grabNext(char ** string);
@@ -215,11 +216,71 @@ GPSDebug * getGPSDebug(){
   return &currentDebug;
 }
 
-
+/*
+ * the task for reading the GPS data from the USB serial
+ */
 void GPSReadTask(){
   while(TRUE){
     trySerialRead(&internalState);
     parseNEMA(&internalState, &currentInfo, &currentDebug);
     NextTask();
+  }
+}
+
+
+/*
+ * finds the port given the serial number of the device we are looking for.
+ *
+ * @param devSerial the serail device we are looking for
+ * @return the serial port or null if no dev can be found
+ */
+struct sp_port * getPort(char * devSerial){
+  int returnVal;
+  struct sp_port ** portList   = 0;
+  struct sp_port ** curretPort = 0;
+  struct sp_port * portReturn  = NULL;
+  returnVal  = sp_list_ports(&portList);
+  curretPort = portList;
+
+  if(returnVal >= 0){
+    while(*curretPort != NULL){
+      char * name;
+      char * serial;
+      name   = sp_get_port_name(*curretPort);
+      serial = sp_get_port_usb_serial(*curretPort);
+
+      if(strcmp(devSerial, serial) == 0){
+        sp_copy_port(*curretPort, &portReturn);
+        break;
+      }
+
+      curretPort++;
+    }
+    sp_free_port_list(portList);
+  } else {
+    fprintf(stderr, "Can't get port list!\n");
+  }
+
+  if(portReturn == NULL){
+    fprintf(stderr, "Could not find port for seriall # %s!\n", devSerial);
+  }
+
+  return portReturn;
+}
+
+/*
+ * initializes the serial ports for the GPS
+ */
+void GPSInit(char * serial){
+  struct sp_port * port;
+  port = getPort(serial);
+  if(port != NULL){
+    enum sp_return returnValue;
+    returnValue = sp_open(port, SP_MODE_READ);
+    if(returnValue != SP_OK){
+      fprintf(stderr, "Unable to open port with seriall #%s!\n", serial);
+    } else {
+      internalState.serialport = port;
+    }
   }
 }
