@@ -14,6 +14,7 @@ set_target_properties (Base11FC_tests PROPERTIES LINK_FLAGS "-Wall")
 set(LIBSERIALPORT_DIR ${PROJECT_SOURCE_DIR}/../libserialport)
 
 target_link_libraries(Base11FC_tests
+  Base11FC_lib
   -lcunit
   ${LIBSERIALPORT_DIR}/serialport.o
   ${LIBSERIALPORT_DIR}/linux.o

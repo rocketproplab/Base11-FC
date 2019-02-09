@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.2)
 project(Base11FC)
 
-set(SOURCE_FILES main.c)
+file(GLOB SOURCE_FILES *.c comm/*.c)
 
 add_executable(Base11FC ${SOURCE_FILES})
+add_library(Base11FC_lib STATIC ${SOURCE_FILES})
 
 set(LIBSERIALPORT_DIR ${PROJECT_SOURCE_DIR}/../libserialport)
 

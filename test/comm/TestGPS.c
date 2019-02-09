@@ -56,7 +56,7 @@ void test_findNEMA(){
   strcpy((char *) &gpsState.nemaMessage,
          (char *) "a$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FBlaasdfasd\0");
 
-  nemaFound = findNEMA(&gpsState);
+  nemaFound = findNEMA(&gpsState, NULL);
 
   CU_ASSERT_STRING_EQUAL(nemaFound,
                          "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
@@ -64,14 +64,17 @@ void test_findNEMA(){
 
   strcpy((char *) &gpsState.nemaMessage,
          (char *) "**************asdfasdf**$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FB$**$$$$");
-  nemaFound = findNEMA(&gpsState);
+  nemaFound = findNEMA(&gpsState, NULL);
   CU_ASSERT_STRING_EQUAL(nemaFound,
                          "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
   free(nemaFound);
 
   strcpy((char *) &gpsState.nemaMessage,
          (char *) "2.0,0031*4FB**$$$$");
-  CU_ASSERT_EQUAL(findNEMA(&gpsState),  NULL);
+  nemaFound = findNEMA(&gpsState, NULL);
+  CU_ASSERT_EQUAL(nemaFound,  NULL);
+
+  free(nemaFound);
 }
 
 void test_parseNEMA(){
@@ -82,14 +85,17 @@ void test_parseNEMA(){
   strcpy((char *) &gpsState.nemaMessage,
          (char *) "a$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4FBlaasdfasd\0");
 
+  gpsState.currentNemaPos = 72;
+
   parseNEMA(&gpsState, &info, &debug);
 
-  CU_ASSERT_STRING_EQUAL(&gpsState, "Blaasdfasd");
+  CU_ASSERT_STRING_EQUAL(&gpsState.nemaMessage, "Blaasdfasd");
   CU_ASSERT_DOUBLE_EQUAL(420, info.t_b, EPSILON);
   CU_ASSERT_DOUBLE_EQUAL(-32, info.lat, EPSILON);
   CU_ASSERT_DOUBLE_EQUAL(7, info.lon, EPSILON);
   CU_ASSERT_DOUBLE_EQUAL(100000, info.alt, EPSILON);
   CU_ASSERT_EQUAL(12, debug.sVCount);
+  CU_ASSERT_EQUAL(gpsState.currentNemaPos, 11);
 
   memset(&info, 0, sizeof( GPSInfo ));
   memset(&debug, 0, sizeof( GPSDebug ));
@@ -107,6 +113,31 @@ void test_parseNEMA(){
   CU_ASSERT_DOUBLE_EQUAL(0, info.lon, EPSILON);
   CU_ASSERT_DOUBLE_EQUAL(0, info.alt, EPSILON);
   CU_ASSERT_EQUAL(0, debug.sVCount);
+
+  strcpy((char *) &gpsState.nemaMessage,
+         (char *) "B$GPGGA,1,1,N,1,W,1,1,1,1,M,1,M,1,1*4F$GPGGA,2,2,N,2,W,2,2,2,2,M,2,M,2,2*4F");
+  gpsState.currentNemaPos = 75;
+
+  parseNEMA(&gpsState, &info, &debug);
+
+  CU_ASSERT_STRING_EQUAL(&gpsState.nemaMessage,
+                         "$GPGGA,2,2,N,2,W,2,2,2,2,M,2,M,2,2*4F");
+  CU_ASSERT_DOUBLE_EQUAL(1, info.t_b, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(1, info.lat, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(1, info.lon, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(1, info.alt, EPSILON);
+  CU_ASSERT_EQUAL(1, debug.sVCount);
+  CU_ASSERT_EQUAL(gpsState.currentNemaPos, 37);
+
+  parseNEMA(&gpsState, &info, &debug);
+
+  CU_ASSERT_STRING_EQUAL(&gpsState.nemaMessage,"");
+  CU_ASSERT_DOUBLE_EQUAL(2, info.t_b, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(2, info.lat, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(2, info.lon, EPSILON);
+  CU_ASSERT_DOUBLE_EQUAL(2, info.alt, EPSILON);
+  CU_ASSERT_EQUAL(2, debug.sVCount);
+  CU_ASSERT_EQUAL(gpsState.currentNemaPos, 0);
 
 }
 
