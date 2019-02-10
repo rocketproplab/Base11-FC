@@ -1,5 +1,10 @@
 #include "stdio.h"
+#include "comm/TestComm.c"
+
 
 int main( int argc, char** argv){
-  printf("Your tests have now been run\n");
+  int retVal = 0;
+  retVal |= testComm();
+
+  return retVal;
 }

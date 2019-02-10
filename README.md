@@ -8,6 +8,18 @@ This is the repository which houses the code for RPL's flight computer.
 
 To build you must install cmake and cunit.
 
+After that Initialize the libserialport submodule and build libserialport.
+
+```bash
+git submodule init libserialport
+git submodule update libserialport
+cd libserialport
+./autogen.sh
+./configure
+make
+cd ..
+```
+
 Then create a build directory, run cmake and run make.
 
 ```bash
@@ -20,6 +32,9 @@ $ make
 After compiling there will be two folders in build, src and test. In src the
 program executable Base11FC is the Flight Computer program. In test there is
 the test executable Base11FC_tests which when run will run all the tests.
+
+After building once you can use the watchBuild.sh script to watch for changes
+and autobuild and run the tests.
 
 ### Contributing
 

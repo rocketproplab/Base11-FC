@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 project(Base11FC_tests)
 
-include_directories(${BASE11_FC_HEADERS_DIR})
+include_directories(${BASE11_FC_HEADERS_DIR} ${PROJECT_SOURCE_DIR}/test/)
 
 set(SOURCE_FILES test_main.c)
 
@@ -11,6 +11,12 @@ link_directories(/usr/lib/)
 
 set_target_properties (Base11FC_tests PROPERTIES LINK_FLAGS "-Wall")
 
-target_link_libraries(Base11FC_tests -lcunit)
+set(LIBSERIALPORT_DIR ${PROJECT_SOURCE_DIR}/../libserialport)
 
-add_test (test_lib ${EXECUTABLE_OUTPUT_PATH}/test_fc)
+target_link_libraries(Base11FC_tests
+  Base11FC_lib
+  -lcunit
+  ${LIBSERIALPORT_DIR}/serialport.o
+  ${LIBSERIALPORT_DIR}/linux.o
+  ${LIBSERIALPORT_DIR}/linux_termios.o
+)
