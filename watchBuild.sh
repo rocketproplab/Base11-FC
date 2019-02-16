@@ -1,4 +1,5 @@
 #!/bin/bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/WiringPi/wiringPi
 if [ ! -f build/ ]; then    #check if the build directory exists
   mkdir -p build            #if not create it and run cmake
   cd build
