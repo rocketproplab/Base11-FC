@@ -6,12 +6,10 @@ file(GLOB SOURCE_FILES *.c comm/*.c)
 add_executable(Base11FC ${SOURCE_FILES})
 add_library(Base11FC_lib STATIC ${SOURCE_FILES})
 
-set(LIBSERIALPORT_DIR ${PROJECT_SOURCE_DIR}/../libserialport)
+set(LIBWIREINGPI_DIR ${PROJECT_SOURCE_DIR}/../WiringPi/wiringPi)
 
 target_link_libraries(Base11FC
-  ${LIBSERIALPORT_DIR}/serialport.o
-  ${LIBSERIALPORT_DIR}/linux.o
-  ${LIBSERIALPORT_DIR}/linux_termios.o
+  ${LIBWIREINGPI_DIR}/libwiringPi.so.2.46
 )
 
 install(TARGETS Base11FC DESTINATION ${BASE11_FC_INSTALL_BIN_DIR})

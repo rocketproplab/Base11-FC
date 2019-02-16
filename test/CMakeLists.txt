@@ -11,12 +11,10 @@ link_directories(/usr/lib/)
 
 set_target_properties (Base11FC_tests PROPERTIES LINK_FLAGS "-Wall")
 
-set(LIBSERIALPORT_DIR ${PROJECT_SOURCE_DIR}/../libserialport)
+set(LIBWIREINGPI_DIR ${PROJECT_SOURCE_DIR}/../WiringPi/wiringPi)
 
 target_link_libraries(Base11FC_tests
   Base11FC_lib
   -lcunit
-  ${LIBSERIALPORT_DIR}/serialport.o
-  ${LIBSERIALPORT_DIR}/linux.o
-  ${LIBSERIALPORT_DIR}/linux_termios.o
+  ${LIBWIREINGPI_DIR}/libwiringPi.so.2.46
 )
