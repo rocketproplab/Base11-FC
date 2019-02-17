@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "comm/TestComm.c"
+#include "test_FlightMode.c"
 
 
 int main( int argc, char** argv){
