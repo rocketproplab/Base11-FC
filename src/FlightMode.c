@@ -13,6 +13,7 @@ static FlightModeState flightState = {0};
 void checkForApogee();
 void checkFalling();
 void checkLanded();
+void updateFlightMode();
 
 /**
  * gets the current flight mode for the rocket
@@ -25,7 +26,12 @@ enum FlightMode getFlightMode(){
 /**
  * The task funtion to run all the computation necessary for the flight mode
  */
-void FlightModeTask(){}
+void FlightModeTask(){
+  while(1){
+    updateFlightMode();
+    NextTask();
+  }
+}
 
 /**
  * Initializes the flight mode subsystem
