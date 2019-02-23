@@ -1,4 +1,5 @@
 #include "FlightMode.h"
+#include <uev/uev.h>
 
 typedef struct FlightModeState {
 
@@ -31,5 +32,16 @@ void InitFlightMode(){
  * @param FlightMode the flight mode to wait for
  */
 void waitForFlightMode(enum FlightMode flightMode){
+
+}
+
+/**
+ * Called when the engien changes its state
+ *
+ * @param watch pointer to the uev_t watcher
+ * @param arg the arguments passed to this event
+ * @param events the events which are changed
+ */
+void engineCallback(uev_t *watch, void *arg, int events){
 
 }

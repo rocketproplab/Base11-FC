@@ -2,7 +2,3 @@
 	path = WiringPi
 	url = https://github.com/WiringPi/WiringPi.git
 	ignore = dirty
-[submodule "libuev"]
-	path = libuev
-	url = https://github.com/troglobit/libuev
-	ignore = dirty

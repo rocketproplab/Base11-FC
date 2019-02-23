@@ -13,6 +13,7 @@ set(BASE11_FC_HEADERS_DIR ${PROJECT_SOURCE_DIR}/src)
 include_directories(${BASE11_FC_INSTALL_INCLUDE_DIR})
 include_directories(${BASE11_FC_HEADERS_DIR})
 include_directories(WiringPi/wiringPi)
+include_directories(libuev/.out/usr/local/include)
 
 add_subdirectory(src)
 add_subdirectory(test)
