@@ -23,6 +23,18 @@ make
 cd ../..
 ```
 
+Then you need to build libuev which can be done by
+```bash
+git submodule init libuev
+git submodule update libuev
+cd libuev
+./autogen.sh
+./configure
+make
+make check
+make DESTDIR=`pwd`/.out/ install-strip
+```
+
 Then create a build directory, run cmake and run make.
 
 ```bash
