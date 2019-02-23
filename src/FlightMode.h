@@ -1,3 +1,6 @@
+#ifndef FLIGHT_MODE_GAURD
+#define FLIGHT_MODE_GAURD
+
 /**
  *  The state of the rocket
  *  Sitting   - On the launch pad but no ignition yet
@@ -27,6 +30,17 @@ void InitFlightMode();
 
 /**
  * Waits until the given flight mode has been reached.
- * @param FlightMode the flight mode to wait for
+ * @param flightMode the flight mode to wait for
  */
-void waitForFlightMode(enum FlightMode);
+void waitForFlightMode(enum FlightMode flightMode);
+
+/**
+ * Called when there is new infromation regarding the velocity of the rocket.
+ * @param vertical the vertical speed of the rocket in m/s
+ * @param heading the heading 0 is due north 180 is south
+ * @param groundSpeed the speed in m/s across the ground
+ */
+void flightModeVelocityUpdate(double vertical, double heading,
+                              double groundSpeed);
+
+#endif
