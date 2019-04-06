@@ -1,6 +1,0 @@
-#ifndef TEST_CONSTANTS_B11
-#define TEST_CONSTANTS_B11
-
-#define EPSILON 0.00001
-
-#endif
