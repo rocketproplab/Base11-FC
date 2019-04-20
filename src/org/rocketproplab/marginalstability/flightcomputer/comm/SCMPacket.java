@@ -2,9 +2,9 @@ package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 public class SCMPacket {
 
-  public String  id;
-  public String  data;
-  public boolean isValid;
+  private String  id;
+  private String  data;
+  private boolean isValid;
 
   public static int LAST_THREE_CHARS      = 3;
   public static int NUM_CHARS_PACKET      = 12;
@@ -89,7 +89,7 @@ public class SCMPacket {
     return this.data;
   }
   
-  public boolean getIsValid() {
+  public boolean isValid() {
     return this.isValid;
   }
   
