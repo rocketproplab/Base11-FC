@@ -17,14 +17,14 @@ public interface EngineEventListener {
    * @param type the type of data which was received
    * @param value the value of the data which was received
    */
-  public void onEngineData(EngienDataType type, double value);
+  public void onEngineData(EngineDataType type, double value);
   
   /**
    * The different types of data which relate to the engine
    * @author Max Apodaca
    *
    */
-  public enum EngienDataType {
+  public enum EngineDataType {
     /**
      * Temperature of the engine bell
      */

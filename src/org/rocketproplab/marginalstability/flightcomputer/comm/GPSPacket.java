@@ -79,7 +79,7 @@ public class GPSPacket {
   }
 
   /**
-   * @return the time at which packet was received by GPS
+   * @return the time at which packet was received by GPS in seconds
    */
   public double getTime() {
     return time;
