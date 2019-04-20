@@ -7,6 +7,7 @@ public class SCMPacket {
   public boolean isValid;
 
   public static int LAST_THREE_CHARS      = 3;
+  public static int NUM_CHARS_PACKET      = 12;
   public static int NUM_COMPONENTS_PACKET = 3;
 
   /**
@@ -27,7 +28,8 @@ public class SCMPacket {
   public void parsepacket(String packet) {
     String[] packetComponents = packet.split(",");
 
-    if (packetComponents.length != NUM_COMPONENTS_PACKET) {
+    if (packet.toCharArray().length != NUM_CHARS_PACKET
+        || packetComponents.length != NUM_COMPONENTS_PACKET) {
       this.isValid = false;
       return;
     }
@@ -36,9 +38,9 @@ public class SCMPacket {
     int    checksum    = Integer.parseInt(strChecksum);
 
     if (verifyChecksum(packet, checksum)) {
-      this.id   = packetComponents[0];
-      this.data = packetComponents[1];
-      this.isValid   = true;
+      this.id      = packetComponents[0];
+      this.data    = packetComponents[1];
+      this.isValid = true;
     } else {
       this.isValid = false;
     }
@@ -78,10 +80,35 @@ public class SCMPacket {
 
     return calculatedChecksum;
   }
-
+  
+  public String getID() {
+    return this.id;
+  }
+  
+  public String getData() {
+    return this.data;
+  }
+  
+  public boolean getIsValid() {
+    return this.isValid;
+  }
+  
   /**
-   * toString method that returns the original packet and the components
-   * 
-   * @return original message and components formatted in a String
+   * Encodes id and data into a packet
+   * @param id
+   * @param data
+   * @return the packet as String
    */
+  public static String encodeSCMPacket(String id, String data ) {
+    String packet = id + "," + data + ",";
+    
+    int addedASCII = 0;
+    for (int i = 0; i < packet.length(); i++) {
+      addedASCII += packet.charAt(i);
+    }
+    int calculatedChecksum = addedASCII % 100;
+    
+    packet = packet + Integer.toString(calculatedChecksum) + ";";
+    return packet;
+  }
 }
