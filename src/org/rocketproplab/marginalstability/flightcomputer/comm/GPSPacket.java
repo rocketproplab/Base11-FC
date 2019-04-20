@@ -17,10 +17,18 @@ public class GPSPacket {
   private double  time;
   private int     sVCount;
 
+  /**
+   * Create a new GPS Packet based on the NEMA String
+   * @param nEMA the nema to make the packet of
+   */
   public GPSPacket(String nEMA) {
     this.parseNEMA(nEMA);
   }
 
+  /**
+   * Internally parses the NEMA for the packet
+   * @param nEMA the nema to assign this packet to
+   */
   private void parseNEMA(String nEMA) {
     String[] nEMAParts = nEMA.split(NEMA_DELIMITER);
     if (nEMAParts.length != NEMA_PART_LENGTH) {
