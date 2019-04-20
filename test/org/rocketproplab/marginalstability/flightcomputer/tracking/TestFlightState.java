@@ -83,6 +83,35 @@ public class TestFlightState {
   }
   
   @Test
+  public void InFallingEvenIfSkipApogee() {
+    FlightState flightState = new FlightState();
+    flightState.onEngineActivation();
+    flightState.onEngineShutdown();
+    flightState.onVelocityUpdate(new Vector3(0, 0, Settings.APOGEE_SPEED + 100),
+        0);
+
+    flightState.onVelocityUpdate(new Vector3(0, 0, Settings.APOGEE_SPEED + 1),
+        1);
+    flightState.onVelocityUpdate(new Vector3(0, 0, -Settings.APOGEE_SPEED - 1),
+        2);
+    assertEquals(FlightMode.Falling, flightState.getFlightMode());
+  }
+  
+  @Test
+  public void NotFallingIfNegativeVelInBurn() {
+    FlightState flightState = new FlightState();
+    flightState.onEngineActivation();
+    flightState.onVelocityUpdate(new Vector3(0, 0, Settings.APOGEE_SPEED + 100),
+        0);
+
+    flightState.onVelocityUpdate(new Vector3(0, 0, Settings.APOGEE_SPEED + 1),
+        1);
+    flightState.onVelocityUpdate(new Vector3(0, 0, -Settings.APOGEE_SPEED - 1),
+        2);
+    assertEquals(FlightMode.Burn, flightState.getFlightMode());
+  }
+  
+  @Test
   public void InDescendingAfterMainChuteOpens() {
     FlightState flightState = new FlightState();
     flightState.onEngineActivation();
