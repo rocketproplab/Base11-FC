@@ -7,4 +7,9 @@ public class Settings {
    */
   public static double APOGEE_SPEED = 10; // m/s
   
+  /**
+   * The speed we need to be moving less than to be considered landed
+   */
+  public static double LANDED_SPEED = 1; // m/s
+  
 }
