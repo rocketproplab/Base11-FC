@@ -12,6 +12,10 @@ set(BASE11_FC_HEADERS_DIR ${PROJECT_SOURCE_DIR}/src)
 
 include_directories(${BASE11_FC_INSTALL_INCLUDE_DIR})
 include_directories(${BASE11_FC_HEADERS_DIR})
+include_directories(libserialport)
 
 add_subdirectory(src)
 add_subdirectory(test)
+
+enable_testing()
+add_test (NAME all COMMAND Base11FC_tests)
