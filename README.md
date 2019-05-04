@@ -6,20 +6,11 @@ This is the repository which houses the code for RPL's flight computer.
 
 ### Building
 
-To build you must install cmake and cunit.
-
-Then create a build directory, run cmake and run make.
-
-```bash
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-```
-
-After compiling there will be two folders in build, src and test. In src the
-program executable Base11FC is the Flight Computer program. In test there is
-the test executable Base11FC_tests which when run will run all the tests.
+The build system is currently integrated with the Eclipse development
+environment. As a result to work on the project first clone the project into
+an existing workspace and then create a new project of the same name as the
+newly cloned folder. Remember to add the JUnit library and you should be good
+to go.
 
 ### Contributing
 
