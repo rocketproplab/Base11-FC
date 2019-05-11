@@ -1,8 +1,6 @@
 package org.rocketproplab.marginalstability.flightcomputer.routing;
 
 import java.lang.*;
-import java.util.Random;
-
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 
 

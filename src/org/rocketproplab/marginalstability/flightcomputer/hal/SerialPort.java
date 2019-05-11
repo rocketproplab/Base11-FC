@@ -14,5 +14,5 @@ public interface SerialPort {
 	/*
 	 * Read data from serial port
 	 */
-	public void read(String data);
+	public String read(String data);
 }
