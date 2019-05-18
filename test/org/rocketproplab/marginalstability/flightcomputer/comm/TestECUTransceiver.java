@@ -13,19 +13,13 @@ public class TestECUTransceiver {
   private class TestSerialPort implements SerialPort {
 
     public ArrayList<String> lastWritten;
-    public SerialListener    listener;
 
     public TestSerialPort() {
       this.lastWritten = new ArrayList<String>();
     }
 
-    public void sendMessage(String message) {
-      this.listener.onSerialData(message);
-    }
-
     @Override
     public void registerListener(SerialListener listener) {
-      this.listener = listener;
     }
 
     @Override
@@ -33,14 +27,10 @@ public class TestECUTransceiver {
       this.lastWritten.add(data);
     }
 
-    public void clearLastWritten() {
-      this.lastWritten.clear();
-    }
-
   }
 
   @Test
-  public void eCUTransciverRedirectsRecievedPacketToRouter() {
+  public void testECUTransciverRedirectsRecievedPacketToRouter() {
     PacketRouter                  router   = new PacketRouter();
     TestSerialPort                port     = new TestSerialPort();
     ECUTransceiver                tx       = new ECUTransceiver(port, router);
@@ -51,6 +41,24 @@ public class TestECUTransceiver {
     SCMPacket comparePacket = new SCMPacket(
         new SCMPacket(SCMPacketType.VS, "10010").toString());
     assertEquals(comparePacket, listener.lastPacket);
+    assertEquals(0, port.lastWritten.size());
+  }
+
+  @Test
+  public void testECUTransciverRedirectsRecivedPacketToPort() {
+    PacketRouter                  router   = new PacketRouter();
+    TestSerialPort                port     = new TestSerialPort();
+    ECUTransceiver                tx       = new ECUTransceiver(port, router);
+    TestPacketListener<SCMPacket> listener = new TestPacketListener<SCMPacket>();
+    router.addListener(listener, SCMPacket.class,
+        PacketSources.EngineControllerUnit);
+    router.addListener(tx, SCMPacket.class, PacketSources.EngineControllerUnit);
+    SCMPacket sourcePacket = new SCMPacket(
+        new SCMPacket(SCMPacketType.VS, "10010").toString());
+    router.sendPacket(sourcePacket, PacketSources.EngineControllerUnit);
+    assertEquals(sourcePacket.toString(), port.lastWritten.get(0));
+    assertEquals(1, port.lastWritten.size());
+    assertEquals(listener.lastDirection, PacketDirection.SEND);
   }
 
 }
