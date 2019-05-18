@@ -9,18 +9,14 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 public class TestPacketRouter {
 
   private PacketRouter            router;
-  private TestListener<SCMPacket> scmListener;
-  private TestListener<GPSPacket> gpsListener;
+  private TestPacketListener<SCMPacket> scmListener;
+  private TestPacketListener<GPSPacket> gpsListener;
 
-  private class TestListener<E> implements PacketListener<E> {
-
-    private E               lastPacket;
-    private PacketDirection lastDirection;
+  private class TestListenerTyped implements PacketListener<SCMPacket> {
 
     @Override
-    public void onPacket(PacketDirection direction, E packet) {
-      this.lastPacket    = packet;
-      this.lastDirection = direction;
+    public void onPacket(PacketDirection direction, SCMPacket packet) {
+
     }
 
   }
@@ -28,8 +24,8 @@ public class TestPacketRouter {
   @Before
   public void before() {
     router      = new PacketRouter();
-    scmListener = new TestListener<SCMPacket>();
-    gpsListener = new TestListener<GPSPacket>();
+    scmListener = new TestPacketListener<SCMPacket>();
+    gpsListener = new TestPacketListener<GPSPacket>();
   }
 
   @Test
@@ -58,7 +54,7 @@ public class TestPacketRouter {
     assertEquals(scmPacket, scmListener.lastPacket);
     assertEquals(PacketDirection.RECIVE, scmListener.lastDirection);
   }
-  
+
   @Test
   public void testPacketRouterFowardsTwoPacketsIndependently() {
     router.addListener(scmListener, SCMPacket.class, PacketSources.CommandBox);
@@ -69,20 +65,27 @@ public class TestPacketRouter {
     router.recivePacket(gpsPacket, PacketSources.GPS);
     assertEquals(scmPacket, scmListener.lastPacket);
     assertEquals(PacketDirection.SEND, scmListener.lastDirection);
-    
+
     assertEquals(gpsPacket, gpsListener.lastPacket);
     assertEquals(PacketDirection.RECIVE, gpsListener.lastDirection);
   }
-  
+
   @Test
   public void testPacketRouterDiscernsTwoSources() {
     router.addListener(scmListener, SCMPacket.class, PacketSources.CommandBox);
-    SCMPacket scmPacket = new SCMPacket("");
+    SCMPacket scmPacket  = new SCMPacket("");
     SCMPacket scmPacket2 = new SCMPacket("");
     router.sendPacket(scmPacket, PacketSources.CommandBox);
     router.sendPacket(scmPacket2, PacketSources.EngineControllerUnit);
     assertEquals(scmPacket, scmListener.lastPacket);
     assertEquals(PacketDirection.SEND, scmListener.lastDirection);
+  }
+
+  @Test
+  public void testDoesNotFailOnBadPacket() {
+    router.addListener(new TestListenerTyped(), Object.class,
+        PacketSources.CommandBox);
+    router.sendPacket(new Object(), PacketSources.CommandBox);
   }
 
 }
