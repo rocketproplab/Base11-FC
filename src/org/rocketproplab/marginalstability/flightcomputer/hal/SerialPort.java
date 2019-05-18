@@ -1,5 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
+import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
+
 public interface SerialPort {
 	/*
 	 * Register a serial port as a listener	
