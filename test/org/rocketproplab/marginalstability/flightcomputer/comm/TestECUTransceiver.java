@@ -47,9 +47,9 @@ public class TestECUTransceiver {
     TestPacketListener<SCMPacket> listener = new TestPacketListener<SCMPacket>();
     router.addListener(listener, SCMPacket.class,
         PacketSources.EngineControllerUnit);
-    tx.onSerialData(SCMPacket.encodeSCMPacket("VS", "10010"));
+    tx.onSerialData(new SCMPacket(SCMPacketType.VS, "10010").toString());
     SCMPacket comparePacket = new SCMPacket(
-        SCMPacket.encodeSCMPacket("VS", "10010"));
+        new SCMPacket(SCMPacketType.VS, "10010").toString());
     assertEquals(comparePacket, listener.lastPacket);
   }
 
