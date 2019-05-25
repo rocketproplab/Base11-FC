@@ -1,6 +1,5 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
-import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,7 +76,6 @@ public class Telemetry {
     }
     SCMPacket packet = new SCMPacket(type, dataString);
     this.relay.sendPacket(packet, PacketSources.CommandBox);
-    this.logNumber(type, data);
     this.logger.log(Level.INFO, type.getName() + " is " + data);
   }
 
