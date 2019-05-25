@@ -184,14 +184,22 @@ public class SCMPacket {
       return false;
     }
     
-    if(!packet.id.equals(this.id)) {
+    if(packet.id == null) {
+      if(this.id != null) {
+        return false;
+      }
+    } else if(!packet.id.equals(this.id)) {
       return false;
     }
     
-    if(!packet.data.equals(this.data)){
+    if(packet.data == null) {
+      if(this.data != null) {
+        return false;
+      }
+    } else if(!packet.data.equals(this.data)){
       return false;
     }
     
-    return this.isValid;
+    return true;
   }
 }
