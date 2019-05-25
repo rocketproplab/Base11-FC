@@ -139,13 +139,4 @@ public class Telemetry {
     this.logger.log(Level.INFO, "Reporting Error: " + error.toString());
   }
 
-  /**
-   * Adds the number to the log file
-   * 
-   * @param type the type of data logged
-   * @param data the number which is to be logged
-   */
-  private void logNumber(SCMPacketType type, double data) {
-  }
-
 }
