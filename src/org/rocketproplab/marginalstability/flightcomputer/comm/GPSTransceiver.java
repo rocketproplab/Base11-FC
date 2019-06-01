@@ -3,10 +3,9 @@ package org.rocketproplab.marginalstability.flightcomputer.comm;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 
 /**
- * A class to handle the sending and receiving information from the any SCM
- * source.
+ * A class to handle the sending and receiving information from the GPS
  * 
- * @author Max Apodaca, Antonio
+ * @author Max Apodaca
  *
  */
 public class GPSTransceiver implements SerialListener {
