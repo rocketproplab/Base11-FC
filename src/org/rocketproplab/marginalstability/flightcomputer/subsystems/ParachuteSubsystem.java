@@ -18,6 +18,14 @@ import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
 public class ParachuteSubsystem
     implements FlightStateListener, PositionListener, Subsystem {
 
+  private static ParachuteSubsystem instance;
+  public static ParachuteSubsystem getInstance() {
+    if(instance == null) {
+      instance = new ParachuteSubsystem(null, null, null);
+    }
+    return instance;
+  }
+  
   private Solenoid             mainChute;
   private Solenoid             drogueChute;
   private FlightMode           lastMode;
