@@ -4,3 +4,4 @@ WiringPi/
 .classpath
 /dist/
 .project
+.DS_Store
