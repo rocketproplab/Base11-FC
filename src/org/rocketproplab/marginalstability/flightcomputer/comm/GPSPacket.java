@@ -2,13 +2,13 @@ package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 public class GPSPacket {
 
-  private static final String NEMA_DELIMITER           = ",";
-  private static final int    NEMA_PART_LENGTH         = 15;
-  private static final int    NEMA_TIME_INDEX          = 1;
-  private static final int    NEMA_LAT_INDEX           = 2;
-  private static final int    NEMA_LON_INDEX           = 4;
-  private static final int    NEMA_SV_COUNT_INDEX      = 7;
-  private static final int    NEMA_ALTITUDE_INDEX      = 9;
+  private static final String NEMA_DELIMITER      = ",";
+  private static final int    NEMA_PART_LENGTH    = 15;
+  private static final int    NEMA_TIME_INDEX     = 1;
+  private static final int    NEMA_LAT_INDEX      = 2;
+  private static final int    NEMA_LON_INDEX      = 4;
+  private static final int    NEMA_SV_COUNT_INDEX = 7;
+  private static final int    NEMA_ALTITUDE_INDEX = 9;
 
   private boolean valid;
   private double  latitude;
@@ -19,6 +19,7 @@ public class GPSPacket {
 
   /**
    * Create a new GPS Packet based on the NEMA String
+   * 
    * @param nEMA the nema to make the packet of
    */
   public GPSPacket(String nEMA) {
@@ -27,13 +28,14 @@ public class GPSPacket {
 
   /**
    * Internally parses the NEMA for the packet
+   * 
    * @param nEMA the nema to assign this packet to
    */
-  private void parseNEMA(String nEMA) {	
-	if (nEMA == null) {
-		this.valid = false;
-	   return;
-	}
+  private void parseNEMA(String nEMA) {
+    if (nEMA == null) {
+      this.valid = false;
+      return;
+    }
     String[] nEMAParts = nEMA.split(NEMA_DELIMITER);
     if (nEMAParts.length != NEMA_PART_LENGTH) {
       this.valid = false;
