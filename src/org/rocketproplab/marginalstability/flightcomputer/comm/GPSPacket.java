@@ -36,6 +36,10 @@ public class GPSPacket {
    * @param nEMA the nema to assign this packet to
    */
   private void parseNEMA(String nEMA) {
+    if (nEMA == null) {
+      this.valid = false;
+      return;
+    }
     String[] nEMAParts = nEMA.split(NEMA_DELIMITER);
     if (nEMAParts.length != NEMA_PART_LENGTH) {
       this.valid = false;
