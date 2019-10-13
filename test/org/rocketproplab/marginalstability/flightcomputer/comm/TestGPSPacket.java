@@ -1,6 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -32,6 +33,14 @@ public class TestGPSPacket {
     assertEquals(7, packet.getLongitude(), EPSILON);
     assertEquals(100000, packet.getAltitude(), EPSILON);
     assertEquals(12, packet.getSVCount());
+  }
+  
+  @Test
+  public void gPSPacketisInvalid() {
+	  String nEMA = null;
+	  GPSPacket packet = new GPSPacket(nEMA);
+	  
+	  assertFalse(packet.isValid()); 
   }
 
 }
