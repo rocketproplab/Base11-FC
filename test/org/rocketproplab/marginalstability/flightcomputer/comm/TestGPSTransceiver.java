@@ -12,14 +12,12 @@ public class TestGPSTransceiver {
     GPSTransceiver tx     = new GPSTransceiver(router);
 
     TestPacketListener<GPSPacket> listener = new TestPacketListener<GPSPacket>();
-
+    
     router.addListener(listener, GPSPacket.class, PacketSources.GPS);
-    tx.onSerialData(
-        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
-
-    GPSPacket comparePacket = new GPSPacket(new GPSPacket(
-        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F")
-            .toString());
+    
+    String nEMA = "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F";
+    tx.onSerialData(nEMA);
+    GPSPacket comparePacket = new GPSPacket(nEMA);
 
     assertEquals(comparePacket, listener.lastPacket);
   }
