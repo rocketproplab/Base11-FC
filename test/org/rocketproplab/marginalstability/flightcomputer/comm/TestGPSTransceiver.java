@@ -31,9 +31,7 @@ public class TestGPSTransceiver {
 
     router.addListener(listener, GPSPacket.class,
         PacketSources.EngineControllerUnit);
-    tx.onSerialData(new GPSPacket(
-        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F")
-            .toString());
+    tx.onSerialData("$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
 
     assertEquals(null, listener.lastPacket);
   }
