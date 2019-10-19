@@ -1,5 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.commands;
 
+import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
+
 /**
  * This is the super class for all commands. All commands will implement this
  * class.
@@ -30,5 +32,19 @@ public interface Command {
    * Called when the scheduler requests the command to stop
    */
   public void end();
+
+  /**
+   * Register a subsystem as a dependency for the command.
+   * 
+   * @param dependency The subsystem dependency
+   */
+  public void registerDependency(Subsystem dependency);
+
+  /**
+   * Retrieves a list of dependencies
+   * 
+   * @return array of subsystems
+   */
+  public Subsystem[] getDependencies();
 
 }
