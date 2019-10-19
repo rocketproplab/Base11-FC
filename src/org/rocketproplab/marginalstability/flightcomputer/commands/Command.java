@@ -16,7 +16,7 @@ public interface Command {
   /**
    * Returns whether the command has finished execution.
    */
-  public void isDone();
+  public boolean isDone();
 
   /**
    * Called by the scheduler every xx ms while the command is not done
