@@ -34,13 +34,6 @@ public interface Command {
   public void end();
 
   /**
-   * Register a subsystem as a dependency for the command.
-   * 
-   * @param dependency The subsystem dependency
-   */
-  public void registerDependency(Subsystem dependency);
-
-  /**
    * Retrieves a list of dependencies
    * 
    * @return array of subsystems
