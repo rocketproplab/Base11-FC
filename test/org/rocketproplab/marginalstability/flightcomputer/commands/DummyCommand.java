@@ -15,18 +15,19 @@ public class DummyCommand implements Command {
   public boolean done = false;
 
   /**
-   * Whether the command has been started by the scheduler;
+   * Whether the command has been started by the scheduler.
    */
   public boolean started = false;
 
   /**
    * Number of times execute must be called until command is done.
    */
-  public int  doneAfter = 1;
+  public int doneAfter = 1;
+  
   /**
    * Number of times execute has been called.
    */
-  private int counter   = 0;
+  private int counter = 0;
 
   @Override
   public boolean isDone() {
