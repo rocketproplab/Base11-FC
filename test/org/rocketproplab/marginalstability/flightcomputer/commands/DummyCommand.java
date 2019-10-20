@@ -23,7 +23,7 @@ public class DummyCommand implements Command {
    * Number of times execute must be called until command is done.
    */
   public int doneAfter = 1;
-  
+
   /**
    * Number of times execute has been called.
    */
