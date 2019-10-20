@@ -69,7 +69,7 @@ public class TestCommandScheduler {
    * A and C.
    * Expected order of commands: 3 & 4 in parallel
    * Since commands 3 and 4 do not require the same dependencies, they should
-   * both run together.
+   * both run at the same time.
    * 
    */
   @Test
@@ -96,6 +96,7 @@ public class TestCommandScheduler {
     CommandScheduler.getInstance().scheduleCommand(command1);
     CommandScheduler.getInstance().scheduleCommand(command2);
     CommandScheduler.getInstance().scheduleCommand(command3);
+    CommandScheduler.getInstance().scheduleCommand(command4);
 
     assertFalse(command1.isDone());
     assertFalse(command2.isDone());

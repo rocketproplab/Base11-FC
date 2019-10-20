@@ -2,8 +2,9 @@ package org.rocketproplab.marginalstability.flightcomputer.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.Queue;
+import java.util.List;
 
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 
@@ -43,7 +44,7 @@ public class CommandScheduler {
   private ArrayList<Command> queue;  
 
   /**
-   * Constructor for Command Scheduler.
+   * Constructor.
    */
   public CommandScheduler() {
     active = new ArrayList<Command>();
@@ -64,28 +65,46 @@ public class CommandScheduler {
    * Called every interval. Processes the queue.
    */
   public void tick() {
-    // TODO implement method
-  }
-  
-  /* old code
-  /**
-   * Called every xx interval.
-   *
-  public void tick() {
-    ArrayList<Subsystem> busySubsystems = new ArrayList<Subsystem>();
+    List<Subsystem> busySubsystems = new ArrayList<Subsystem>();
     
-    // Iterate over started commands and check if completed, otherwise execute.
-    Iterator<Command> startedcmdsIterator = started.iterator();
-    while (startedcmdsIterator.hasNext()) {
-      Command command = startedcmdsIterator.next();
+    // Process active commands.
+    Iterator<Command> activeCmdsIterator = active.iterator();
+    while (activeCmdsIterator.hasNext()) {
+      // Get next active command in list.
+      Command command = activeCmdsIterator.next();
       if (command.isDone()) {
-        // Command is done, remove from started list.
-        startedcmdsIterator.remove();
+        // Remove the last command from the active list.
+        activeCmdsIterator.remove();
       } else {
-        // Command is not done, add all dependencies to busySubsystems.
+        // Get the command's dependencies.
         busySubsystems.addAll(Arrays.asList(command.getDependencies()));
+        // Invoke command's execute method.
+        command.execute();
       }
     }
-  }*/
+    
+    // Process queue.
+    Iterator<Command> queueIterator = queue.iterator();
+    while (queueIterator.hasNext()) {
+      // Get next command in queue and it's dependencies.
+      Command command = queueIterator.next();
+      List<Subsystem> dependencies = Arrays.asList(command.getDependencies());
+      
+      // Check if command has no dependencies that are in-use.
+      if (Collections.disjoint(dependencies, busySubsystems)) {
+        queueIterator.remove();  // Remove command from queue.
+        command.start();         // Start command execution.
+        command.execute();
+        active.add(command);     // Add command to active list.
+      }
+      
+      // Add all of command's dependencies to busySubsystems list.
+      for (int d = 0; d < dependencies.size(); d++) {
+        if (!busySubsystems.contains(dependencies.get(d))) {
+          busySubsystems.add(dependencies.get(d));
+        }
+      }
+    }
+  }
 
 }
