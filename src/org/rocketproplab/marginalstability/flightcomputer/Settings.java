@@ -28,4 +28,9 @@ public class Settings {
    * Conversion constant for how many milliseconds are in a second
    */
   public static double MS_PER_SECOND = 1000; // ms/s
+  
+  /**
+   * How far off we are allowed to be to be equal
+   */
+  public static double EQUALS_EPSILON = 0.00000001;
 }
