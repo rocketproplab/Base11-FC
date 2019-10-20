@@ -1,4 +1,4 @@
-package org.rocketproplab.marginalstability.flightcomputer.commands;
+package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 

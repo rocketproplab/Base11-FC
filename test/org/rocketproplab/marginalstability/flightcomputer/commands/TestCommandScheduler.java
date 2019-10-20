@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.rocketproplab.marginalstability.flightcomputer.subsystems.DummySubsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 
 public class TestCommandScheduler {
