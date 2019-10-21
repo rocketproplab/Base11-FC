@@ -1,0 +1,7 @@
+build/
+WiringPi/
+/bin/
+.classpath
+/dist/
+.project
+.DS_Store
