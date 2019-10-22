@@ -1,8 +1,10 @@
 package org.rocketproplab.marginalstability.flightcomputer.commands;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -24,6 +26,77 @@ public class TestCommandScheduler {
 
     // new command scheduler must be different than singleton instance
     assertNotEquals(differentScheduler, singletonInstance);
+  }
+
+  @Test
+  public void testScheduleSameCommandMultipleTimes() {
+    CommandScheduler cs       = CommandScheduler.getInstance();
+    DummyCommand     command1 = new DummyCommand();
+    cs.scheduleCommand(command1);
+    cs.scheduleCommand(command1);
+    cs.scheduleCommand(command1);
+
+    assertFalse(command1.isDone());
+    assertEquals(0, command1.getNumberOfTimesExecuted());
+
+    cs.tick();
+
+    assertTrue(command1.isDone());
+    assertEquals(1, command1.getNumberOfTimesExecuted());
+
+    cs.scheduleCommand(command1);
+    cs.tick();
+
+    assertTrue(command1.isDone());
+    assertEquals(1, command1.getNumberOfTimesExecuted());
+
+    cs.scheduleCommand(command1);
+    cs.tick();
+
+    assertTrue(command1.isDone());
+    assertEquals(1, command1.getNumberOfTimesExecuted());
+  }
+
+  @Test
+  public void testSchedulerGetCommandUsingSubsystem() {
+    CommandScheduler cs = CommandScheduler.getInstance();
+
+    DummySubsystem sA = new DummySubsystem();
+    DummySubsystem sB = new DummySubsystem();
+    DummySubsystem sC = new DummySubsystem();
+
+    DummyCommand command1 = new DummyCommand();
+    command1.dependencies = new Subsystem[] { sA, sC };
+    DummyCommand command2 = new DummyCommand();
+    command2.dependencies = new Subsystem[] { sC };
+    DummyCommand command3 = new DummyCommand();
+    command3.dependencies = new Subsystem[] { sB };
+
+    cs.scheduleCommand(command1);
+    cs.scheduleCommand(command2);
+    cs.scheduleCommand(command3);
+
+    assertNull(cs.getCommandUsingSubsystem(sA));
+    assertNull(cs.getCommandUsingSubsystem(sB));
+    assertNull(cs.getCommandUsingSubsystem(sC));
+
+    cs.tick();
+
+    assertEquals(command1, cs.getCommandUsingSubsystem(sA));
+    assertEquals(command3, cs.getCommandUsingSubsystem(sB));
+    assertEquals(command1, cs.getCommandUsingSubsystem(sC));
+
+    cs.tick();
+
+    assertNull(cs.getCommandUsingSubsystem(sA));
+    assertNull(cs.getCommandUsingSubsystem(sB));
+    assertEquals(command2, cs.getCommandUsingSubsystem(sC));
+
+    cs.tick();
+
+    assertNull(cs.getCommandUsingSubsystem(sA));
+    assertNull(cs.getCommandUsingSubsystem(sB));
+    assertNull(cs.getCommandUsingSubsystem(sC));
   }
 
   @Test
@@ -59,18 +132,16 @@ public class TestCommandScheduler {
    * Tests scenarios:
    * 
    * 1. Command 1 in queue depends on subsystem A, command 2 depends on
-   * subsystems A and B, and command 3 depends on subsystem B.
-   * Expected order of commands: 1, 2, 3.
-   * Even though command 3 could run while command 1 is running, if we did
-   * that then we would be blocking command 2 from running since it depends
-   * on both subsystems A and B. Thus command 3 must not run until command 2
-   * is done.
+   * subsystems A and B, and command 3 depends on subsystem B. Expected order of
+   * commands: 1, 2, 3. Even though command 3 could run while command 1 is
+   * running, if we did that then we would be blocking command 2 from running
+   * since it depends on both subsystems A and B. Thus command 3 must not run
+   * until command 2 is done.
    * 
-   * 2. Command 3 depends on subsystem B and command 4 depends on subsystems
-   * A and C.
-   * Expected order of commands: 3 & 4 in parallel
-   * Since commands 3 and 4 do not require the same dependencies, they should
-   * both run at the same time.
+   * 2. Command 3 depends on subsystem B and command 4 depends on subsystems A
+   * and C. Expected order of commands: 3 & 4 in parallel Since commands 3 and 4
+   * do not require the same dependencies, they should both run at the same
+   * time.
    * 
    */
   @Test
@@ -92,17 +163,21 @@ public class TestCommandScheduler {
     DummyCommand command4 = new DummyCommand();
     command4.dependencies = new Subsystem[] { subsystemA, subsystemC };
     command4.doneAfter    = 1;
+    DummyCommand command5 = new DummyCommand();
+    command5.doneAfter    = 1;
 
     // Add all commands to scheduler
     CommandScheduler.getInstance().scheduleCommand(command1);
     CommandScheduler.getInstance().scheduleCommand(command2);
     CommandScheduler.getInstance().scheduleCommand(command3);
     CommandScheduler.getInstance().scheduleCommand(command4);
+    CommandScheduler.getInstance().scheduleCommand(command5);
 
     assertFalse(command1.isDone());
     assertFalse(command2.isDone());
     assertFalse(command3.isDone());
     assertFalse(command4.isDone());
+    assertFalse(command5.isDone());
 
     CommandScheduler.getInstance().tick();
 
@@ -110,6 +185,7 @@ public class TestCommandScheduler {
     assertFalse(command2.isDone());
     assertFalse(command3.isDone());
     assertFalse(command4.isDone());
+    assertTrue(command5.isDone());
 
     CommandScheduler.getInstance().tick();
 
@@ -117,6 +193,7 @@ public class TestCommandScheduler {
     assertFalse(command2.isDone());
     assertFalse(command3.isDone());
     assertFalse(command4.isDone());
+    assertTrue(command5.isDone());
 
     CommandScheduler.getInstance().tick();
 
@@ -124,6 +201,7 @@ public class TestCommandScheduler {
     assertTrue(command2.isDone());
     assertFalse(command3.isDone());
     assertFalse(command4.isDone());
+    assertTrue(command5.isDone());
 
     CommandScheduler.getInstance().tick();
 
@@ -131,6 +209,7 @@ public class TestCommandScheduler {
     assertTrue(command2.isDone());
     assertTrue(command3.isDone());
     assertTrue(command4.isDone());
+    assertTrue(command5.isDone());
   }
 
 }

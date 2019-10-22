@@ -29,6 +29,10 @@ public class DummyCommand implements Command {
    */
   private int counter = 0;
 
+  public int getNumberOfTimesExecuted() {
+    return counter;
+  }
+  
   @Override
   public boolean isDone() {
     return done;
