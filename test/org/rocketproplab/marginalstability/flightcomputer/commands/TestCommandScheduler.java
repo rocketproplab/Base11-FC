@@ -30,8 +30,9 @@ public class TestCommandScheduler {
 
   @Test
   public void testScheduleSameCommandMultipleTimes() {
-    CommandScheduler cs       = CommandScheduler.getInstance();
+    CommandScheduler cs       = new CommandScheduler();
     DummyCommand     command1 = new DummyCommand();
+    
     cs.scheduleCommand(command1);
     cs.scheduleCommand(command1);
     cs.scheduleCommand(command1);
@@ -59,7 +60,7 @@ public class TestCommandScheduler {
 
   @Test
   public void testSchedulerGetCommandUsingSubsystem() {
-    CommandScheduler cs = CommandScheduler.getInstance();
+    CommandScheduler cs = new CommandScheduler();
 
     DummySubsystem sA = new DummySubsystem();
     DummySubsystem sB = new DummySubsystem();
@@ -101,28 +102,30 @@ public class TestCommandScheduler {
 
   @Test
   public void testScheduleCommandsWithNoDependencies() {
+    CommandScheduler cs = new CommandScheduler();
+    
     DummyCommand command1 = new DummyCommand();
     command1.doneAfter = 3;
     DummyCommand command2 = new DummyCommand();
     command2.doneAfter = 1;
 
-    CommandScheduler.getInstance().scheduleCommand(command1);
-    CommandScheduler.getInstance().scheduleCommand(command2);
+    cs.scheduleCommand(command1);
+    cs.scheduleCommand(command2);
 
     assertFalse(command1.isDone());
     assertFalse(command2.isDone());
 
-    CommandScheduler.getInstance().tick();
+    cs.tick();
 
     assertFalse(command1.isDone());
     assertTrue(command2.isDone());
 
-    CommandScheduler.getInstance().tick();
+    cs.tick();
 
     assertFalse(command1.isDone());
     assertTrue(command2.isDone());
 
-    CommandScheduler.getInstance().tick();
+    cs.tick();
 
     assertTrue(command1.isDone());
     assertTrue(command2.isDone());
@@ -146,6 +149,8 @@ public class TestCommandScheduler {
    */
   @Test
   public void testScheduleCommandsWithDependencies() {
+    CommandScheduler cs = new CommandScheduler();
+    
     Subsystem subsystemA = new DummySubsystem();
     Subsystem subsystemB = new DummySubsystem();
     Subsystem subsystemC = new DummySubsystem();
@@ -167,11 +172,11 @@ public class TestCommandScheduler {
     command5.doneAfter    = 1;
 
     // Add all commands to scheduler
-    CommandScheduler.getInstance().scheduleCommand(command1);
-    CommandScheduler.getInstance().scheduleCommand(command2);
-    CommandScheduler.getInstance().scheduleCommand(command3);
-    CommandScheduler.getInstance().scheduleCommand(command4);
-    CommandScheduler.getInstance().scheduleCommand(command5);
+    cs.scheduleCommand(command1);
+    cs.scheduleCommand(command2);
+    cs.scheduleCommand(command3);
+    cs.scheduleCommand(command4);
+    cs.scheduleCommand(command5);
 
     assertFalse(command1.isDone());
     assertFalse(command2.isDone());
@@ -179,7 +184,7 @@ public class TestCommandScheduler {
     assertFalse(command4.isDone());
     assertFalse(command5.isDone());
 
-    CommandScheduler.getInstance().tick();
+    cs.tick();
 
     assertFalse(command1.isDone());
     assertFalse(command2.isDone());
@@ -187,7 +192,7 @@ public class TestCommandScheduler {
     assertFalse(command4.isDone());
     assertTrue(command5.isDone());
 
-    CommandScheduler.getInstance().tick();
+    cs.tick();
 
     assertTrue(command1.isDone());
     assertFalse(command2.isDone());
@@ -195,7 +200,7 @@ public class TestCommandScheduler {
     assertFalse(command4.isDone());
     assertTrue(command5.isDone());
 
-    CommandScheduler.getInstance().tick();
+    cs.tick();
 
     assertTrue(command1.isDone());
     assertTrue(command2.isDone());
@@ -203,7 +208,7 @@ public class TestCommandScheduler {
     assertFalse(command4.isDone());
     assertTrue(command5.isDone());
 
-    CommandScheduler.getInstance().tick();
+    cs.tick();
 
     assertTrue(command1.isDone());
     assertTrue(command2.isDone());
