@@ -86,7 +86,62 @@ public enum SCMPacketType {
    * Reading of pressure transducer 4. Bits are integer value (PSI)
    */
   P4("Pressure Transducer 4"),
+  
+  /**
+   * Reading of pressure transducer 5. Bits are integer value (PSI)
+   */
+  P5("Pressure Transducer 5"),
+  
+  /**
+   * Reading of pressure transducer 6. Bits are integer value (PSI)
+   */
+  P6("Pressure Transducer 6"),
 
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P7("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P8("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P9("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P10("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P11("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P12("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P13("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P14("Pressure Transducer 7"),
+  
+  /**
+   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   */
+  P15("Pressure Transducer 7"),
+  
   /**
    * Error. The bits are the error code
    */

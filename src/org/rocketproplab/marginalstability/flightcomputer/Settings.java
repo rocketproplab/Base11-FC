@@ -33,4 +33,20 @@ public class Settings {
    * How far off we are allowed to be to be equal
    */
   public static double EQUALS_EPSILON = 0.00000001;
+  
+  /**
+   * 'a' constant for pressures
+   */
+  public static double[] A_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  
+  /**
+   * 'b' constant for pressures
+   */
+  public static double[] B_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  
+  /**
+   * 'c' constant for pressures
+   */
+  public static double[] C_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 }
+
