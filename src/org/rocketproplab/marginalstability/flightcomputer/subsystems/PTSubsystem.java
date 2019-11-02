@@ -2,9 +2,8 @@ package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 import org.rocketproplab.marginalstability.flightcomputer.Settings;
 
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
-
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
+
 import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 
 /*
@@ -18,8 +17,8 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 public class PTSubsystem implements PacketListener<SCMPacket> {
 	
 	private SCMPacket packet;
-	public static int MIN_PT = 0;
-	public static int MAX_PT = 1023;
+	public final static int MIN_PT = 0;
+	public final static int MAX_PT = 1023;
 	private double pt = 0;
 	private double[] multiplepts = {Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN};	
 	private PacketDirection direction;
@@ -41,25 +40,21 @@ public class PTSubsystem implements PacketListener<SCMPacket> {
 		}
 	}
 	
-	public double returnValidNumsOnly(double value) {
-		if (value > MIN_PT - 1 && value < MAX_PT + 1) {
-			return value;
-		} else {
-			return Double.NaN;
-		}
-	}
-	
-	public void calibrate(int index) {
-		multiplepts[index] = ((Settings.A_PT_CONSTANTS[index] * pt * pt) + (Settings.B_PT_CONSTANTS[index]* pt) + (Settings.C_PT_CONSTANTS[index]));
+	private double calibrate(int index, double p) {
+		return ((Settings.A_PT_CONSTANTS[index] * p * p) + (Settings.B_PT_CONSTANTS[index]* p) + (Settings.C_PT_CONSTANTS[index]));
 	}
 	
 	public void setPT() {
-		
-		pt = returnValidNumsOnly(Double.parseDouble(this.packet.getData()));
+		// Checks if PT is valid
+		pt = Double.parseDouble(this.packet.getData());
+		if (!(pt > MIN_PT - 1 && pt < MAX_PT + 1)) {
+			pt = Double.NaN;
+		}
 		
 		int x = 0;
 		switch (this.packet.getID()) {
 			case P0:
+				x = 0;
 			  	break;
 			case P1:
 				x = 1;
@@ -88,28 +83,29 @@ public class PTSubsystem implements PacketListener<SCMPacket> {
 			case P9:
 				x = 9;
 				break;
-			case P10:
+			case PA:
 				x = 10;
 				break;
-			case P11:
+			case PB:
 				x = 11;
 				break;
-			case P12:
+			case PC:
 				x = 12;
 				break;
-			case P13:
+			case PD:
 				x = 13;
 				break;
-			case P14:
+			case PE:
 				x = 14;
 				break;
-			case P15:
+			case PF:
 				x = 15;
 				break;
 			default:
-				break;
+				// TODO handle error, unexpected PT Type
+				return;
 		}
-		multiplepts[x] = pt;
+		multiplepts[x] = calibrate(x, pt);
 	}
 	
 	

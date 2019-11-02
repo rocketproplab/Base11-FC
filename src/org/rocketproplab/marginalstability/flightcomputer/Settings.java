@@ -37,7 +37,7 @@ public class Settings {
   /**
    * 'a' constant for pressures
    */
-  public static double[] A_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  public static double[] A_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   
   /**
    * 'b' constant for pressures
@@ -47,6 +47,6 @@ public class Settings {
   /**
    * 'c' constant for pressures
    */
-  public static double[] C_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  public static double[] C_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 }
 

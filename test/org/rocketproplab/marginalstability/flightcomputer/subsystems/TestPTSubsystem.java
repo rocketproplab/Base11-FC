@@ -28,17 +28,17 @@ public class TestPTSubsystem {
 	@Test
 	public void onValueSCMPacketReceivePTReadValue() {
 		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket fourpacket = new SCMPacket(SCMPacketType.P0, "00005");
-		ptsubsystem.onPacket(PacketDirection.RECIVE, fourpacket);
+		SCMPacket zeropacket = new SCMPacket(SCMPacketType.P0, "00005");
+		ptsubsystem.onPacket(PacketDirection.RECIVE, zeropacket);
 		assertEquals(5, ptsubsystem.getPT(0), 0.0000001);
 	}
 	
 	@Test
 	public void onValueSCMPacketReceivePTReadValue2() {
 		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket fourpacket = new SCMPacket(SCMPacketType.P0, "00001");
+		SCMPacket fourpacket = new SCMPacket(SCMPacketType.P4, "00001");
 		ptsubsystem.onPacket(PacketDirection.RECIVE, fourpacket);
-		assertEquals(1, ptsubsystem.getPT(0), 0.0000001);
+		assertEquals(1, ptsubsystem.getPT(4), 0.0000001);
 	}
 	
 	@Test
@@ -68,10 +68,9 @@ public class TestPTSubsystem {
 	@Test
 	public void returnZeroIfPTIsCalibratedAndZero() {
 		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket packetyPacket = new SCMPacket(SCMPacketType.P4, "00000");
+		SCMPacket packetyPacket = new SCMPacket(SCMPacketType.P4, "00005");
 		ptsubsystem.onPacket(PacketDirection.RECIVE, packetyPacket);
-		ptsubsystem.calibrate(4);
-		assertEquals(1, ptsubsystem.getPT(4), 0.0000001);
+		assertEquals(5, ptsubsystem.getPT(4), 0.0000001);
 	}
 	
 
