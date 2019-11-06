@@ -28,4 +28,6 @@ public class Settings {
    * Conversion constant for how many milliseconds are in a second
    */
   public static double MS_PER_SECOND = 1000; // ms/s
+
+  public static double HEARTBEAT_THRESHOLD = 1; // s
 }
