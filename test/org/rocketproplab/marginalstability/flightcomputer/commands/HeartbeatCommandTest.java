@@ -15,8 +15,6 @@ public class HeartbeatCommandTest {
 
   private static final double EPSILON = 0.00000001;
 
-  private Telemetry telemetry;
-
   public class TestTime extends Time {
     public double currentTime;
 
@@ -43,8 +41,9 @@ public class HeartbeatCommandTest {
 
   @Test
   public void testIsDone() {
-    TestTime         newTime   = new TestTime();
-    HeartbeatCommand HBcommand = new HeartbeatCommand(newTime, telemetry);
+    TestTime         newTime      = new TestTime();
+    TestTelemetry    newTelemetry = new TestTelemetry(null, null);
+    HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
     assertFalse(HBcommand.isDone());
   }
 
@@ -140,8 +139,9 @@ public class HeartbeatCommandTest {
 
   @Test
   public void testStart() {
-    TestTime         newTime   = new TestTime();
-    HeartbeatCommand HBcommand = new HeartbeatCommand(newTime, telemetry);
+    TestTime         newTime      = new TestTime();
+    TestTelemetry    newTelemetry = new TestTelemetry(null, null);
+    HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
     newTime.currentTime = 2;
     HBcommand.start();
     assertEquals(2, HBcommand.getStartTime(), EPSILON);
@@ -149,8 +149,9 @@ public class HeartbeatCommandTest {
 
   @Test
   public void testGetDependencies() {
-    TestTime         newTime   = new TestTime();
-    HeartbeatCommand HBcommand = new HeartbeatCommand(newTime, telemetry);
+    TestTime         newTime      = new TestTime();
+    TestTelemetry    newTelemetry = new TestTelemetry(null, null);
+    HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
 
     assertArrayEquals(new Subsystem[] {}, HBcommand.getDependencies());
   }
