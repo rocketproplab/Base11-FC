@@ -1,5 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
+
 public class GPSPacket {
 
   private static final String NEMA_DELIMITER      = ",";
@@ -16,6 +18,7 @@ public class GPSPacket {
   private double  altitude;
   private double  time;
   private int     sVCount;
+  private String nema;
 
   /**
    * Create a new GPS Packet based on the NEMA String
@@ -24,6 +27,7 @@ public class GPSPacket {
    */
   public GPSPacket(String nEMA) {
     this.parseNEMA(nEMA);
+    this.nema = nEMA;
   }
 
   /**
@@ -99,6 +103,26 @@ public class GPSPacket {
    */
   public int getSVCount() {
     return this.sVCount;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof GPSPacket)) {
+      return false;
+    }
+    GPSPacket other = (GPSPacket) o;
+    boolean   equal = this.valid == other.valid;
+    equal &= (this.latitude - other.latitude) < Settings.EQUALS_EPSILON;
+    equal &= (this.longitude - other.longitude) < Settings.EQUALS_EPSILON;
+    equal &= (this.altitude - other.altitude) < Settings.EQUALS_EPSILON;
+    equal &= (this.time - other.time) < Settings.EQUALS_EPSILON;
+    equal &= this.sVCount == other.sVCount;
+    return equal;
+  }
+  
+  @Override
+  public String toString() {
+    return this.nema;
   }
 
 }

@@ -30,4 +30,25 @@ public class Settings {
   public static double MS_PER_SECOND = 1000; // ms/s
 
   public static double HEARTBEAT_THRESHOLD = 1; // s
+  
+  /**
+   * How far off we are allowed to be to be equal
+   */
+  public static double EQUALS_EPSILON = 0.00000001;
+  
+  /**
+   * 'a' constant for pressures
+   */
+  public static double[] A_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  
+  /**
+   * 'b' constant for pressures
+   */
+  public static double[] B_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  
+  /**
+   * 'c' constant for pressures
+   */
+  public static double[] C_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 }
+

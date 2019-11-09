@@ -1,6 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -34,13 +35,51 @@ public class TestGPSPacket {
     assertEquals(100000, packet.getAltitude(), EPSILON);
     assertEquals(12, packet.getSVCount());
   }
-  
+
   @Test
   public void gPSPacketisInvalid() {
 	  String nEMA = null;
 	  GPSPacket packet = new GPSPacket(nEMA);
-	  
-	  assertFalse(packet.isValid()); 
+
+	  assertFalse(packet.isValid());
+  }
+
+  @Test
+  public void gpsPacketsThatAreEqualAreEqual() {
+    GPSPacket packet = new GPSPacket(
+        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+    GPSPacket other  = new GPSPacket(
+        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+
+    assertEquals(packet, other);
+  }
+
+  @Test
+  public void gpsPacketsDoesNotCrashEqualsWithNull() {
+    GPSPacket packet = new GPSPacket(
+        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+
+    assertNotEquals(packet, null);
+  }
+
+  @Test
+  public void gpsPacketsThatAreUnqualEqualAreUnqualEqual() {
+    GPSPacket packet = new GPSPacket(
+        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+    GPSPacket other  = new GPSPacket(
+        "$GPGGA,420,-32,N,-7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+
+    assertNotEquals(packet, other);
+  }
+
+  @Test
+  public void gpsPacketsThatAreVeryCloseToEqualAreEqual() {
+    GPSPacket packet = new GPSPacket(
+        "$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669000000001,M,2.0,0031*4F");
+    GPSPacket other  = new GPSPacket(
+        "$GPGGA,420,-32,N,-7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+
+    assertNotEquals(packet, other);
   }
 
 }
