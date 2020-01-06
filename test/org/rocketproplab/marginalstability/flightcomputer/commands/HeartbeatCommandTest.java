@@ -144,7 +144,7 @@ public class HeartbeatCommandTest {
     HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
     newTime.currentTime = 2;
     HBcommand.start();
-    assertEquals(2, HBcommand.getStartTime(), EPSILON);
+    assertEquals(2, HBcommand.startTime, EPSILON);
   }
 
   @Test

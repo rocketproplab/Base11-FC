@@ -16,8 +16,7 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 public class HeartbeatCommand implements Command {
   private static final Subsystem[] EMPTY_ARRAY = {};
   private int                      HBcounter;
-  private double                   startTime;
-  private double                   currentTime;
+  public double                    startTime;
   private Time                     time;
   private Telemetry                telemetry;
 
@@ -33,39 +32,12 @@ public class HeartbeatCommand implements Command {
   }
 
   /**
-   * Getter method to return start time.
-   * 
-   * @return startTime
-   */
-  public double getStartTime() {
-    return startTime;
-  }
-
-  /**
    * Setter method to set the start time.
    * 
    * @param startTime input to set start time with
    */
-  public void setStartTime(double startTime) {
+  private void setStartTime(double startTime) {
     this.startTime = startTime;
-  }
-
-  /**
-   * Getter method to return current time.
-   * 
-   * @return currentTime
-   */
-  public double getcurrentTime() {
-    return currentTime;
-  }
-
-  /**
-   * Setter method to set the current time.
-   * 
-   * @param currentTime input to set the current time with
-   */
-  public void setCurrentTime(double currentTime) {
-    this.currentTime = currentTime;
   }
 
   /**
@@ -82,15 +54,15 @@ public class HeartbeatCommand implements Command {
    */
   @Override
   public void execute() {
-    this.setCurrentTime(time.getSystemTime());
+    double currentTime = time.getSystemTime();
     if (HBcounter == 0) {
       if (currentTime - startTime >= Settings.HEARTBEAT_THRESHOLD) {
         telemetry.sendHeartbeat();
         HBcounter += 1;
       }
     } else {
-      if (currentTime - startTime >= (HBcounter * (currentTime - startTime)
-          / (HBcounter + 1) + 1)) {
+      if (currentTime
+          - startTime >= ((HBcounter + 1) * (Settings.HEARTBEAT_THRESHOLD))) {
         telemetry.sendHeartbeat();
         HBcounter += 1;
       }
