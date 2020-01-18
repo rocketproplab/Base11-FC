@@ -128,13 +128,22 @@ public class Telemetry {
   }
 
   /**
-   * Send the error to the command box
+   * Send the error to the Command Box
    * 
    * @param error the error to inform the command box of
    */
   public void reportError(Errors error) {
     this.reportTelemetry(SCMPacketType.ER, error.ordinal());
     this.logger.log(Level.INFO, "Reporting Error: " + error.toString());
+  }
+
+  /**
+   * Send the heartbeat to the command box
+   */
+  public void sendHeartbeat() {
+    String    dataString = "00000";
+    SCMPacket packet     = new SCMPacket(SCMPacketType.HB, dataString);
+    this.relay.sendPacket(packet, PacketSources.CommandBox);
   }
 
 }

@@ -120,4 +120,12 @@ public class TestTelemetry {
     assertEquals(PacketDirection.SEND, this.testListener.lastDirection);
   }
 
+  @Test
+  public void telemetrySendsHeartbeat() {
+    this.telemetry.sendHeartbeat();
+    SCMPacket testPacket = new SCMPacket(SCMPacketType.HB, "00000");
+    assertEquals(testPacket, this.testListener.lastPacket);
+    assertEquals(PacketDirection.SEND, this.testListener.lastDirection);
+  }
+
 }
