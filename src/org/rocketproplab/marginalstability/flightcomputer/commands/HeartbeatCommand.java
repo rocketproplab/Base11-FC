@@ -16,7 +16,7 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 public class HeartbeatCommand implements Command {
   private static final Subsystem[] EMPTY_ARRAY = {};
   private int                      HBcounter;
-  public double                    startTime;
+  private double                   startTime;
   private Time                     time;
   private Telemetry                telemetry;
 

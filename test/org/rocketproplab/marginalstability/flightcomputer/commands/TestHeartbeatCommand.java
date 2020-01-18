@@ -11,9 +11,7 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRelay;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 
-public class HeartbeatCommandTest {
-
-  private static final double EPSILON = 0.00000001;
+public class TestHeartbeatCommand {
 
   public class TestTime extends Time {
     public double currentTime;
@@ -52,9 +50,9 @@ public class HeartbeatCommandTest {
     TestTime         newTime      = new TestTime();
     TestTelemetry    newTelemetry = new TestTelemetry(null, null);
     HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
-    newTime.currentTime = 0;
     HBcommand.start();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD - 0.01;
+    HBcommand.execute();
     HBcommand.execute();
     assertEquals(0, newTelemetry.heartbeatCounter);
 
@@ -65,9 +63,9 @@ public class HeartbeatCommandTest {
     TestTime         newTime      = new TestTime();
     TestTelemetry    newTelemetry = new TestTelemetry(null, null);
     HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
-    newTime.currentTime = 0;
     HBcommand.start();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD + 0.01;
+    HBcommand.execute();
     HBcommand.execute();
     assertEquals(1, newTelemetry.heartbeatCounter);
 
@@ -78,11 +76,11 @@ public class HeartbeatCommandTest {
     TestTime         newTime      = new TestTime();
     TestTelemetry    newTelemetry = new TestTelemetry(null, null);
     HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
-    newTime.currentTime = 0;
     HBcommand.start();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD + 0.01;
     HBcommand.execute();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD * 2 - 0.01;
+    HBcommand.execute();
     HBcommand.execute();
     assertEquals(1, newTelemetry.heartbeatCounter);
 
@@ -93,11 +91,11 @@ public class HeartbeatCommandTest {
     TestTime         newTime      = new TestTime();
     TestTelemetry    newTelemetry = new TestTelemetry(null, null);
     HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
-    newTime.currentTime = 0;
     HBcommand.start();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD + 0.01;
     HBcommand.execute();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD * 2 + 0.01;
+    HBcommand.execute();
     HBcommand.execute();
     assertEquals(2, newTelemetry.heartbeatCounter);
 
@@ -108,13 +106,13 @@ public class HeartbeatCommandTest {
     TestTime         newTime      = new TestTime();
     TestTelemetry    newTelemetry = new TestTelemetry(null, null);
     HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
-    newTime.currentTime = 0;
     HBcommand.start();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD + 0.01;
     HBcommand.execute();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD * 2 + 0.01;
     HBcommand.execute();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD * 3 - 0.01;
+    HBcommand.execute();
     HBcommand.execute();
     assertEquals(2, newTelemetry.heartbeatCounter);
 
@@ -125,7 +123,6 @@ public class HeartbeatCommandTest {
     TestTime         newTime      = new TestTime();
     TestTelemetry    newTelemetry = new TestTelemetry(null, null);
     HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
-    newTime.currentTime = 0;
     HBcommand.start();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD + 0.01;
     HBcommand.execute();
@@ -133,18 +130,9 @@ public class HeartbeatCommandTest {
     HBcommand.execute();
     newTime.currentTime = Settings.HEARTBEAT_THRESHOLD * 3 + 0.01;
     HBcommand.execute();
+    HBcommand.execute();
     assertEquals(3, newTelemetry.heartbeatCounter);
 
-  }
-
-  @Test
-  public void testStart() {
-    TestTime         newTime      = new TestTime();
-    TestTelemetry    newTelemetry = new TestTelemetry(null, null);
-    HeartbeatCommand HBcommand    = new HeartbeatCommand(newTime, newTelemetry);
-    newTime.currentTime = 2;
-    HBcommand.start();
-    assertEquals(2, HBcommand.startTime, EPSILON);
   }
 
   @Test
