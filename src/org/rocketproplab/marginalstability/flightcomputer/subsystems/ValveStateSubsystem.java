@@ -67,21 +67,6 @@ public class ValveStateSubsystem implements PacketListener<SCMPacket> {
 		sendPacket(valve);
 	}
 	
-	public Double getValve(int valve) {
-		if (valve > valveStates.length) {
-			return Double.NaN;
-		} else {
-			Boolean currValve = valveStates[valve - 1];
-			if (null == currValve) {
-				return Double.NaN;
-			} else if (currValve == true) {
-				return 1.0;
-			} else {
-				return 0.0;
-			}
-		}
-	}
-	
 	private void sendPacket(int valve) {
 		if (valve < 5) {
 			sendPacket(SCMPacketType.V0);
