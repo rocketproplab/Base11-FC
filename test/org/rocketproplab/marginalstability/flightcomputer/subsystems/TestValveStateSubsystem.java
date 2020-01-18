@@ -25,8 +25,8 @@ public class TestValveStateSubsystem {
 	@Before
 	public void init() {
 		this.testListener = new TestPacketListener<SCMPacket>();
-	    this.router = new PacketRouter();
-	    router.addListener(testListener, SCMPacket.class, PacketSources.EngineControllerUnit);
+		this.router = new PacketRouter();
+		router.addListener(testListener, SCMPacket.class, PacketSources.EngineControllerUnit);
 	  }
 	
 	@Test
@@ -108,10 +108,26 @@ public class TestValveStateSubsystem {
 	@Test
 	public void checkIfSentPacketIsCorrectWhenOneValueIsChanged() {
 		this.valveState = new ValveStateSubsystem(router);
-		SCMPacket packetTwo = new SCMPacket(SCMPacketType.V1, "01000");
+		SCMPacket packetTwo = new SCMPacket(SCMPacketType.V1, "01100");
 		valveState.onPacket(PacketDirection.RECIVE, packetTwo);
-		valveState.setValve(8, false);
-		assertEquals(packetTwo.getData(), this.testListener.lastPacket.getData());
+		valveState.setValve(8, 0);
+		assertEquals("01000", this.testListener.lastPacket.getData());
+	}
+	//test if setting to true
+	@Test
+	public void checkIfSentPacketIsCorrectWhenOneValueIsChanged2() {
+		this.valveState = new ValveStateSubsystem(router);
+		SCMPacket packetOne = new SCMPacket(SCMPacketType.V0, "10011");
+		valveState.onPacket(PacketDirection.RECIVE, packetOne);
+		valveState.setValve(2, 1);
+		assertEquals("11011", this.testListener.lastPacket.getData());
+	}
+	
+	//test out of bounds set value
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void checkForErrorOutOfBounds() {
+		this.valveState = new ValveStateSubsystem(router);
+		valveState.setValve(9, 1);
 	}
 	
 	// if a value isn't valid, check if packet doesn't get passed along
@@ -124,5 +140,6 @@ public class TestValveStateSubsystem {
 		valveState.onPacket(PacketDirection.RECIVE, packetTwo);
 		assertEquals(packetOne.getData(), this.testListener.lastPacket.getData());
 	}
+	//
 
 }
