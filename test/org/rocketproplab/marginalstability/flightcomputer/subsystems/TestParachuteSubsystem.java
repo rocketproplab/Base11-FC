@@ -1,5 +1,6 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -7,6 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
+import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
+import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Solenoid;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
@@ -171,6 +175,20 @@ public class TestParachuteSubsystem {
     paraSystem.update();
     assertTrue(main.active);
     assertTrue(drogue.active);
+  }
+  
+  @Test
+  public void mainDeploysWhenPacketReceived() {
+	 SCMPacket mainDeploy = new SCMPacket(SCMPacketType.MD, "00000");
+	 paraSystem.onPacket(PacketDirection.RECIVE, mainDeploy);
+	 assertTrue(main.active);
+  }
+  
+  @Test
+  public void drogueDeploysWhenPacketsRecived() {
+	  SCMPacket drogueDeploy = new SCMPacket(SCMPacketType.DD, "00000");
+	  paraSystem.onPacket(PacketDirection.RECIVE, drogueDeploy);
+	  assertTrue(drogue.active);
   }
 
 }
