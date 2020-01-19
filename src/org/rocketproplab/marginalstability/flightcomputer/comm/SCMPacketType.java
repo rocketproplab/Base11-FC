@@ -109,44 +109,44 @@ public enum SCMPacketType {
   P7("Pressure Transducer 7"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 8. Bits are integer value (PSI)
    */
-  P8("Pressure Transducer 7"),
+  P8("Pressure Transducer 8"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 9. Bits are integer value (PSI)
    */
-  P9("Pressure Transducer 7"),
+  P9("Pressure Transducer 9"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 10. Bits are integer value (PSI)
    */
-  PA("Pressure Transducer 7"),
+  PA("Pressure Transducer 10"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 11. Bits are integer value (PSI)
    */
-  PB("Pressure Transducer 7"),
+  PB("Pressure Transducer 11"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 12. Bits are integer value (PSI)
    */
-  PC("Pressure Transducer 7"),
+  PC("Pressure Transducer 12"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 13. Bits are integer value (PSI)
    */
-  PD("Pressure Transducer 7"),
+  PD("Pressure Transducer 13"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 14. Bits are integer value (PSI)
    */
-  PE("Pressure Transducer 7"),
+  PE("Pressure Transducer 14"),
   
   /**
-   * Reading of pressure transducer 7. Bits are integer value (PSI)
+   * Reading of pressure transducer 15. Bits are integer value (PSI)
    */
-  PF("Pressure Transducer 7"),
+  PF("Pressure Transducer 15"),
   
   /**
    * Error. The bits are the error code
@@ -156,7 +156,17 @@ public enum SCMPacketType {
   /**
    * Warning. The bits are the warning code
    */
-  WA("Warning"), VS("VS");
+  WA("Warning"), VS("VS"),
+  
+  /**
+   * Drogue Chute Deploy
+   */
+  DD("Drogue Chute Deploy"),
+  
+  /**
+   * Main Chute Deploy
+   */
+  MD("Main Chute Deploy");
 
   private String name;
 

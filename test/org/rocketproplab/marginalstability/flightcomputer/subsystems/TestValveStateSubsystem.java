@@ -113,6 +113,7 @@ public class TestValveStateSubsystem {
 		valveState.setValve(8, 0);
 		assertEquals("01000", this.testListener.lastPacket.getData());
 	}
+	
 	//test if setting to true
 	@Test
 	public void checkIfSentPacketIsCorrectWhenOneValueIsChanged2() {

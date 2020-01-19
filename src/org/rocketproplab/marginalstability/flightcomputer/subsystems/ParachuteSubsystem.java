@@ -4,10 +4,14 @@ import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.events.FlightStateListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.PositionListener;
+import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Solenoid;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
+import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
+import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 
 /**
  * A subsystem that controls the solenoids for deploying the parachutes.
@@ -16,7 +20,8 @@ import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
  *
  */
 public class ParachuteSubsystem
-    implements FlightStateListener, PositionListener, Subsystem {
+    implements FlightStateListener, PositionListener, Subsystem,
+    PacketListener<SCMPacket> {
 
   private static ParachuteSubsystem instance;
   public static ParachuteSubsystem getInstance() {
@@ -45,6 +50,15 @@ public class ParachuteSubsystem
     this.drogueChute = drogueChute;
     this.lastMode    = FlightMode.Sitting;
     this.time        = time;
+  }
+  
+  @Override
+  public void onPacket(PacketDirection direction, SCMPacket packet) {
+	  if (packet.getID() == SCMPacketType.DD) {
+		  drogueChute.set(true);
+	  } else if (packet.getID() == SCMPacketType.MD) {
+		  mainChute.set(true);
+	  }
   }
 
   @Override
