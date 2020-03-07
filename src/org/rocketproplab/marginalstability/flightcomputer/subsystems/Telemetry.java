@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRelay;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
@@ -17,7 +18,14 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
  *
  */
 public class Telemetry {
-
+  private static Telemetry instance;
+  public static Telemetry getInstance() {
+    if(instance == null) {
+      instance = new Telemetry(Logger.getLogger("Telemetry"), PacketRouter.getInstance());
+    }
+    return instance;
+  }
+  
   public static final int BASE_10            = 10;
   public static final int BASE_16            = 16;
   public static final int MAX_PACKET_BASE_10 = (int) Math

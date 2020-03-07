@@ -15,7 +15,14 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  *
  */
 public class PTSubsystem implements PacketListener<SCMPacket> {
-	
+	private static PTSubsystem instance;
+	public static PTSubsystem getInstance() {
+	  if(instance == null) {
+	    instance = new PTSubsystem();
+	  }
+	  return instance;
+	}
+  
 	private SCMPacket packet;
 	public final static int MIN_PT = 0;
 	public final static int MAX_PT = 1023;

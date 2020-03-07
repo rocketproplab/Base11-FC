@@ -18,12 +18,17 @@ public class FlightComputer {
   }
   
   public void tick() {
-    for(Subsystem subsystem : this.subsystems) {
-      try {
-        subsystem.update();
-      } catch (Exception e) {
-        this.telemetry.reportError(Errors.TOP_LEVEL_EXCEPTION);
+    try {
+      for(Subsystem subsystem : this.subsystems) {
+        try {
+          subsystem.update();
+        } catch (Exception e) {
+          this.telemetry.reportError(Errors.TOP_LEVEL_EXCEPTION);
+        }
       }
+    } catch (Exception e) {
+      System.err.println("Unable to log errors!");
     }
+    
   }
 }

@@ -3,6 +3,7 @@ import org.rocketproplab.marginalstability.flightcomputer.Settings;
 
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRelay;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
@@ -17,13 +18,19 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  *
  */
 public class ValveStateSubsystem implements PacketListener<SCMPacket> {
-	
+  private static ValveStateSubsystem instance;
+  public static ValveStateSubsystem getInstance() {
+    if(instance == null) {
+      instance = new ValveStateSubsystem(PacketRouter.getInstance());
+    }
+    return instance;
+  }
+  
 	private SCMPacket packet;
 	private int[] valveStates = {-1, -1, -1, -1, -1, -1, -1, -1};
 	private String data;
 	private SCMPacketType id;
 	private PacketRelay relay;
-	
 	
 	public ValveStateSubsystem(PacketRelay relay) {
 		this.relay = relay;
