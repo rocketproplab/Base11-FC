@@ -15,14 +15,17 @@ public class Main {
     Main.registerSubsystems(flightComputer);
     Main.registerPacketListeners();
     
-    while(true) {
-      flightComputer.tick();
-    }
+//    while(true) {
+//      flightComputer.tick();
+//    }
   }
 
   private static void registerSubsystems(FlightComputer flightComputer) {
+    Telemetry telemetry = Telemetry.getInstance();
+    telemetry.logInfo(Info.INIT_SUBSYSTEMS_START);
     flightComputer.registerSubsystem(ParachuteSubsystem.getInstance());
     ValveStateSubsystem.getInstance();
+    telemetry.logInfo(Info.FINISH_SUBSYSTEM_START);
   }
 
   private static void registerPacketListeners() {

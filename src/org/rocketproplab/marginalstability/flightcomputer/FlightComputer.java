@@ -28,6 +28,7 @@ public class FlightComputer {
       }
     } catch (Exception e) {
       System.err.println("Unable to log errors!");
+      e.printStackTrace();
     }
     
   }

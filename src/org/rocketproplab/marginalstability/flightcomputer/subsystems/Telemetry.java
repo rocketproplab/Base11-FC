@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
+import org.rocketproplab.marginalstability.flightcomputer.Info;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRelay;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
@@ -19,40 +20,34 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
  */
 public class Telemetry {
   private static Telemetry instance;
+
   public static Telemetry getInstance() {
-    if(instance == null) {
+    if (instance == null) {
       instance = new Telemetry(Logger.getLogger("Telemetry"), PacketRouter.getInstance());
     }
     return instance;
   }
-  
+
   public static final int BASE_10            = 10;
   public static final int BASE_16            = 16;
-  public static final int MAX_PACKET_BASE_10 = (int) Math
-      .round(Math.pow(BASE_10, SCMPacket.DATA_LENGTH)) - 1;
-  public static final int MAX_PACKET_BASE_16 = (int) Math
-      .round(Math.pow(BASE_16, SCMPacket.DATA_LENGTH)) - 1;
+  public static final int MAX_PACKET_BASE_10 = (int) Math.round(Math.pow(BASE_10, SCMPacket.DATA_LENGTH)) - 1;
+  public static final int MAX_PACKET_BASE_16 = (int) Math.round(Math.pow(BASE_16, SCMPacket.DATA_LENGTH)) - 1;
 
-  public static final int MIN_PACKET_BASE_10 = (int) -Math
-      .round(Math.pow(BASE_10, SCMPacket.DATA_LENGTH - 1)) + 1;
-  public static final int MIN_PACKET_BASE_16 = (int) -Math
-      .round(Math.pow(BASE_16, SCMPacket.DATA_LENGTH - 1)) + 1;
+  public static final int MIN_PACKET_BASE_10 = (int) -Math.round(Math.pow(BASE_10, SCMPacket.DATA_LENGTH - 1)) + 1;
+  public static final int MIN_PACKET_BASE_16 = (int) -Math.round(Math.pow(BASE_16, SCMPacket.DATA_LENGTH - 1)) + 1;
 
   public static final String  INFINITY      = "INF  ";
   public static final String  NEG_INFINITY  = "-INF ";
-  private static final String INT_FORMAT    = "%0" + SCMPacket.DATA_LENGTH
-      + "d";
-  private static final String HEX_FORMAT    = "%0" + SCMPacket.DATA_LENGTH
-      + "x";
-  private static final String DOUBLE_FORMAT = "%0" + SCMPacket.DATA_LENGTH
-      + "f";
+  private static final String INT_FORMAT    = "%0" + SCMPacket.DATA_LENGTH + "d";
+  private static final String HEX_FORMAT    = "%0" + SCMPacket.DATA_LENGTH + "x";
+  private static final String DOUBLE_FORMAT = "%0" + SCMPacket.DATA_LENGTH + "f";
 
   private Logger      logger;
   private PacketRelay relay;
 
   /**
-   * Creates a new telemetry subsystem that logs to the given logger and uses
-   * the given packet reply to send its packets.
+   * Creates a new telemetry subsystem that logs to the given logger and uses the
+   * given packet reply to send its packets.
    * 
    * @param logger the logger to use for info output
    * @param relay  the relay to use for sending packets
@@ -88,17 +83,15 @@ public class Telemetry {
   }
 
   /**
-   * Reports an integer to the command box in base 16 to allow for greater data
-   * to be set.
+   * Reports an integer to the command box in base 16 to allow for greater data to
+   * be set.
    * 
    * @param type the data type to send
    * @param data the data to send, must fit in 5 characters
    */
   public void reportTelemetryHex(SCMPacketType type, int data) {
-    this.reportTelemetry(type, data, HEX_FORMAT, MAX_PACKET_BASE_16,
-        MIN_PACKET_BASE_16);
-    this.logger.log(Level.INFO,
-        type.getName() + " is " + Integer.toString(data, 16));
+    this.reportTelemetry(type, data, HEX_FORMAT, MAX_PACKET_BASE_16, MIN_PACKET_BASE_16);
+    this.logger.log(Level.INFO, type.getName() + " is " + Integer.toString(data, 16));
   }
 
   /**
@@ -109,8 +102,7 @@ public class Telemetry {
    * @param data the data to be sent, must fit in 5 character
    */
   public void reportTelemetry(SCMPacketType type, int data) {
-    this.reportTelemetry(type, data, INT_FORMAT, MAX_PACKET_BASE_10,
-        MIN_PACKET_BASE_10);
+    this.reportTelemetry(type, data, INT_FORMAT, MAX_PACKET_BASE_10, MIN_PACKET_BASE_10);
     this.logger.log(Level.INFO, type.getName() + " is " + data);
   }
 
@@ -123,8 +115,7 @@ public class Telemetry {
    * @param max    the maximum value (if greater prints infinity)
    * @param min    the minimum value (if less prints - infinity)
    */
-  private void reportTelemetry(SCMPacketType type, int data, String format,
-      int max, int min) {
+  private void reportTelemetry(SCMPacketType type, int data, String format, int max, int min) {
     String dataString = String.format(format, data).toUpperCase();
     if (data > max) {
       dataString = INFINITY;
@@ -143,6 +134,10 @@ public class Telemetry {
   public void reportError(Errors error) {
     this.reportTelemetry(SCMPacketType.ER, error.ordinal());
     this.logger.log(Level.INFO, "Reporting Error: " + error.toString());
+  }
+
+  public void logInfo(Info info) {
+    this.logger.log(Level.INFO, info.getDescription());
   }
 
   /**

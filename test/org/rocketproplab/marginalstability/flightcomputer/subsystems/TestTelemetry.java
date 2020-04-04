@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
+import org.rocketproplab.marginalstability.flightcomputer.Info;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
@@ -18,17 +19,32 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.TestPacketListene
 public class TestTelemetry {
 
   private TestPacketListener<SCMPacket> testListener;
-  Logger                                logger;
+  TestLog                               logger;
   PacketRouter                          router;
   Telemetry                             telemetry;
+
+  class TestLog extends Logger {
+
+    public String lastMessage;
+    public Level  lastLevel;
+
+    protected TestLog() {
+      super("Dummy", null);
+    }
+
+    public void log(Level level, String message) {
+      this.lastLevel   = level;
+      this.lastMessage = message;
+    }
+
+  }
 
   @Before
   public void init() {
     this.testListener = new TestPacketListener<SCMPacket>();
-    this.logger       = Logger.getLogger("Dummy");
+    this.logger       = new TestLog();
     this.router       = new PacketRouter();
     this.telemetry    = new Telemetry(logger, router);
-    this.logger.setLevel(Level.SEVERE);
     router.addListener(testListener, SCMPacket.class, PacketSources.CommandBox);
   }
 
@@ -126,6 +142,13 @@ public class TestTelemetry {
     SCMPacket testPacket = new SCMPacket(SCMPacketType.HB, "00000");
     assertEquals(testPacket, this.testListener.lastPacket);
     assertEquals(PacketDirection.SEND, this.testListener.lastDirection);
+  }
+
+  @Test
+  public void telemetryLogsInfo() {
+    this.telemetry.logInfo(Info.FINISH_SUBSYSTEM_START);
+    assertEquals(Level.INFO, this.logger.lastLevel);
+    assertEquals(Info.FINISH_SUBSYSTEM_START.getDescription(), this.logger.lastMessage);
   }
 
 }
