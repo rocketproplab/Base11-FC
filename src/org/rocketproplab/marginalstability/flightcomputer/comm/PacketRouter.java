@@ -12,6 +12,13 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  *
  */
 public class PacketRouter implements PacketRelay {
+  private static PacketRouter instance;
+  public static PacketRouter getInstance() {
+    if(instance == null) {
+      instance = new PacketRouter();
+    }
+    return instance;
+  }
 
   private HashMap<LookupTuple, ArrayList<PacketListener<?>>> listenerMap;
 

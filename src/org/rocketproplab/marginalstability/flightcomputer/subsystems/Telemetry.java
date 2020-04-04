@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRelay;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
@@ -17,7 +18,14 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
  *
  */
 public class Telemetry {
-
+  private static Telemetry instance;
+  public static Telemetry getInstance() {
+    if(instance == null) {
+      instance = new Telemetry(Logger.getLogger("Telemetry"), PacketRouter.getInstance());
+    }
+    return instance;
+  }
+  
   public static final int BASE_10            = 10;
   public static final int BASE_16            = 16;
   public static final int MAX_PACKET_BASE_10 = (int) Math
@@ -128,13 +136,22 @@ public class Telemetry {
   }
 
   /**
-   * Send the error to the command box
+   * Send the error to the Command Box
    * 
    * @param error the error to inform the command box of
    */
   public void reportError(Errors error) {
     this.reportTelemetry(SCMPacketType.ER, error.ordinal());
     this.logger.log(Level.INFO, "Reporting Error: " + error.toString());
+  }
+
+  /**
+   * Send the heartbeat to the command box
+   */
+  public void sendHeartbeat() {
+    String    dataString = "00000";
+    SCMPacket packet     = new SCMPacket(SCMPacketType.HB, dataString);
+    this.relay.sendPacket(packet, PacketSources.CommandBox);
   }
 
 }
