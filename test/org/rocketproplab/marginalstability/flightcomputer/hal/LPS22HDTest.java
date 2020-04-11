@@ -121,65 +121,67 @@ public class LPS22HDTest {
     
   }
   
+  private class BarometerTime extends Time {
+  }
+  
   @Test
   public void readsOutsideOfBoundsOnStartup() {
     MockI2CDevice i2c = new MockI2CDevice();
-    LPS22HD barometer = new LPS22HD(i2c);
+    BarometerTime time = new BarometerTime();
+    LPS22HD barometer = new LPS22HD(i2c, time);
     assertFalse(barometer.inUsableRange());
   }
   
   @Test
   public void pollReadsNewBarometricData() {
-    MockI2CDevice i2c = new MockI2CDevice();
-    LPS22HD barometer = new LPS22HD(i2c);
-    assertFalse(barometer.inUsableRange());
+	  MockI2CDevice i2c = new MockI2CDevice();
+	  BarometerTime time = new BarometerTime();
+	  LPS22HD barometer = new LPS22HD(i2c, time);
+	  assertFalse(barometer.inUsableRange());
   }
   
   @Test
   public void getPressure() {
 	  MockI2CDevice i2c = new MockI2CDevice();
-	  LPS22HD barometer = new LPS22HD(i2c);
+	  BarometerTime time = new BarometerTime();
+	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  assertEquals(0.0, barometer.getPressure(), 0.000005);
   }
   
-  /**@Test
+  @Test
   public void getPressureNonZero() {
 	  MockI2CDevice i2c = new MockI2CDevice();
-	  LPS22HD barometer = new LPS22HD(i2c);
+	  BarometerTime time = new BarometerTime();
+	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  
-	  try {
-		  i2c.write((byte)5);
-	  } catch (IOException e) {
-		  // TODO Auto-generated catch block
-		  e.printStackTrace();
-	  }
-	  
+	  i2c.initValuesOne();
 	  barometer.poll();
 	  assertNotEquals(0.0, barometer.getPressure(), 0.000005);
-  }**/
+  }
   
   @Test
   public void getLastMeasurementTime() {
 	  MockI2CDevice i2c = new MockI2CDevice();
-	  LPS22HD barometer = new LPS22HD(i2c);
-	  assertEquals(0.0, barometer.getLastMeasurementTime(), 0.000005);
+	  BarometerTime time = null;
+	  LPS22HD barometer = new LPS22HD(i2c, time);
+	  assertEquals(0.0, barometer.getLastMeasurementTime(), 0.000000001);
   }
   
   @Test
   public void getLastMeasurementTimeNonZero() {
 	  MockI2CDevice i2c = new MockI2CDevice();
-	  LPS22HD barometer = new LPS22HD(i2c);
+	  BarometerTime time = new BarometerTime();
+	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  
-	  i2c.initValuesOne();
-	  barometer.poll();
 	  barometer.getLastMeasurementTime();
-	  assertEquals(new Time().getSystemTime(), barometer.getLastMeasurementTime(), 0.000005);
+	  assertEquals(new Time().getSystemTime(), barometer.getLastMeasurementTime(), 0.000000001);
   }
   
   @Test
   public void inUsableRangeTests () {
 	  MockI2CDevice i2c = new MockI2CDevice();
-	  LPS22HD barometer = new LPS22HD(i2c);
+	  BarometerTime time = new BarometerTime();
+	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  
 	  i2c.initValuesOne();
 	  barometer.poll();
@@ -197,7 +199,8 @@ public class LPS22HDTest {
   @Test
   public void initSetsCTRL_REG1() {
 	  MockI2CDevice i2c = new MockI2CDevice();
-	  LPS22HD barometer = new LPS22HD(i2c);
+	  BarometerTime time = new BarometerTime();
+	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  barometer.init();
 	  byte val = 0b01100000;
 	  byte readMapVal = i2c.readMap.get(0x10).byteValue();

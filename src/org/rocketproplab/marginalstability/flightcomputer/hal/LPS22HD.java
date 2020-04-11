@@ -19,10 +19,14 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
 	private final int MAXIMUM_RANGE = 1260;
 	private final double ZERO_TIME = 0.0;
 	private final double SCALING_FACTOR = 4096;
+	private final int ADDRESS_ONE = 0x2A;
+	private final int ADDRESS_TWO = 0x29;
+	private final int ADDRESS_THREE = 0x28;
 	
 	
-	public LPS22HD(I2CDevice i2cDevice) {
+	public LPS22HD(I2CDevice i2cDevice, Time time) {
 		this.i2cDevice = i2cDevice;
+		this.currTime = time;
 	}
 	
 	@Override
@@ -52,6 +56,7 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
 	@Override
 	public double getLastMeasurementTime() {
 		if (currTime != null) {
+			System.out.println(currTime.getSystemTime());
 			return currTime.getSystemTime();
 		} else {
 			return ZERO_TIME;
@@ -60,15 +65,13 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
   
 	public void poll() {
 		try {
-			pressureValue = i2cDevice.read(0x2A) + i2cDevice.read(0x29)
-			+ i2cDevice.read(0x28);
+			pressureValue = i2cDevice.read(ADDRESS_ONE) + 
+					i2cDevice.read(ADDRESS_TWO) + i2cDevice.read(ADDRESS_THREE);
 			pressure = pressureValue/SCALING_FACTOR;
-			System.out.println(pressure);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		currTime = new Time();
 	}
 
 }
