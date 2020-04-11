@@ -4,6 +4,8 @@ import com.pi4j.io.i2c.I2CDevice;
 
 public class LPS22HD implements Barometer, PollingSensor {
 
+  I2CDevice i2cDevice;
+  
   public LPS22HD(I2CDevice i2cDevice) {
     
   }
@@ -27,7 +29,6 @@ public class LPS22HD implements Barometer, PollingSensor {
   }
   
   public void poll() {
-    
   }
 
 }
