@@ -24,21 +24,21 @@ public class LPS22HDTest {
     private int address;
     
     public void initValuesOne() {
-    	readMap.put(0x2A, 255);
-    	readMap.put(0x29, 2000);
-    	readMap.put(0x28, 1000);
+    	readMap.put(0x2A, 0b100010);
+    	readMap.put(0x29, 0b10);
+    	readMap.put(0x28, 0b0);
     }
     
     public void initValuesTwo() {
-    	readMap.put(0x2A, 10000000);
-    	readMap.put(0x29, 10000000);
-    	readMap.put(0x28, 10000000);
+    	readMap.put(0x2A, 0b111111111111111);
+    	readMap.put(0x29, 0);
+    	readMap.put(0x28, 0b111111111111);
     }
     
     public void initValuesThree() {
-    	readMap.put(0x2A, 0);
-    	readMap.put(0x29, 0);
-    	readMap.put(0x28, 2000000);
+    	readMap.put(0x2A, 0b111111111111111111111);
+    	readMap.put(0x29, 0b1);
+    	readMap.put(0x28, 0);
     }
     
     
@@ -121,7 +121,10 @@ public class LPS22HDTest {
     
   }
   
-  private class BarometerTime extends Time {
+  public class BarometerTime extends Time {
+	  public double getTime() {
+		  return 105;
+	  }
   }
   
   @Test
@@ -173,8 +176,10 @@ public class LPS22HDTest {
 	  BarometerTime time = new BarometerTime();
 	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  
+	  i2c.initValuesOne();
+	  barometer.poll();
 	  barometer.getLastMeasurementTime();
-	  assertEquals(new Time().getSystemTime(), barometer.getLastMeasurementTime(), 0.000000001);
+	  assertEquals(105, barometer.getLastMeasurementTime(), 0.000000001);
   }
   
   @Test

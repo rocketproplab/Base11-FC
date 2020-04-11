@@ -3,6 +3,7 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 import java.io.IOException;
 
 import org.rocketproplab.marginalstability.flightcomputer.Time;
+import org.rocketproplab.marginalstability.flightcomputer.hal.LPS22HDTest.BarometerTime;
 
 import com.pi4j.io.i2c.I2CDevice;
 
@@ -11,12 +12,13 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
 	private I2CDevice i2cDevice;
 	private double pressure;
 	private double pressureValue;
+	private long time;
 	private Time currTime;
 	
 	private final byte ON_MESSAGE = 0b01100000;
 	private final int ON_ADDRESS = 0x10;
-	private final int MINIMUM_RANGE = 260;
-	private final int MAXIMUM_RANGE = 1260;
+	private final double MINIMUM_RANGE = 259;
+	private final double MAXIMUM_RANGE = 1261;
 	private final double ZERO_TIME = 0.0;
 	private final double SCALING_FACTOR = 4096;
 	private final int ADDRESS_ONE = 0x2A;
@@ -46,7 +48,7 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
 
 	@Override
 	public boolean inUsableRange() {
-		if (pressure >= MINIMUM_RANGE && pressure <= MAXIMUM_RANGE) {
+		if ((pressure > MINIMUM_RANGE) && (pressure < MAXIMUM_RANGE)) {
 			return true;
 		} else  {
 			return false;
@@ -55,9 +57,9 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
 
 	@Override
 	public double getLastMeasurementTime() {
+		
 		if (currTime != null) {
-			System.out.println(currTime.getSystemTime());
-			return currTime.getSystemTime();
+			return time;
 		} else {
 			return ZERO_TIME;
 		}
@@ -65,13 +67,15 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
   
 	public void poll() {
 		try {
-			pressureValue = i2cDevice.read(ADDRESS_ONE) + 
-					i2cDevice.read(ADDRESS_TWO) + i2cDevice.read(ADDRESS_THREE);
+			pressureValue = i2cDevice.read(ADDRESS_ONE)
+					+ (i2cDevice.read(ADDRESS_TWO)<<8)
+					+ (i2cDevice.read(ADDRESS_THREE)<<16);
 			pressure = pressureValue/SCALING_FACTOR;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		time = (long)((BarometerTime) currTime).getTime();
 	}
 
 }
