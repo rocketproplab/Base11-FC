@@ -67,15 +67,15 @@ public class LPS22HD implements Barometer, PollingSensor, Sensor {
   
 	public void poll() {
 		try {
-			pressureValue = i2cDevice.read(ADDRESS_ONE)
+			pressureValue = (i2cDevice.read(ADDRESS_ONE)<<16)
 					+ (i2cDevice.read(ADDRESS_TWO)<<8)
-					+ (i2cDevice.read(ADDRESS_THREE)<<16);
+					+ (i2cDevice.read(ADDRESS_THREE));
 			pressure = pressureValue/SCALING_FACTOR;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		time = (long)((BarometerTime) currTime).getTime();
+		time = (long)currTime.getSystemTime();
 	}
 
 }

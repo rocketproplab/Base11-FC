@@ -24,21 +24,21 @@ public class LPS22HDTest {
     private int address;
     
     public void initValuesOne() {
-    	readMap.put(0x2A, 0b100010);
+    	readMap.put(0x2A, 0b0);
     	readMap.put(0x29, 0b10);
-    	readMap.put(0x28, 0b0);
+    	readMap.put(0x28, 0b100010);
     }
     
     public void initValuesTwo() {
-    	readMap.put(0x2A, 0b111111111111111);
+    	readMap.put(0x2A, 0b111111111111);
     	readMap.put(0x29, 0);
-    	readMap.put(0x28, 0b111111111111);
+    	readMap.put(0x28, 0b111111111111111);
     }
     
     public void initValuesThree() {
-    	readMap.put(0x2A, 0b111111111111111111111);
+    	readMap.put(0x2A, 0b0);
     	readMap.put(0x29, 0b1);
-    	readMap.put(0x28, 0);
+    	readMap.put(0x28, 0b111111111111111111111);
     }
     
     
@@ -122,7 +122,7 @@ public class LPS22HDTest {
   }
   
   public class BarometerTime extends Time {
-	  public double getTime() {
+	  public double getSystemTime() {
 		  return 105;
 	  }
   }
