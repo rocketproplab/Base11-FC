@@ -2,6 +2,9 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
+
+import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 
 import com.pi4j.io.i2c.I2CDevice;
 
@@ -25,6 +28,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
   public static final int  FIFO_SAMPLES_STORED_MASK    = 0b111111;
 
   private static final int BYTES_PER_FIFO_LINE = 12;
+  private static final int BITS_PER_BYTE       = 8;
 
   public enum Registers {
     ACT_THS(0x04),
@@ -184,8 +188,8 @@ public class LSM9DS1 implements PollingSensor, IMU {
     TEMP_AVALIABLE
   }
 
-  private I2CDevice        i2c;
-  private ArrayDeque<Byte> samples = new ArrayDeque<>();
+  private I2CDevice              i2c;
+  private ArrayDeque<IMUReading> samples = new ArrayDeque<>();
 
   public LSM9DS1(I2CDevice device) {
     this.i2c = device;
@@ -274,24 +278,60 @@ public class LSM9DS1 implements PollingSensor, IMU {
   @Override
   public void poll() {
     try {
-      int    samplesInFIFO = this.getSamplesInFIFO();
-      if(samplesInFIFO == 0) {
+      int samplesInFIFO = this.getSamplesInFIFO();
+      if (samplesInFIFO == 0) {
         return;
       }
-      int    dataLength    = samplesInFIFO * BYTES_PER_FIFO_LINE;
-      byte[] data          = new byte[dataLength];
-      int    samplesRead   = this.i2c.read(data, Registers.OUT_X_L_G.getAddress(), dataLength);
-      samples.add(data[0]);
+      int    dataLength  = samplesInFIFO * BYTES_PER_FIFO_LINE;
+      byte[] data        = new byte[dataLength];
+      int    samplesRead = this.i2c.read(data, Registers.OUT_X_L_G.getAddress(), dataLength);
+      this.parseReadings(data, samplesRead);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
+  private void parseReadings(byte[] data, int bytesRead) {
+    int samplesRead = bytesRead / BYTES_PER_FIFO_LINE;
+    for (int i = 0; i < samplesRead; i++) {
+      int        start   = i * BYTES_PER_FIFO_LINE;
+      int        end     = (i + 1) * BYTES_PER_FIFO_LINE;
+      byte[]     samples = Arrays.copyOfRange(data, start, end);
+      IMUReading reading = this.buildReading(samples);
+      this.samples.add(reading);
+    }
+  }
+
+  public IMUReading buildReading(byte[] data) {
+    int[] results = this.getData(data);
+
+    int xGyro = results[0];
+    int yGyro = results[1];
+    int zGyro = results[2];
+    int xAcc  = results[3];
+    int yAcc  = results[4];
+    int zAcc  = results[5];
+
+    Vector3 gyroVec = new Vector3(xGyro, yGyro, zGyro);
+    Vector3 accVec  = new Vector3(xAcc, yAcc, zAcc);
+    return new IMUReading(accVec, gyroVec);
+  }
+
+  private int[] getData(byte[] data) {
+    int[] results = new int[data.length / 2];
+    for (int i = 0; i < data.length / 2; i++) {
+      short low    = (short) (char) data[i * 2];
+      short high   = (short) (char) data[i * 2 + 1];
+      short result = (short) (low | (high << BITS_PER_BYTE));
+      results[i] = result;
+    }
+    return results;
+  }
+
   @Override
   public IMUReading getNext() {
-    // TODO Auto-generated method stub
-    return null;
+    return samples.pollFirst();
   }
 
   @Override
