@@ -37,7 +37,7 @@ public class TestSaraSMSSender {
 		
 		SMSSera.sendMessage("13108665454", "Hello, World!");
 		
-		assertEquals(serialPort.getData().get(3), "Hello, World!");
+		assertEquals(serialPort.getData().get(3), "Hello, World!\r");
 	}
 	
 	@Test
@@ -45,9 +45,9 @@ public class TestSaraSMSSender {
 		SerialPortSara serialPort = new SerialPortSara();
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
 		
-		SMSSera.sendMessage("13108665454", "Wow A Message");
-		assertEquals(serialPort.getData().get(2).substring(10, 21), "13108665454");
-		assertEquals(serialPort.getData().get(3), "Wow A Message");
+		SMSSera.sendMessage("12908665454", "Wow A Message");
+		assertEquals(serialPort.getData().get(2).substring(10, 21), "12908665454");
+		assertEquals(serialPort.getData().get(3), "Wow A Message\r");
 	}
 	
 	@Test
@@ -55,22 +55,17 @@ public class TestSaraSMSSender {
 		SerialPortSara serialPort = new SerialPortSara();
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
 		
-		SMSSera.sendMessage("13108665454", "BLOOD FOR THE BLOOD GOD");
+		SMSSera.sendMessage("12908665454", "BLOOD FOR THE BLOOD GOD");
 		assertEquals(serialPort.getData().get(0), "AT");
 		assertEquals(serialPort.getData().get(1), "AT+CMFG=1");
-		assertEquals(serialPort.getData().get(2), "AT+CMGS=\"+13108665454\"");
-		assertEquals(serialPort.getData().get(3), "BLOOD FOR THE BLOOD GOD");
+		assertEquals(serialPort.getData().get(2), "AT+CMGS=\"+12908665454\"\n");
+		assertEquals(serialPort.getData().get(3), "BLOOD FOR THE BLOOD GOD\r");
 	}
 	
 	@Test
 	public void numberNotValid() {
 		SerialPortSara serialPort = new SerialPortSara();
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
-		
-		try {
-			SMSSera.sendMessage(null, "BLOOD FOR THE BLOOD GOD");
-			fail("Expected NullPointerException");
-		} catch (NullPointerException e) {}
 		
 		try {
 			SMSSera.sendMessage("4", "FOR NARNIAAAA");
