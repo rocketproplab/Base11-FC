@@ -57,7 +57,7 @@ public class TestSaraSMSSender {
 		
 		SMSSera.sendMessage("12908665454", "BLOOD FOR THE BLOOD GOD");
 		assertEquals(serialPort.getData().get(0), "AT");
-		assertEquals(serialPort.getData().get(1), "AT+CMFG=1");
+		assertEquals(serialPort.getData().get(1), "AT+CMGF=1");
 		assertEquals(serialPort.getData().get(2), "AT+CMGS=\"+12908665454\"\n");
 		assertEquals(serialPort.getData().get(3), "BLOOD FOR THE BLOOD GOD\r");
 	}
