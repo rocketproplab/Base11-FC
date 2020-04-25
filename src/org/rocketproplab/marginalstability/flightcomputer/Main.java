@@ -29,8 +29,6 @@ public class Main {
   }
 
   private static void registerPacketListeners() {
-    PacketRouter.getInstance().addListener(PTSubsystem.getInstance(),
-        SCMPacket.class, PacketSources.EngineControllerUnit);
     PacketRouter.getInstance().addListener(ValveStateSubsystem.getInstance(),
         SCMPacket.class, PacketSources.EngineControllerUnit);
   }

@@ -1,77 +1,46 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotEquals;
-
 import org.junit.Test;
-import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
+import org.rocketproplab.marginalstability.flightcomputer.hal.AnalogDigitalConverter;
+
+import static org.junit.Assert.*;
 
 public class TestPTSubsystem {
-	
-	@Test
-	public void onZeroSCMPacketReceivePTreadZero() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket zeropacket = new SCMPacket(SCMPacketType.P0, "00000");
-		ptsubsystem.onPacket(PacketDirection.RECIVE, zeropacket);
-		assertEquals(0, ptsubsystem.getPT(0), 0.0000001);
-	}
-	
-	@Test
-	public void returnNonNumberIfNotInitialised() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		assertTrue(Double.isNaN(ptsubsystem.getPT(0)));
-	}
-	
-	@Test
-	public void onValueSCMPacketReceivePTReadValue() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket zeropacket = new SCMPacket(SCMPacketType.P0, "00005");
-		ptsubsystem.onPacket(PacketDirection.RECIVE, zeropacket);
-		assertEquals(5, ptsubsystem.getPT(0), 0.0000001);
-	}
-	
-	@Test
-	public void onValueSCMPacketReceivePTReadValue2() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket fourpacket = new SCMPacket(SCMPacketType.P4, "00001");
-		ptsubsystem.onPacket(PacketDirection.RECIVE, fourpacket);
-		assertEquals(1, ptsubsystem.getPT(4), 0.0000001);
-	}
-	
-	@Test
-	public void returnNaNifValueNotValid() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket nonValidPacket = new SCMPacket(SCMPacketType.P0, "01234");
-		ptsubsystem.onPacket(PacketDirection.RECIVE, nonValidPacket);
-		assertEquals(Double.NaN, ptsubsystem.getPT(0), 0.0000001);
-	}
-	
-	@Test
-	public void ifCorrectValue() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket notUsefulPacket = new SCMPacket(SCMPacketType.P2, "00005");
-		ptsubsystem.onPacket(PacketDirection.RECIVE, notUsefulPacket);
-		assertNotEquals(0, ptsubsystem.getPT(2), 0.000001);
-	}
-	
-	@Test
-	public void returnNaNIfPacketNotRecive() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket sendedPacket = new SCMPacket(SCMPacketType.P2, "00005");
-		ptsubsystem.onPacket(PacketDirection.SEND, sendedPacket);
-		assertEquals(Double.NaN, ptsubsystem.getPT(2), 0.000001);
-	}
-	
-	@Test
-	public void returnZeroIfPTIsCalibratedAndZero() {
-		PTSubsystem ptsubsystem = new PTSubsystem();
-		SCMPacket packetyPacket = new SCMPacket(SCMPacketType.P4, "00005");
-		ptsubsystem.onPacket(PacketDirection.RECIVE, packetyPacket);
-		assertEquals(5, ptsubsystem.getPT(4), 0.0000001);
-	}
-	
 
+  private static final double EPSILON = 0.0000001;
+  private static final double[] TEST_VOLTAGES = {
+          3.243100861992423,
+          4.96298205308679,
+          3.4319099852820822,
+          3.6941158775736316,
+          1.0388381644118727,
+          1.6895078811799191,
+          0.9166823110491484,
+          2.3365812211691708};
+  private static final double[] TEST_PRESSURES = {
+          3.243100861992423,
+          4.96298205308679,
+          3.4319099852820822,
+          3.6941158775736316,
+          1.0388381644118727,
+          1.6895078811799191,
+          0.9166823110491484,
+          2.3365812211691708};
+  private static final AnalogDigitalConverter TEST_ADC = index -> TEST_VOLTAGES[index];
+
+  @Test(expected = NullPointerException.class)
+  public void nullADCInDefaultInstance() {
+    PTSubsystem ptSubsystem = PTSubsystem.getInstance();
+    ptSubsystem.getPTValue(PTSubsystem.ChannelIndex.ONE);
+  }
+
+  @Test
+  public void voltageToPTValueConversion() {
+    PTSubsystem ptSubsystem = new PTSubsystem(TEST_ADC);
+    for (PTSubsystem.ChannelIndex channelIndex : PTSubsystem.ChannelIndex.values()) {
+      double ptValue  = ptSubsystem.getPTValue(channelIndex);
+      double expected = TEST_PRESSURES[channelIndex.getAdcChannel()];
+      assertEquals(expected, ptValue, EPSILON);
+    }
+  }
 }
