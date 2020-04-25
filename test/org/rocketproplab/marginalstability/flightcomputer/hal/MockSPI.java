@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 
 import com.pi4j.io.spi.SpiDevice;
 
@@ -12,6 +13,8 @@ public class MockSPI implements SpiDevice {
   
   public byte[] lastWritten;
   public byte[] toReturn;
+  
+  public HashMap<Integer, byte[]> returnMap = new HashMap<>();
 
   @Override
   public String write(String data, Charset charset) throws IOException {
