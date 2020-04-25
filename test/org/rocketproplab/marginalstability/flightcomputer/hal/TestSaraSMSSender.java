@@ -37,7 +37,7 @@ public class TestSaraSMSSender {
 		
 		SMSSera.sendMessage("13108665454", "Hello, World!");
 		
-		assertEquals(serialPort.getData().get(3), "Hello, World!\r");
+		assertEquals(serialPort.getData().get(3), "Hello, World!\r\n");
 	}
 	
 	@Test
@@ -47,7 +47,7 @@ public class TestSaraSMSSender {
 		
 		SMSSera.sendMessage("12908665454", "Wow A Message");
 		assertEquals(serialPort.getData().get(2).substring(10, 21), "12908665454");
-		assertEquals(serialPort.getData().get(3), "Wow A Message\r");
+		assertEquals(serialPort.getData().get(3), "Wow A Message\r\n");
 	}
 	
 	@Test
@@ -56,10 +56,10 @@ public class TestSaraSMSSender {
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
 		
 		SMSSera.sendMessage("12908665454", "BLOOD FOR THE BLOOD GOD");
-		assertEquals(serialPort.getData().get(0), "AT");
-		assertEquals(serialPort.getData().get(1), "AT+CMGF=1");
+		assertEquals(serialPort.getData().get(0), "AT\n");
+		assertEquals(serialPort.getData().get(1), "AT+CMGF=1\n");
 		assertEquals(serialPort.getData().get(2), "AT+CMGS=\"+12908665454\"\n");
-		assertEquals(serialPort.getData().get(3), "BLOOD FOR THE BLOOD GOD\r");
+		assertEquals(serialPort.getData().get(3), "BLOOD FOR THE BLOOD GOD\r\n");
 	}
 	
 	@Test
@@ -69,6 +69,15 @@ public class TestSaraSMSSender {
 		
 		try {
 			SMSSera.sendMessage("4", "FOR NARNIAAAA");
+			fail("Expected IllegalArgumentException");
+		} catch (IllegalArgumentException e) {}
+		
+		String longMessage = "FOR NARNIAAAA AND NO ONE ELSE OR MAYBE FOR THE BLOOD"
+				+ "GOD OR SOMEONE ELSE. I HAVE NO IDEA, THIS IS ME YELLING TO TAKE"
+				+ "UP SPACE SO THAT I CAN TEST A THINGAMAJING MWAHAHAH MEWTWO I WIN";
+		
+		try {
+			SMSSera.sendMessage("12348192019", longMessage);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {}
 	}
