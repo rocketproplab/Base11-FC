@@ -58,14 +58,14 @@ public class TestLandedSMSSubsystem {
     }
   }
 
-  private TestSMSSender smsSender;
-  private TestSMSTime smsTime;
+  private TestSMSSender      smsSender;
+  private TestSMSTime        smsTime;
   private LandedSMSSubsystem landedSMSSubsystem;
 
   @Before
   public void init() {
-    this.smsSender = new TestSMSSender();
-    this.smsTime = new TestSMSTime();
+    this.smsSender          = new TestSMSSender();
+    this.smsTime            = new TestSMSTime();
     this.landedSMSSubsystem = new LandedSMSSubsystem(null, smsSender, smsTime);
   }
 
