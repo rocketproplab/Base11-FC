@@ -14,7 +14,8 @@ public class MockSPI implements SpiDevice {
   public byte[] lastWritten;
   public byte[] toReturn;
   
-  public HashMap<Integer, byte[]> returnMap = new HashMap<>();
+  public HashMap<Integer, byte[]> toReturnMap = new HashMap<>();
+  public HashMap<Integer, byte[]> lastWrittenMap = new HashMap<>();
 
   @Override
   public String write(String data, Charset charset) throws IOException {
@@ -55,6 +56,10 @@ public class MockSPI implements SpiDevice {
   @Override
   public byte[] write(byte... data) throws IOException {
     this.lastWritten = data;
+    this.lastWrittenMap.put((int) data[0], data);
+    if(this.toReturnMap.containsKey((int)data[0])) {
+      return this.toReturnMap.get((int)data[0]);
+    }
     return this.toReturn;
   }
 

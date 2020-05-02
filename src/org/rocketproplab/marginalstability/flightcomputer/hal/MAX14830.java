@@ -1,8 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import java.io.IOException;
-
-import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
+import java.nio.charset.Charset;
 
 import com.pi4j.io.spi.SpiDevice;
 
@@ -44,7 +43,7 @@ public class MAX14830 implements PollingSensor {
     XON1(0x14),
     XON2(0x15),
     XOFF1(0x16),
-    XOFF2(0x17), 
+    XOFF2(0x17),
     // GPIOs
     GPIOConfg(0x18),
     GPIOData(0x19),
@@ -63,7 +62,7 @@ public class MAX14830 implements PollingSensor {
     SynchDelay2(0x22),
     // TIMER REGISTERS
     TIMER1(0x23),
-    TIMER2(0x24), 
+    TIMER2(0x24),
     // REVISION
     REVID(0x25);
 
@@ -78,107 +77,141 @@ public class MAX14830 implements PollingSensor {
     }
   }
 
-  private static final int UART_SELECT_LSB_IDX = 5;
-  private static final byte WRITE = -0x80;
-  private static final int BYTE_MSB_VALUE = 128;
+  private static final String CHARSET = "US-ASCII";
 
-  private SpiDevice spi;
-  private StringBuffer uart0Buffer;
-  private StringBuffer uart1Buffer;
-  private StringBuffer uart2Buffer;
-  private StringBuffer uart3Buffer;
+  private static final int  UART_SELECT_LSB_IDX = 5;
+  private static final byte WRITE               = -0x80;
+  private static final int  BYTE_MSB_VALUE      = 128;
+
+  private static final int TX_BUFFER_SIZE = 128;
+
+  private SpiDevice           spi;
+  private StringBuffer[]      uartBufferArray;
+  private SerialPortAdapter[] serialPortArray;
+  private int[]               txFifoLengths;
+  private Charset             charset;
 
   public MAX14830(SpiDevice spi) {
-    this.spi = spi;
-    this.uart0Buffer = new StringBuffer();
-    this.uart1Buffer = new StringBuffer();
-    this.uart2Buffer = new StringBuffer();
-    this.uart3Buffer = new StringBuffer();
+    this.spi             = spi;
+    this.uartBufferArray = new StringBuffer[Port.values().length];
+    this.serialPortArray = new SerialPortAdapter[Port.values().length];
+    this.txFifoLengths   = new int[Port.values().length];
+    for (int i = 0; i < Port.values().length; i++) {
+      this.uartBufferArray[i] = new StringBuffer();
+      this.txFifoLengths[i]   = TX_BUFFER_SIZE;
+      final Port port = Port.values()[i];
+      this.serialPortArray[i] = new SerialPortAdapter(message -> this.writeToPort(port, message));
+    }
+    this.charset = Charset.forName(CHARSET);
   }
 
   protected int getTXBufferLen(Port port) throws IOException {
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | Registers.TxFIFOLvl.address());
+    int  uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte command    = (byte) (uartSelect | Registers.TxFIFOLvl.address());
     return this.readRegister(command);
   }
 
   protected int getRXBufferLen(Port port) throws IOException {
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | Registers.RxFIFOLvl.address());
+    int  uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte command    = (byte) (uartSelect | Registers.RxFIFOLvl.address());
     return this.readRegister(command);
   }
-  
+
   private int readRegister(byte command) throws IOException {
-    byte[] data = {command, 0};
+    byte[] data     = { command, 0 };
     byte[] readData = this.spi.write(data);
-    if(readData.length < 2) {
+    if (readData.length < 2) {
       return -1;
     }
     int result = readData[1];
-    if(result < 0) {
-      result += 2*BYTE_MSB_VALUE;
+    if (result < 0) {
+      result += 2 * BYTE_MSB_VALUE;
     }
     return result;
   }
-  
+
   protected int writeToTxFifo(Port port, int charCount) throws IOException {
     StringBuffer stringBuffer = this.selectBuffer(port);
-    
+
     int readCount = Math.min(charCount, stringBuffer.length());
-    
+
     String first = stringBuffer.substring(0, readCount);
     stringBuffer.delete(0, readCount);
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | WRITE | Registers.RHR.address());
-    byte[] data = first.getBytes();
-    byte[] toWrite = new byte[data.length + 1];
+    int    uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte   command    = (byte) (uartSelect | WRITE | Registers.THR.address());
+    byte[] data       = first.getBytes(this.charset);
+    byte[] toWrite    = new byte[data.length + 1];
     toWrite[0] = command;
     System.arraycopy(data, 0, toWrite, 1, data.length);
     this.spi.write(toWrite);
     return readCount;
   }
 
+  protected byte[] readFromRxFifo(Port port, int charCount) throws IOException {
+    int    uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte   command    = (byte) (uartSelect | Registers.RHR.address());
+    byte[] zeros      = new byte[charCount + 1];
+    zeros[0] = command;
+    return this.spi.write(zeros);
+  }
+
   public SerialPort getPort(Port port) {
-    return new SerialPort() {
-
-      @Override
-      public void registerListener(SerialListener listener) {
-        MAX14830.this.registerListener(port, listener);
-      }
-
-      @Override
-      public void write(String data) {
-        writeToPort(port, data);
-      }
-      
-    };
+    return this.serialPortArray[port.ordinal()];
   }
 
   public void writeToPort(Port port, String data) {
     StringBuffer stringBuffer = this.selectBuffer(port);
     stringBuffer.append(data);
   }
-  
+
   private StringBuffer selectBuffer(Port port) {
-    switch(port) {
-    case UART0:
-      return this.uart0Buffer;
-    case UART1:
-      return this.uart1Buffer;
-    case UART2:
-      return this.uart2Buffer;
-    default:
-      return this.uart3Buffer;
+    return this.uartBufferArray[port.ordinal()];
+  }
+
+  private void writeToPort(Port port, int length) throws IOException {
+    int spaceLeft = TX_BUFFER_SIZE - this.txFifoLengths[port.ordinal()];
+    if (spaceLeft < length) {
+      int txBufferLen = this.getTXBufferLen(port);
+      spaceLeft                          = TX_BUFFER_SIZE - txBufferLen;
+      this.txFifoLengths[port.ordinal()] = txBufferLen;
+    }
+
+    if (spaceLeft > 0) {
+      int written = this.writeToTxFifo(port, spaceLeft);
+      this.txFifoLengths[port.ordinal()] += written;
     }
   }
 
-  public void registerListener(Port port, SerialListener listener) {
-
+  private void readFromPort(Port port, int length) throws IOException {
+    byte[]            byteMessage        = this.readFromRxFifo(port, length);
+    String            unprocessedMessage = new String(byteMessage, this.charset);
+    String            message            = unprocessedMessage.substring(1);
+    SerialPortAdapter serialPort         = this.serialPortArray[port.ordinal()];
+    serialPort.newMessage(message);
   }
-  
+
+  private void pollPort(Port port) throws IOException {
+    StringBuffer buffer = this.selectBuffer(port);
+    int          length = buffer.length();
+    if (length != 0) {
+      this.writeToPort(port, length);
+    }
+    int rxLen = this.getRXBufferLen(port);
+    if (rxLen > 0) {
+      this.readFromPort(port, rxLen);
+    }
+  }
 
   @Override
   public void poll() {
+    try {
+      for (Port port : Port.values()) {
+        pollPort(port);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+      // TODO Handle error
+    }
 
   }
 }

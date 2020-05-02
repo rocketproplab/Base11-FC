@@ -1,8 +1,11 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -125,14 +128,55 @@ public class MAX14830Test {
   @Test
   public void pollFillsTxBufferToFull() throws IOException {
     this.spi.toReturn = new byte[] {0, 0};
+    this.spi.toReturnMap.put(0x11, new byte[] {0, 123});
     SerialPort port = this.max14830.getPort(Port.UART0);
-    port.write("Hello");
-    int writeLen = this.max14830.writeToTxFifo(Port.UART0, 10);
-    byte[] written = this.spi.lastWritten;
+    port.write("Hello World");
+    this.max14830.poll();
+    byte[] written = this.spi.lastWrittenMap.get(-0x80);
     assertEquals(6, written.length);
     assertEquals((byte)0b10000000, written[0]);
     String testString = new String(written, 1, 5);
     assertEquals("Hello", testString);
-    assertEquals(5, writeLen);
+  }
+  
+  @Test
+  public void doublePollReadsOnce() throws IOException {
+    this.spi.toReturn = new byte[] {0, 0};
+    this.spi.toReturnMap.put(0x11, new byte[] {0, 110});
+    SerialPort port = this.max14830.getPort(Port.UART0);
+    port.write("Hello World");
+    this.max14830.poll();
+    port.write("Hello");
+    this.spi.lastWrittenMap.clear();
+    this.spi.toReturnMap.put(0x11, new byte[] {0, 121});
+    this.max14830.poll();
+    byte[] written = this.spi.lastWrittenMap.get(-0x80);
+    assertEquals(6, written.length);
+    assertEquals((byte)0b10000000, written[0]);
+    String testString = new String(written, 1, 5);
+    assertEquals("Hello", testString);
+    assertFalse(this.spi.lastWrittenMap.containsKey(0x11));
+  }
+  
+  @Test
+  public void readRxFifoReadsFromFifo() throws IOException {
+    this.spi.toReturn = new byte[] {0, 0};
+    byte[] bytes = "\0Hello World".getBytes(Charset.forName("US-ASCII"));
+    this.spi.toReturnMap.put(0, bytes);
+    byte[] data = this.max14830.readFromRxFifo(Port.UART0, 11);
+    assertEquals(12, data.length);
+    assertEquals(bytes, data);
+  }
+  
+  @Test
+  public void listenerCalledWithNewString() throws IOException {
+    this.spi.toReturn = new byte[] {0, 0};
+    final ArrayList<String> writeList = new ArrayList<>();
+    this.max14830.getPort(Port.UART0).registerListener(writeList::add);
+    this.spi.toReturnMap.put(0x12, new byte[] {0, 11});
+    this.spi.toReturnMap.put(0, "\0Hello World".getBytes(Charset.forName("US-ASCII")));
+    this.max14830.poll();
+    assertEquals(1, writeList.size());
+    assertEquals("Hello World", writeList.get(0));
   }
 }
