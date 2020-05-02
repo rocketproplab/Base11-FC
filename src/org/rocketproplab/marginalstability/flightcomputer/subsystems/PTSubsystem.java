@@ -39,14 +39,14 @@ public class PTSubsystem {
   }
 
   public enum ChannelIndex {
-    ONE(0),
-    TWO(1),
-    THREE(2),
-    FOUR(3),
-    FIVE(4),
-    SIX(5),
-    SEVEN(6),
-    EIGHT(7);
+    CH0(0),
+    CH1(1),
+    CH2(2),
+    CH3(3),
+    CH4(4),
+    CH5(5),
+    CH6(6),
+    CH7(7);
 
     private int adcChannel;
 
