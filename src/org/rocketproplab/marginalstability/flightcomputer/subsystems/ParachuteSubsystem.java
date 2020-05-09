@@ -44,6 +44,8 @@ public class ParachuteSubsystem
   private Barometer            barometer;
 
   private double                  lastPressureBelowThresholdTime = Double.NaN;
+  private boolean                 shouldEmitMainChuteOpen        = true;
+  private boolean                 shouldEmitDrogueChuteOpen      = true;
   private List<ParachuteListener> parachuteListeners;
 
   /**
@@ -108,8 +110,8 @@ public class ParachuteSubsystem
       return;
     }
 
-    Vector3 currentPos = this.position.getAt(time.getSystemTime());
-    double sinceBelowThresholdTime = sincePressureBelowThresholdTime();
+    Vector3 currentPos              = this.position.getAt(time.getSystemTime());
+    double  sinceBelowThresholdTime = sincePressureBelowThresholdTime();
     if (currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT
             && sinceBelowThresholdTime > Settings.MAIN_CHUTE_PRESSURE_TIME_THRESHOLD) {
       this.mainChute.set(true);
@@ -138,6 +140,10 @@ public class ParachuteSubsystem
    * Emit main chute open event to all listeners
    */
   private void mainChuteOpenCallback() {
+    if (!shouldEmitMainChuteOpen) {
+      return;
+    }
+    shouldEmitMainChuteOpen = false;
     for (ParachuteListener listener : parachuteListeners) {
       listener.onMainChuteOpen();
     }
@@ -147,6 +153,10 @@ public class ParachuteSubsystem
    * Emit drogue chute open event to all listeners
    */
   private void drogueChuteOpenCallback() {
+    if (!shouldEmitDrogueChuteOpen) {
+      return;
+    }
+    shouldEmitDrogueChuteOpen = false;
     for (ParachuteListener listener : parachuteListeners) {
       listener.onDrogueOpen();
     }
