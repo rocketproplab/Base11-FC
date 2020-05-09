@@ -17,8 +17,7 @@ public class Settings {
   // Parachute Deploy Settings
 
   /**
-   * The height at which we should deploy the main chute in meters above sea
-   * level
+   * The height at which we should deploy the main chute in meters above sea level
    */
   public static double MAIN_CHUTE_HEIGHT = 5000; // m
 
@@ -52,18 +51,24 @@ public class Settings {
   /**
    * 'a' constant for pressures
    */
-  public static double[] A_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  public static double[] A_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0 };
 
   /**
    * 'b' constant for pressures
    */
-  public static double[] B_PT_CONSTANTS = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+  public static double[] B_PT_CONSTANTS = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+      1.0 };
 
   /**
    * 'c' constant for pressures
    */
-  public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0 };
+
+  /**
+   * Frequency of reference oscillator for the MAX14830, currently a LFXTAL003260
+   * labeled X1 in the schematic.
+   */
+  public static int MAX14830_F_REF = 3686400; // Hz
 }
