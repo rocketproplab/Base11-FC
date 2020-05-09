@@ -45,6 +45,9 @@ public class SaraSMSSender implements SMSSender, SerialListener {
 				+ " is: " + latitude;
 		
 		return message;
+		// how do we get message into string(data) if the phone number
+		//is passed in the method call and we don't necessarily have
+		//the phone number yet?
 	}
 	
 	public void getGPSInfo() {
