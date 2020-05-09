@@ -69,9 +69,11 @@ public class TestParachuteSubsystem {
   }
 
   private class TestBarometer implements Barometer {
+    public double pressure = -1;
+
     @Override
     public double getPressure() {
-      return -1;
+      return pressure;
     }
 
     @Override
@@ -167,13 +169,16 @@ public class TestParachuteSubsystem {
     paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+    barometer.pressure = -1;
+    paraSystem.update();
+    time.time = 20;
     paraSystem.update();
     assertTrue(main.active);
     assertTrue(drogue.active);
   }
 
   @Test
-  public void mainDoesntDeployOnWayDownTooHighWhileFalling() {
+  public void mainDoesNotDeployOnWayDownTooHighWhileFalling() {
     paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT * 2));
@@ -211,4 +216,29 @@ public class TestParachuteSubsystem {
     assertTrue(drogue.active);
   }
 
+  @Test
+  public void parachuteDoesNotOpenAbovePressure() {
+    paraSystem.onFlightModeChange(FlightMode.Falling);
+    paraSystem.onPositionEstimate(
+            new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+    barometer.pressure = 1;
+    paraSystem.update();
+    assertFalse(main.active);
+    time.time = 20;
+    paraSystem.update();
+    assertFalse(main.active);
+  }
+
+  @Test
+  public void parachuteOpensAfterTimeThreshold() {
+    paraSystem.onFlightModeChange(FlightMode.Falling);
+    paraSystem.onPositionEstimate(
+            new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+    barometer.pressure = -1;
+    paraSystem.update();
+    assertFalse(main.active);
+    time.time = 20;
+    paraSystem.update();
+    assertTrue(main.active);
+  }
 }

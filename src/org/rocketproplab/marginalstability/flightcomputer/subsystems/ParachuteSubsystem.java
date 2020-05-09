@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * A subsystem that controls the solenoids for deploying the parachutes.
  *
- * @author Max Apodaca
+ * @author Max Apodaca, Chi Chow
  */
 public class ParachuteSubsystem
         implements FlightStateListener, PositionListener, Subsystem,
@@ -43,7 +43,7 @@ public class ParachuteSubsystem
   private Time                 time;
   private Barometer            barometer;
 
-  private double                  lastPressureBelowThresholdTime = -1;
+  private double                  lastPressureBelowThresholdTime = Double.NaN;
   private List<ParachuteListener> parachuteListeners;
 
   /**
@@ -63,6 +63,11 @@ public class ParachuteSubsystem
     this.parachuteListeners = new ArrayList<>();
   }
 
+  /**
+   * Add a ParachuteListener to emit parachute changes
+   *
+   * @param parachuteListener ParachuteListener to emit callbacks to
+   */
   public void addParachuteListener(ParachuteListener parachuteListener) {
     parachuteListeners.add(parachuteListener);
   }
@@ -93,6 +98,9 @@ public class ParachuteSubsystem
     this.position = positionEstimate;
   }
 
+  /**
+   * Update parachute state to determine whether the main chute should be deployed
+   */
   @Override
   public void update() {
     if (this.position == null ||
@@ -101,13 +109,19 @@ public class ParachuteSubsystem
     }
 
     Vector3 currentPos = this.position.getAt(time.getSystemTime());
+    double sinceBelowThresholdTime = sincePressureBelowThresholdTime();
     if (currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT
-            && sincePressureBelowThresholdTime() > Settings.MAIN_CHUTE_PRESSURE_TIME_THRESHOLD) {
+            && sinceBelowThresholdTime > Settings.MAIN_CHUTE_PRESSURE_TIME_THRESHOLD) {
       this.mainChute.set(true);
       mainChuteOpenCallback();
     }
   }
 
+  /**
+   * Calculate the time since the pressure was below the threshold to deploy the main chute
+   *
+   * @return time since pressure is below the threshold
+   */
   private double sincePressureBelowThresholdTime() {
     if (barometer.getPressure() >= Settings.MAIN_CHUTE_PRESSURE) {
       lastPressureBelowThresholdTime = Double.NaN;
@@ -115,16 +129,23 @@ public class ParachuteSubsystem
     }
     if (Double.isNaN(lastPressureBelowThresholdTime)) {
       lastPressureBelowThresholdTime = time.getSystemTime();
+      System.out.println(lastPressureBelowThresholdTime);
     }
     return time.getSystemTime() - lastPressureBelowThresholdTime;
   }
 
+  /**
+   * Emit main chute open event to all listeners
+   */
   private void mainChuteOpenCallback() {
     for (ParachuteListener listener : parachuteListeners) {
       listener.onMainChuteOpen();
     }
   }
 
+  /**
+   * Emit drogue chute open event to all listeners
+   */
   private void drogueChuteOpenCallback() {
     for (ParachuteListener listener : parachuteListeners) {
       listener.onDrogueOpen();
