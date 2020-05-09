@@ -11,6 +11,12 @@ import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 
 public class TestSaraSMSSender {
+	public class SeraGPS {
+		//when the rocket lands we want it to send us it's location
+		//i think i should pass this as an object, then we can set a listener
+		//on it for when it lands
+		//we have to talk to this through the serial port?
+	}
 	public class SerialPortSara implements SerialPort{
 		List<String> data = new ArrayList<String>();
 		
@@ -35,7 +41,7 @@ public class TestSaraSMSSender {
 		SerialPortSara serialPort = new SerialPortSara();
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
 		
-		SMSSera.sendMessage("13108665454", "Hello, World!");
+		SMSSera.sendTextMessage("13108665454", "Hello, World!");
 		
 		assertEquals(serialPort.getData().get(3), "Hello, World!\r\n");
 	}
@@ -45,7 +51,7 @@ public class TestSaraSMSSender {
 		SerialPortSara serialPort = new SerialPortSara();
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
 		
-		SMSSera.sendMessage("12908665454", "Wow A Message");
+		SMSSera.sendTextMessage("12908665454", "Wow A Message");
 		assertEquals(serialPort.getData().get(2).substring(10, 21), "12908665454");
 		assertEquals(serialPort.getData().get(3), "Wow A Message\r\n");
 	}
@@ -55,7 +61,7 @@ public class TestSaraSMSSender {
 		SerialPortSara serialPort = new SerialPortSara();
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
 		
-		SMSSera.sendMessage("12908665454", "BLOOD FOR THE BLOOD GOD");
+		SMSSera.sendTextMessage("12908665454", "BLOOD FOR THE BLOOD GOD");
 		assertEquals(serialPort.getData().get(0), "AT\n");
 		assertEquals(serialPort.getData().get(1), "AT+CMGF=1\n");
 		assertEquals(serialPort.getData().get(2), "AT+CMGS=\"+12908665454\"\n");
@@ -68,7 +74,7 @@ public class TestSaraSMSSender {
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
 		
 		try {
-			SMSSera.sendMessage("4", "FOR NARNIAAAA");
+			SMSSera.sendTextMessage("4", "FOR NARNIAAAA");
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {}
 		
@@ -77,9 +83,33 @@ public class TestSaraSMSSender {
 				+ "UP SPACE SO THAT I CAN TEST A THINGAMAJING MWAHAHAH MEWTWO I WIN";
 		
 		try {
-			SMSSera.sendMessage("12348192019", longMessage);
+			SMSSera.sendTextMessage("12348192019", longMessage);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException e) {}
+	}
+	
+	@Test
+	public void testGetGPSInfo() {
+		SerialPortSara serialPort = new SerialPortSara();
+		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
+		SMSSera.getGPSInfo();
+		assertEquals(serialPort.getData().get(2), "AT+UGPS=1\n");
+		assertEquals(serialPort.getData().get(3), "AT+UGGGA?\r\n");
+	}
+	
+	@Test
+	public void testGPSCreateMessage() {
+		SerialPortSara serialPort = new SerialPortSara();
+		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
+		SMSSera.onSerialData("+UGGGA: 1,$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+		
+		String message = SMSSera.createMessage();
+		SMSSera.sendTextMessage("12908665454", message);
+		
+		assertEquals(serialPort.getData().get(3), "The longitude is: 7.0\n" + 
+				"The latitude is: -32.0\r\n");
+		
+		System.out.println(serialPort.getData().get(3));
 	}
 	
 
