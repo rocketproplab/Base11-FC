@@ -21,6 +21,16 @@ public class Settings {
    */
   public static double MAIN_CHUTE_HEIGHT = 5000; // m
 
+  /**
+   * The pressure at which we should deploy the main chute
+   */
+  public static double MAIN_CHUTE_PRESSURE = 0; // TODO: set main chute pressure
+
+  /**
+   * Time threshold needed to exceed to deploy the main chute
+   */
+  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to deploy main chute
+
   // Unit conversions
 
   /**
