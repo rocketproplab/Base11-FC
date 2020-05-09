@@ -214,4 +214,8 @@ public class MAX14830 implements PollingSensor {
     }
 
   }
+  
+  public void setBaudrate(Port port, int baudrate) {
+    // D = fREF / ( 16 * BaudRate )  from datasheet page 21
+  }
 }

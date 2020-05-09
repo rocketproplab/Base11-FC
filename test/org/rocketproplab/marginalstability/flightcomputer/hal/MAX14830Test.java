@@ -179,4 +179,10 @@ public class MAX14830Test {
     assertEquals(1, writeList.size());
     assertEquals("Hello World", writeList.get(0));
   }
+  
+  @Test
+  public void setBuadrateSetsBaudrateAccordingTofREF() {
+    this.spi.toReturn = new byte[] {0,0};
+    this.max14830.setBaudrate(Port.UART0, 115200);
+  }
 }

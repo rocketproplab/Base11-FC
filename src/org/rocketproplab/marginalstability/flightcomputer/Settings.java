@@ -56,4 +56,10 @@ public class Settings {
    */
   public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  
+  /**
+   * Frequency of reference oscillator to MAX14830, currently a LFXTAL003260
+   * labeled X1 in the schematic.
+   */
+  public static int MAX14830_F_REF = 3686400; // Hz
 }
