@@ -7,7 +7,22 @@ import org.rocketproplab.marginalstability.flightcomputer.Settings;
 
 import com.pi4j.io.spi.SpiDevice;
 
+/**
+ * A class that implements the SPI protocol for the MAX14830, it contains the
+ * code to emit serial port events to any listeners listening to ports provided
+ * by the MAX14830.
+ * 
+ * @author Max Apodaca
+ *
+ */
 public class MAX14830 implements PollingSensor {
+
+  /**
+   * The list of ports which we can access on the MAX14830
+   * 
+   * @author Max Apodaca
+   *
+   */
   public enum Port {
     UART0,
     UART1,
@@ -15,6 +30,12 @@ public class MAX14830 implements PollingSensor {
     UART3;
   }
 
+  /**
+   * The list of registers found on the MAX14830
+   * 
+   * @author Max Apodaca
+   *
+   */
   public enum Registers {
     // FIFO DATA
     RHR(0x00),
