@@ -11,6 +11,7 @@ import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
+import org.rocketproplab.marginalstability.flightcomputer.hal.Barometer;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Solenoid;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
@@ -67,17 +68,36 @@ public class TestParachuteSubsystem {
 
   }
 
+  private class TestBarometer implements Barometer {
+    @Override
+    public double getPressure() {
+      return -1;
+    }
+
+    @Override
+    public boolean inUsableRange() {
+      return false;
+    }
+
+    @Override
+    public double getLastMeasurementTime() {
+      return 0;
+    }
+  }
+
   private ParachuteSubsystem paraSystem;
   private TestSolenoid       main;
   private TestSolenoid       drogue;
   private TestTime           time;
+  private TestBarometer      barometer;
 
   @Before
   public void init() {
     main       = new TestSolenoid();
     drogue     = new TestSolenoid();
     time       = new TestTime();
-    paraSystem = new ParachuteSubsystem(main, drogue, time);
+    barometer  = new TestBarometer();
+    paraSystem = new ParachuteSubsystem(main, drogue, time, barometer);
   }
 
   @Test
@@ -126,7 +146,7 @@ public class TestParachuteSubsystem {
   public void mainDoesNotActivateOnWayUpBurn() {
     paraSystem.onFlightModeChange(FlightMode.Burn);
     paraSystem.onPositionEstimate(
-        new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+            new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
     paraSystem.update();
     assertFalse(main.active);
     assertFalse(drogue.active);
@@ -136,7 +156,7 @@ public class TestParachuteSubsystem {
   public void mainDoesNotActivateOnWayUpCoast() {
     paraSystem.onFlightModeChange(FlightMode.Coasting);
     paraSystem.onPositionEstimate(
-        new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+            new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
     paraSystem.update();
     assertFalse(main.active);
     assertFalse(drogue.active);
@@ -146,7 +166,7 @@ public class TestParachuteSubsystem {
   public void mainDeploysOnWayDownFalling() {
     paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
-        new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+            new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
     paraSystem.update();
     assertTrue(main.active);
     assertTrue(drogue.active);
@@ -156,7 +176,7 @@ public class TestParachuteSubsystem {
   public void mainDoesntDeployOnWayDownTooHighWhileFalling() {
     paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
-        new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT * 2));
+            new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT * 2));
     paraSystem.update();
     assertFalse(main.active);
     assertTrue(drogue.active);
@@ -176,19 +196,19 @@ public class TestParachuteSubsystem {
     assertTrue(main.active);
     assertTrue(drogue.active);
   }
-  
+
   @Test
   public void mainDeploysWhenPacketReceived() {
-	 SCMPacket mainDeploy = new SCMPacket(SCMPacketType.MD, "00000");
-	 paraSystem.onPacket(PacketDirection.RECIVE, mainDeploy);
-	 assertTrue(main.active);
+    SCMPacket mainDeploy = new SCMPacket(SCMPacketType.MD, "00000");
+    paraSystem.onPacket(PacketDirection.RECIVE, mainDeploy);
+    assertTrue(main.active);
   }
-  
+
   @Test
   public void drogueDeploysWhenPacketsRecived() {
-	  SCMPacket drogueDeploy = new SCMPacket(SCMPacketType.DD, "00000");
-	  paraSystem.onPacket(PacketDirection.RECIVE, drogueDeploy);
-	  assertTrue(drogue.active);
+    SCMPacket drogueDeploy = new SCMPacket(SCMPacketType.DD, "00000");
+    paraSystem.onPacket(PacketDirection.RECIVE, drogueDeploy);
+    assertTrue(drogue.active);
   }
 
 }
