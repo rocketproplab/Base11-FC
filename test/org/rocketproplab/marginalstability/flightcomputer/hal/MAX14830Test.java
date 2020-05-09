@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.hal.MAX14830.Port;
 
 public class MAX14830Test {
@@ -181,8 +182,38 @@ public class MAX14830Test {
   }
   
   @Test
-  public void setBuadrateSetsBaudrateAccordingTofREF() {
+  public void setBuadrateSetsBaudrateAccordingTofREF() throws IOException {
     this.spi.toReturn = new byte[] {0,0};
-    this.max14830.setBaudrate(Port.UART0, 115200);
+    this.max14830.setBaudrate(Port.UART0, Settings.MAX14830_F_REF/16/2);
+    assertEquals(1, this.spi.lastWrittenMap.size());
+    int addressWrittenTo = (byte)(0x80 | 0x1B);
+    byte[] lastData = this.spi.lastWrittenMap.get(addressWrittenTo);
+    assertEquals(4, lastData.length);
+    assertEquals(0, lastData[1]);
+    assertEquals(2, lastData[2]);
+    assertEquals(0, lastData[3]);
+    
+    this.spi.lastWrittenMap.clear();
+    this.max14830.setBaudrate(Port.UART2, Settings.MAX14830_F_REF/16/257);
+    assertEquals(1, this.spi.lastWrittenMap.size());
+    addressWrittenTo = (byte)(0x80 | 0b01000000 | 0x1B);
+    lastData = this.spi.lastWrittenMap.get(addressWrittenTo);
+    assertEquals(4, lastData.length);
+    assertEquals(0, lastData[1]);
+    assertEquals(0b00000001, lastData[2]);
+    assertEquals(0b00000001, lastData[3]);
+  }
+  
+  @Test
+  public void zeroBaudRateSetsToMax() throws IOException {
+    this.spi.toReturn = new byte[] {0,0};
+    this.max14830.setBaudrate(Port.UART0, 0);
+    assertEquals(1, this.spi.lastWrittenMap.size());
+    int addressWrittenTo = (byte)(0x80 | 0x1B);
+    byte[] lastData = this.spi.lastWrittenMap.get(addressWrittenTo);
+    assertEquals(4, lastData.length);
+    assertEquals(0, lastData[1]);
+    assertEquals(1, lastData[2]);
+    assertEquals(0, lastData[3]);
   }
 }

@@ -3,6 +3,8 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
+
 import com.pi4j.io.spi.SpiDevice;
 
 public class MAX14830 implements PollingSensor {
@@ -82,6 +84,7 @@ public class MAX14830 implements PollingSensor {
   private static final int  UART_SELECT_LSB_IDX = 5;
   private static final byte WRITE               = -0x80;
   private static final int  BYTE_MSB_VALUE      = 128;
+  private static final int  BITS_PER_BYTE       = 8;
 
   private static final int TX_BUFFER_SIZE = 128;
 
@@ -214,8 +217,19 @@ public class MAX14830 implements PollingSensor {
     }
 
   }
-  
-  public void setBaudrate(Port port, int baudrate) {
-    // D = fREF / ( 16 * BaudRate )  from datasheet page 21
+
+  public void setBaudrate(Port port, int baudrate) throws IOException {
+    // D = fREF / ( 16 * BaudRate ) from datasheet page 21
+    int d = 1;
+    if (baudrate > 0) {
+      d = Settings.MAX14830_F_REF / (16 * baudrate);
+    }
+    int    uartSelect           = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte   command              = (byte) (uartSelect | WRITE | Registers.BRGConfig.address());
+    byte   leastSignificantBits = (byte) (d & 0xFF);
+    byte   mostSignificantBits  = (byte) ((d >> BITS_PER_BYTE) & 0xFF);
+    byte[] data                 = { command, 0, leastSignificantBits, mostSignificantBits };
+    this.spi.write(data);
+
   }
 }
