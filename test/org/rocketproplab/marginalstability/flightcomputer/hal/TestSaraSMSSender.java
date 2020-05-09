@@ -112,6 +112,16 @@ public class TestSaraSMSSender {
 		System.out.println(serialPort.getData().get(3));
 	}
 	
+	@Test
+	public void testGPSCreateError() {
+		SerialPortSara serialPort = new SerialPortSara();
+		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
+		try {
+			SMSSera.onSerialData(null);
+		} catch (NullPointerException e) {
+		}
+	}
+	
 
 }
 

@@ -58,6 +58,8 @@ public class SaraSMSSender implements SMSSender, SerialListener {
 		String subData = data.substring(index+1);
 		
 		packet = new GPSPacket(subData);
+		//should this throw an error if null data is sent?
+		//or should it just be thrown to the wayside?
 	}
 	
 	//we need to figure out a way to send a message to the 
