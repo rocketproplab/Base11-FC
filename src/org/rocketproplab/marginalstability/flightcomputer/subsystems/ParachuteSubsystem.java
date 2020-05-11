@@ -131,7 +131,6 @@ public class ParachuteSubsystem
     }
     if (Double.isNaN(lastPressureBelowThresholdTime)) {
       lastPressureBelowThresholdTime = time.getSystemTime();
-      System.out.println(lastPressureBelowThresholdTime);
     }
     return time.getSystemTime() - lastPressureBelowThresholdTime;
   }
