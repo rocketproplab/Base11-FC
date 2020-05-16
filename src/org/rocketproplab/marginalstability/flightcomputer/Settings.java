@@ -1,5 +1,10 @@
 package org.rocketproplab.marginalstability.flightcomputer;
 
+/**
+ * The settings class contains constants that will be loaded form disk on
+ * startup. All constant values that might need to change in a debugging session
+ * should be put here.
+ */
 public class Settings {
 
   // Flight State Settings
@@ -29,7 +34,8 @@ public class Settings {
   /**
    * Time threshold needed to exceed to deploy the main chute
    */
-  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to deploy main chute
+  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to
+                                                               // deploy main chute
 
   // Unit conversions
 

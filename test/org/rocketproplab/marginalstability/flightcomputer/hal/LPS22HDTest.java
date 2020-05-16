@@ -207,7 +207,7 @@ public class LPS22HDTest {
 	  BarometerTime time = new BarometerTime();
 	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  barometer.init();
-	  byte val = 0b01100000;
+	  byte val = 0b00111110;
 	  byte readMapVal = i2c.readMap.get(0x10).byteValue();
 	  
 	  assertEquals(val, readMapVal);
