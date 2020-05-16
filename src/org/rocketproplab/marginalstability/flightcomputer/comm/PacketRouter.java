@@ -6,15 +6,26 @@ import java.util.HashMap;
 import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 
 /**
- * Routes packets of any type to their destination
+ * Routes packets of any type to their destination. <br>
+ * The routing works by having a Map between the type and source of the packet
+ * to a list of listeners. Each time sendPacket or receivePacket is called the
+ * router looks up the listenerArray and iterates through with the given packet.
+ * <br>
+ * {@link #sendPacket(Object, PacketSources)} and
+ * {@link #recivePacket(Object, PacketSources)} specify the PacketDirection for
+ * the packet but both broadcast to all the listeners for that packet type (the
+ * class of the object) and source. See
+ * {@link #dispatchPacket(Object, PacketSources, PacketDirection)} for more
+ * information.
  * 
  * @author Max Apodaca
  *
  */
 public class PacketRouter implements PacketRelay {
   private static PacketRouter instance;
+
   public static PacketRouter getInstance() {
-    if(instance == null) {
+    if (instance == null) {
       instance = new PacketRouter();
     }
     return instance;
@@ -29,7 +40,7 @@ public class PacketRouter implements PacketRelay {
     this.listenerMap = new HashMap<>();
   }
 
-  //@Override
+  // @Override
   public void sendPacket(Object o, PacketSources source) {
     this.dispatchPacket(o, source, PacketDirection.SEND);
   }
@@ -54,8 +65,7 @@ public class PacketRouter implements PacketRelay {
    * @param direction what direction the packet is being sent in
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private void dispatchPacket(Object o, PacketSources source,
-      PacketDirection direction) {
+  private void dispatchPacket(Object o, PacketSources source, PacketDirection direction) {
     try {
       LookupTuple lookup = new LookupTuple(o.getClass(), source);
       if (this.listenerMap.containsKey(lookup)) {
@@ -78,8 +88,7 @@ public class PacketRouter implements PacketRelay {
    * @param type     the class which will be hashed to make lookup easier
    * @param source   what source to listen from
    */
-  public void addListener(PacketListener<?> listener, Class<?> type,
-      PacketSources source) {
+  public void addListener(PacketListener<?> listener, Class<?> type, PacketSources source) {
     LookupTuple lookup = new LookupTuple(type, source);
     if (!this.listenerMap.containsKey(lookup)) {
       this.listenerMap.put(lookup, new ArrayList<>());

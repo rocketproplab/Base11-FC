@@ -2,6 +2,10 @@ package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 import org.rocketproplab.marginalstability.flightcomputer.Settings;
 
+/**
+ * A class to represent the GPSNMEA GGA packet as well as providing a parser for
+ * this packet.
+ */
 public class GPSPacket {
 
   private static final String NEMA_DELIMITER      = ",";
@@ -18,7 +22,7 @@ public class GPSPacket {
   private double  altitude;
   private double  time;
   private int     sVCount;
-  private String nema;
+  private String  nema;
 
   /**
    * Create a new GPS Packet based on the NEMA String
@@ -96,8 +100,8 @@ public class GPSPacket {
   }
 
   /**
-   * Used as debug information for how many satellite vehicles (SVs) are
-   * connected to the GPS.
+   * Used as debug information for how many satellite vehicles (SVs) are connected
+   * to the GPS.
    * 
    * @return the number of satellite vehicles connected to the GPS
    */
@@ -119,7 +123,7 @@ public class GPSPacket {
     equal &= this.sVCount == other.sVCount;
     return equal;
   }
-  
+
   @Override
   public String toString() {
     return this.nema;
