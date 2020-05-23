@@ -16,7 +16,6 @@ public class TestSaraSMSSender {
 		
 		@Override
 		public void registerListener(SerialListener listener) {
-			// TODO Auto-generated method stub
 			
 		}
 

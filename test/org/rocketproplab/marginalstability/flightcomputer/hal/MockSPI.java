@@ -19,37 +19,31 @@ public class MockSPI implements SpiDevice {
 
   @Override
   public String write(String data, Charset charset) throws IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String write(String data, String charset) throws IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public ByteBuffer write(ByteBuffer data) throws IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public byte[] write(InputStream input) throws IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public int write(InputStream input, OutputStream output) throws IOException {
-    // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
   public byte[] write(byte[] data, int start, int length) throws IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -65,13 +59,11 @@ public class MockSPI implements SpiDevice {
 
   @Override
   public short[] write(short[] data, int start, int length) throws IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public short[] write(short... data) throws IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 

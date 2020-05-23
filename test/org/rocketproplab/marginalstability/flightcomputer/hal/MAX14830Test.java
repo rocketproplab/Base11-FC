@@ -184,7 +184,7 @@ public class MAX14830Test {
   @Test
   public void setBuadrateSetsBaudrateAccordingTofREF() throws IOException {
     this.spi.toReturn = new byte[] {0,0};
-    this.max14830.setBaudrate(Port.UART0, Settings.MAX14830_F_REF/16/2);
+    this.max14830.setBaudRate(Port.UART0, Settings.MAX14830_F_REF/16/2);
     assertEquals(1, this.spi.lastWrittenMap.size());
     int addressWrittenTo = (byte)(0x80 | 0x1B);
     byte[] lastData = this.spi.lastWrittenMap.get(addressWrittenTo);
@@ -194,7 +194,7 @@ public class MAX14830Test {
     assertEquals(0, lastData[3]);
     
     this.spi.lastWrittenMap.clear();
-    this.max14830.setBaudrate(Port.UART2, Settings.MAX14830_F_REF/16/257);
+    this.max14830.setBaudRate(Port.UART2, Settings.MAX14830_F_REF/16/257);
     assertEquals(1, this.spi.lastWrittenMap.size());
     addressWrittenTo = (byte)(0x80 | 0b01000000 | 0x1B);
     lastData = this.spi.lastWrittenMap.get(addressWrittenTo);
@@ -207,7 +207,7 @@ public class MAX14830Test {
   @Test
   public void zeroBaudRateSetsToMax() throws IOException {
     this.spi.toReturn = new byte[] {0,0};
-    this.max14830.setBaudrate(Port.UART0, 0);
+    this.max14830.setBaudRate(Port.UART0, 0);
     assertEquals(1, this.spi.lastWrittenMap.size());
     int addressWrittenTo = (byte)(0x80 | 0x1B);
     byte[] lastData = this.spi.lastWrittenMap.get(addressWrittenTo);

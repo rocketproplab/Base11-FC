@@ -55,7 +55,7 @@ public class LPS22HD implements Barometer, PollingSensor {
     try {
       i2cDevice.write(CTRL_REG1, (byte) (ODR_25HZ | LOW_PASS_ENABLE | LOW_PASS_20TH | KEEP_REGISTERS_SYCHONISED_BDU));
     } catch (IOException e) {
-      // TODO Auto-generated catch block
+      // TODO report IO Error
       e.printStackTrace();
     }
   }
@@ -100,7 +100,7 @@ public class LPS22HD implements Barometer, PollingSensor {
           + (i2cDevice.read(REG_PRESSURE_EXTRA_LOW));
       pressure = rawPressure / SCALING_FACTOR;
     } catch (IOException e) {
-      // TODO Auto-generated catch block
+      // TODO Report IO Error
       e.printStackTrace();
     }
     sampleTime = (long) clock.getSystemTime();
