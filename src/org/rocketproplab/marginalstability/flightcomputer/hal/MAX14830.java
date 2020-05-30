@@ -172,7 +172,7 @@ public class MAX14830 implements PollingSensor {
    * {@code | RW | U1 | U0 | A4 | A3 | A2 | A1 | A0 |}
    * <ul>
    * <li>RW should be 0 to indicate reading.</li>
-   * <li>U1 & U0 from a 2 bit integer to specify UART 0 - 3.</li>
+   * <li>U1 and U0 from a 2 bit integer to specify UART 0 - 3.</li>
    * <li>A4 - A0 form a 5 bit integer to specify which register to read. Registers
    * above 0x1F (31) are currently not supported as they are read in a different
    * way.</li>
@@ -284,7 +284,7 @@ public class MAX14830 implements PollingSensor {
    * last call to {@link #getTXBufferLen(Port)} we write to it.
    * 
    * @param port   Which port to select
-   * @param length How many characters to write, must be >= 0
+   * @param length How many characters to write, must be &gt;=  0
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
   private void writeToPort(Port port, int length) throws IOException {
