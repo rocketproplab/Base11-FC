@@ -48,5 +48,7 @@ public class Settings {
    * 'c' constant for pressures
    */
   public static double[] C_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  
+  public static String PHONE_NUMBER = "13150001111";
 }
 

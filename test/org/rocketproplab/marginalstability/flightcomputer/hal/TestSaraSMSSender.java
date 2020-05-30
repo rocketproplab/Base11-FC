@@ -8,7 +8,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rocketproplab.marginalstability.flightcomputer.comm.GPSPacket;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
+import org.rocketproplab.marginalstability.flightcomputer.subsystems.GPSMessageSubsystem;
 
 public class TestSaraSMSSender {
 	public class SeraGPS {
@@ -19,11 +24,10 @@ public class TestSaraSMSSender {
 	}
 	public class SerialPortSara implements SerialPort{
 		List<String> data = new ArrayList<String>();
+		PacketRouter router = new PacketRouter();
 		
 		@Override
-		public void registerListener(SerialListener listener) {
-			// TODO Auto-generated method stub
-			
+		public void registerListener(SerialListener listener) {			
 		}
 
 		@Override
@@ -101,15 +105,17 @@ public class TestSaraSMSSender {
 	public void testGPSCreateMessage() {
 		SerialPortSara serialPort = new SerialPortSara();
 		SaraSMSSender SMSSera = new SaraSMSSender(serialPort);
+		GPSMessageSubsystem gpsMessage = new GPSMessageSubsystem();
+		GPSPacket packet = new GPSPacket("$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
+		
 		SMSSera.onSerialData("+UGGGA: 1,$GPGGA,420,-32,N,7,W,2,12,1.2,100000,M,-25.669,M,2.0,0031*4F");
 		
-		String message = SMSSera.createMessage();
+		gpsMessage.onPacket(PacketDirection.RECIVE, packet);
+		String message = gpsMessage.createMessage();
 		SMSSera.sendTextMessage("12908665454", message);
 		
 		assertEquals(serialPort.getData().get(3), "The longitude is: 7.0\n" + 
 				"The latitude is: -32.0\r\n");
-		
-		System.out.println(serialPort.getData().get(3));
 	}
 	
 	@Test

@@ -2,6 +2,7 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import org.rocketproplab.marginalstability.flightcomputer.comm.GPSPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
+import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.*;
 import java.util.*;
@@ -19,6 +20,7 @@ public class SaraSMSSender implements SMSSender, SerialListener {
 	public SaraSMSSender(SerialPort saraSerialPort) {
 		this.saraSerialPort = saraSerialPort;
 		messageIndex = 0;
+		router = new PacketRouter(); //should this be set to a specific packet router?
 		
 		saraSerialPort.write("AT\n");
 		saraSerialPort.write("AT+CMGF=1\n");
@@ -37,32 +39,21 @@ public class SaraSMSSender implements SMSSender, SerialListener {
 		}
 	}
 	
-	public String createMessage() {
-		double latitude = packet.getLatitude();
-		double longitude = packet.getLongitude();
-		
-		message = "The longitude is: " + longitude + "\nThe latitude"
-				+ " is: " + latitude;
-		
-		return message;
-		// how do we get message into string(data) if the phone number
-		//is passed in the method call and we don't necessarily have
-		//the phone number yet?
-	}
-	
 	public void getGPSInfo() {
 		saraSerialPort.write("AT+UGPS=1\n"); //turns the gps on.
 		saraSerialPort.write("AT+UGGGA?\r\n");
 	}
 
-	@Override
+	@Override //this re
 	public void onSerialData(String data) {
 		int index = data.indexOf(",");
 		String subData = data.substring(index+1);
 		
 		packet = new GPSPacket(subData);
+		router.recivePacket(packet, PacketSources.AUX_GPS);
 		//should this throw an error if null data is sent?
 		//or should it just be thrown to the wayside?
+		//
 	}
 	
 	//we need to figure out a way to send a message to the 
