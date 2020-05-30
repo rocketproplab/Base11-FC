@@ -282,6 +282,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
   /**
    * Sets the scale of the accelerometer
    * 
+   * @param scale the scale of the accelerometer data
    * @throws IOException if we are unable to access the i2c device
    */
   public void setAccelerometerScale(AccelerometerScale scale) throws IOException {
@@ -291,6 +292,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
   /**
    * Sets the scale of the Gyroscope
    * 
+   * @param scale the scale of the gyroscope data
    * @throws IOException if we are unable to access the i2c device
    */
   public void setGyroscopeScale(GyroScale scale) throws IOException {
@@ -439,7 +441,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
       int    samplesRead = this.i2c.read(data, Registers.OUT_X_L_G.getAddress(), dataLength);
       this.parseReadings(data, samplesRead);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
+      // TODO Report IO Error
       e.printStackTrace();
     }
   }

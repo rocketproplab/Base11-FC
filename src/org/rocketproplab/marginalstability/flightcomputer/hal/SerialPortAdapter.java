@@ -6,7 +6,7 @@ import java.util.Set;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 
 /**
- * A relay a serial port. Simply buffers a message without any processing.
+ * A relay for a serial port. Simply buffers a message without any processing.
  * 
  * @author Max Apodaca
  *
