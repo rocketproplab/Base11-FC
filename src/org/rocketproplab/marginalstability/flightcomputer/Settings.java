@@ -40,6 +40,8 @@ public class Settings {
   @UserSetting(comment = "Time threshold needed to exceed to deploy the main chute", units = "s")
   public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to
                                                                // deploy main chute
+  
+  public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
 
   // Unit conversions
 
