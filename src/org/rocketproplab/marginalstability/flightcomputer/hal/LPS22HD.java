@@ -96,9 +96,19 @@ public class LPS22HD implements Barometer, PollingSensor {
     // TODO Read at once so we don't read high on sample 1 and low on sample 2. As
     // in if the sample changes while we are reading.
     try {
-      int rawPressure = (i2cDevice.read(REG_PRESSURE_HIGH) << 16) + (i2cDevice.read(REG_PRESSURE_LOW) << 8)
-          + (i2cDevice.read(REG_PRESSURE_EXTRA_LOW));
-      pressure = rawPressure / SCALING_FACTOR;
+      byte[] buffer = new byte[3];
+      i2cDevice.read(REG_PRESSURE_EXTRA_LOW, buffer, 0, 3);
+
+      // Perform 2's complement if value is negative
+      byte mask = 0b10000000;
+      if(buffer[2] & mask > 0){
+          buffer[0] = ~buffer[0] + 1;
+          buffer[1] = ~buffer[1];
+          buffer[2] = ~buffer[2];
+      }
+
+      int rawPressure = (int)buffer[2]<<16 + (int)buffer[1]<<8 + (int)buffer[0];
+      pressure = rawPressure / (double)SCALING_FACTOR;
     } catch (IOException e) {
       // TODO Report IO Error
       e.printStackTrace();

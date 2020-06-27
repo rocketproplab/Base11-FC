@@ -30,15 +30,15 @@ public class LPS22HDTest {
     }
     
     public void initValuesTwo() {
-    	readMap.put(0x2A, 0b111111111111);
-    	readMap.put(0x29, 0);
-    	readMap.put(0x28, 0b111111111111111);
+    	readMap.put(0x2A, 0b01111111);
+    	readMap.put(0x29, 0b11111111);
+    	readMap.put(0x28, 0b11111111);
     }
     
     public void initValuesThree() {
-    	readMap.put(0x2A, 0b0);
-    	readMap.put(0x29, 0b1);
-    	readMap.put(0x28, 0b111111111111111111111);
+    	readMap.put(0x2A, 0b111111);
+    	readMap.put(0x29, 0b11111111);
+    	readMap.put(0x28, 0b11111111);
     }
     
     
@@ -73,7 +73,9 @@ public class LPS22HDTest {
     @Override
     public void write(int address, byte[] buffer, int offset, int size)
         throws IOException {
-      
+      for(int i = 0; i < size; i++){
+        readMap.put(address + i, buffer[i+offset]);
+      }
     }
 
     @Override
@@ -99,7 +101,10 @@ public class LPS22HDTest {
     @Override
     public int read(int address, byte[] buffer, int offset, int size)
         throws IOException {
-      return 0;
+      for(int i = 0; i < size; i++){
+        buffer[i+offset] = readMap.get(address+i);
+      }
+      return size;
     }
 
     @Override
@@ -157,11 +162,12 @@ public class LPS22HDTest {
 	  BarometerTime time = new BarometerTime();
 	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  
-	  i2c.initValuesOne();
+      byte[] buf = {0b0, 0b1000, 0b0};
+	  i2c.write(0x28, buf, 0, 3);
 	  barometer.poll();
-	  assertNotEquals(0.0, barometer.getPressure(), 0.000005);
+	  assertNotEquals(1.0, barometer.getPressure(), 0.000005);
   }
-  
+
   @Test
   public void getLastMeasurementTime() {
 	  MockI2CDevice i2c = new MockI2CDevice();
