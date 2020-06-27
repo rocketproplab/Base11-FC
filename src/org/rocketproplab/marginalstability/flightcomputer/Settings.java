@@ -42,6 +42,8 @@ public class Settings {
                                                                // deploy main chute
   
   public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
+  
+  public static boolean[] ENGINE_ABORT_VALVE_STATES = {true, true, true, true, true};
 
   // Unit conversions
 
