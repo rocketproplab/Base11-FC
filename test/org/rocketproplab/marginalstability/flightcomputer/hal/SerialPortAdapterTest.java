@@ -26,5 +26,5 @@ public class SerialPortAdapterTest {
     assertEquals(1, stringList.size());
     assertEquals("Hello World", stringList.get(0));
   }
-  
+ 
 }
