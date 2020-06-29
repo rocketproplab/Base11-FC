@@ -2,7 +2,6 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -19,26 +18,26 @@ import com.pi4j.io.i2c.I2CDevice;
 
 public class LPS22HDTest {
   private class MockI2CDevice implements I2CDevice {
-    public HashMap<Integer, Integer> readMap = new HashMap<>();
+    public HashMap<Integer, Byte> readMap = new HashMap<>();
     
     private int address;
     
     public void initValuesOne() {
-    	readMap.put(0x2A, 0b0);
-    	readMap.put(0x29, 0b10);
-    	readMap.put(0x28, 0b100010);
+    	readMap.put(0x2A, (byte)0b0);
+    	readMap.put(0x29, (byte)0b10);
+    	readMap.put(0x28, (byte)0b100010);
     }
     
     public void initValuesTwo() {
-    	readMap.put(0x2A, 0b01111111);
-    	readMap.put(0x29, 0b11111111);
-    	readMap.put(0x28, 0b11111111);
+    	readMap.put(0x2A, (byte)0b01111111);
+    	readMap.put(0x29, (byte)0b11111111);
+    	readMap.put(0x28, (byte)0b11111111);
     }
     
     public void initValuesThree() {
-    	readMap.put(0x2A, 0b111111);
-    	readMap.put(0x29, 0b11111111);
-    	readMap.put(0x28, 0b11111111);
+    	readMap.put(0x2A, (byte)0b111111);
+    	readMap.put(0x29, (byte)0b11111111);
+    	readMap.put(0x28, (byte)0b11111111);
     }
     
     
@@ -50,8 +49,7 @@ public class LPS22HDTest {
     @Override
     public void write(byte b) throws IOException {
     	address = 0;
-    	String value = "" + b;
-    	readMap.put(0, Integer.parseInt(value));
+    	readMap.put(0, b);
     	
     }
 
@@ -67,15 +65,12 @@ public class LPS22HDTest {
     @Override
     public void write(int address, byte b) throws IOException {
     	this.address = address;
-    	readMap.put(address, (int)b);
+    	readMap.put(address, b);
     }
 
     @Override
     public void write(int address, byte[] buffer, int offset, int size)
         throws IOException {
-      for(int i = 0; i < size; i++){
-        readMap.put(address + i, buffer[i+offset]);
-      }
     }
 
     @Override
@@ -162,10 +157,9 @@ public class LPS22HDTest {
 	  BarometerTime time = new BarometerTime();
 	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  
-      byte[] buf = {0b0, 0b1000, 0b0};
-	  i2c.write(0x28, buf, 0, 3);
+	  i2c.initValuesThree();
 	  barometer.poll();
-	  assertNotEquals(1.0, barometer.getPressure(), 0.000005);
+	  assertEquals(1024, barometer.getPressure(), 0.0005);
   }
 
   @Test
