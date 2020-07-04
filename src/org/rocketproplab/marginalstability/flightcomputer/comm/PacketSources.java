@@ -21,5 +21,10 @@ public enum PacketSources {
 	/**
 	 * The packet is coming from or going to the GPS
 	 */
-	GPS
+	GPS,
+	
+	/**
+	 * This packet is coming from or going to the Auxiliary GPS 
+	 */
+	AUX_GPS
 }

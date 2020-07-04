@@ -71,6 +71,9 @@ public class Settings {
   @UserSetting(comment = "'c' constant for quadratic regression for pressure transducers", units = "hPa")
   public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0 };
+  
+  @UserSetting(comment = "Phone number to text position to", units = "1xxxyyyyyyy")
+  public static String PHONE_NUMBER = "13150001111";
 
   @SettingSectionHeader(name = "MAX14830 settings")
 
@@ -247,7 +250,7 @@ public class Settings {
     String home = System.getProperty("user.home");
     return home + "/settings.cfg";
   }
-  
+
   public static void readSettings() {
     String configFileLocation = getSettingsFileLocation();
     List<String> lines = Collections.emptyList();
