@@ -25,6 +25,9 @@ public class SettingsTest {
   @UserSetting(comment = "String", units = "String")
   public static String HEADER_FIELD;
 
+  @UserSetting(comment = "double", units = "number")
+  public static double DOUBLE_FIELD = 0;
+
   @Test
   public void fieldAsStringGivesHeaderForField() throws NoSuchFieldException, SecurityException {
     INT_FIELD = 0;
@@ -103,6 +106,110 @@ public class SettingsTest {
     assertEquals("32", valueMap.get("A"));
     assertTrue(valueMap.containsKey("Be"));
     assertEquals("Hello World=", valueMap.get("Be"));
+  }
+
+  @Test
+  public void setFieldDoubleArraySetsCorrectLengthFieldOfDoubles()
+      throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    String array = "[5.2, 3, 235.1e5]";
+    SettingsTest.ARRAY_FIELD = new double[3];
+    Field arrayField = SettingsTest.class.getField("ARRAY_FIELD");
+    Settings.setFieldDoubleArray(arrayField, array);
+    assertEquals(5.2, SettingsTest.ARRAY_FIELD[0], 0.000001);
+    assertEquals(3, SettingsTest.ARRAY_FIELD[1], 0.000001);
+    assertEquals(235.1e5, SettingsTest.ARRAY_FIELD[2], 0.000001);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void setFieldDoubleArrayThrowsIllegalArgument()
+      throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    String array = "[5.2, 3a, 235.1e5]";
+    SettingsTest.ARRAY_FIELD = new double[3];
+    Field arrayField = SettingsTest.class.getField("ARRAY_FIELD");
+    Settings.setFieldDoubleArray(arrayField, array);
+  }
+
+  @Test
+  public void setFieldDoubleArrayFillsUpToGiven()
+      throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    String array = "[5.2, 3]";
+    SettingsTest.ARRAY_FIELD = new double[3];
+    Field arrayField = SettingsTest.class.getField("ARRAY_FIELD");
+    Settings.setFieldDoubleArray(arrayField, array);
+    assertEquals(5.2, SettingsTest.ARRAY_FIELD[0], 0.000001);
+    assertEquals(3, SettingsTest.ARRAY_FIELD[1], 0.000001);
+    assertEquals(0, SettingsTest.ARRAY_FIELD[2], 0.000001);
+  }
+
+  @Test
+  public void setFieldDoubleArrayFillsUpToMax()
+      throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    String array = "[5.2, 3, 3, 2, 1, 3]";
+    SettingsTest.ARRAY_FIELD = new double[3];
+    Field arrayField = SettingsTest.class.getField("ARRAY_FIELD");
+    Settings.setFieldDoubleArray(arrayField, array);
+    assertEquals(5.2, SettingsTest.ARRAY_FIELD[0], 0.000001);
+    assertEquals(3, SettingsTest.ARRAY_FIELD[1], 0.000001);
+    assertEquals(3, SettingsTest.ARRAY_FIELD[2], 0.000001);
+  }
+
+  @Test
+  public void setFieldDoubleSetsTheField()
+      throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    String line = "854.3";
+    SettingsTest.DOUBLE_FIELD = 0;
+    Field field = SettingsTest.class.getField("DOUBLE_FIELD");
+    Settings.setFieldDouble(field, line);
+    assertEquals(854.3, SettingsTest.DOUBLE_FIELD, 0.000001);
+  }
+
+  @Test
+  public void setFieldIntSetsTheField()
+      throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    String line = "52";
+    SettingsTest.INT_FIELD = 0;
+    Field field = SettingsTest.class.getField("INT_FIELD");
+    Settings.setFieldInt(field, line);
+    assertEquals(52, SettingsTest.INT_FIELD);
+  }
+
+  @Test
+  public void setFieldFromConfigLineSetsDouble() throws NoSuchFieldException, SecurityException {
+    String line = "854.3";
+    SettingsTest.DOUBLE_FIELD = 0;
+    Field field = SettingsTest.class.getField("DOUBLE_FIELD");
+    Settings.setFieldFromConfigLine(field, line);
+    assertEquals(854.3, SettingsTest.DOUBLE_FIELD, 0.000001);
+  }
+
+  @Test
+  public void setFieldFromConfigLineSetsInt() throws NoSuchFieldException, SecurityException {
+    String line = " 1337 ";
+    SettingsTest.INT_FIELD = 0;
+    Field field = SettingsTest.class.getField("INT_FIELD");
+    Settings.setFieldFromConfigLine(field, line);
+    assertEquals(1337, SettingsTest.INT_FIELD);
+  }
+
+  @Test
+  public void setFieldFromConfigLineSetDoubleArray()
+      throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    String array = "[5.2, 3, 235.1e5]";
+    SettingsTest.ARRAY_FIELD = new double[3];
+    Field arrayField = SettingsTest.class.getField("ARRAY_FIELD");
+    Settings.setFieldFromConfigLine(arrayField, array);
+    assertEquals(5.2, SettingsTest.ARRAY_FIELD[0], 0.000001);
+    assertEquals(3, SettingsTest.ARRAY_FIELD[1], 0.000001);
+    assertEquals(235.1e5, SettingsTest.ARRAY_FIELD[2], 0.000001);
+  }
+  
+  @Test
+  public void setFieldFromConfigLineDosntThrowArgs() throws NoSuchFieldException, SecurityException {
+    String line = " 1337a ";
+    SettingsTest.INT_FIELD = 0;
+    Field field = SettingsTest.class.getField("INT_FIELD");
+    Settings.setFieldFromConfigLine(field, line);
+    assertEquals(0, SettingsTest.INT_FIELD);
   }
 
 }

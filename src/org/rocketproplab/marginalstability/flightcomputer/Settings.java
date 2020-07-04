@@ -187,7 +187,7 @@ public class Settings {
     return fieldNameValueMap;
   }
 
-  private static void setFieldDoubleArray(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldDoubleArray(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
     line = line.trim().replace("[", "").replace("]", "");
     String[] newValues = line.split(",");
     double[] fieldValues = (double[]) field.get(null);
@@ -200,19 +200,19 @@ public class Settings {
     }
   }
 
-  private static void setFieldDouble(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldDouble(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
     line = line.trim();
     double value = Double.parseDouble(line);
     field.set(null, value);
   }
 
-  private static void setFieldInt(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldInt(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
     line = line.trim();
     int value = Integer.parseInt(line);
     field.set(null, value);
   }
 
-  private static void setFieldFromConfigLine(Field field, String line) {
+  protected static void setFieldFromConfigLine(Field field, String line) {
     Class<?> fieldType = field.getType();
     try {
       if (fieldType.equals(double[].class)) {
@@ -277,9 +277,5 @@ public class Settings {
   public static void main(String[] args) {
     readSettings();
     System.out.println(Settings.MAX14830_F_REF);
-//    String config = getConfigContents();
-//    readSettingsFromConfig(Arrays.asList(config.split("\n")));
-//    config = getConfigContents();
-//    System.out.println(config);
   }
 }
