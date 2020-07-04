@@ -96,7 +96,7 @@ public class Settings {
     return result;
   }
 
-  private static String fieldAsString(Field field) {
+  public static String fieldAsString(Field field) {
     String result = "";
     if (field.isAnnotationPresent(SettingSectionHeader.class)) {
 
@@ -113,11 +113,7 @@ public class Settings {
       } else {
         result += field.getType() + "\n";
       }
-    } catch (IllegalArgumentException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      // TODO Auto-generated catch block
+    } catch (IllegalArgumentException | IllegalAccessException e) {
       e.printStackTrace();
     }
 
@@ -155,7 +151,7 @@ public class Settings {
     return annotatedName;
   }
 
-  private static Set<String> getUsefulLinesFromConfig(List<String> config) {
+  protected static Set<String> getUsefulLinesFromConfig(List<String> config) {
     Set<String> usefulLines = new HashSet<>();
     for (String line : config) {
       String lineWithoutComment = line;
@@ -172,13 +168,14 @@ public class Settings {
     return usefulLines;
   }
 
-  private static Map<String, String> getFieldNameValueMap(List<String> config) {
+  protected static Map<String, String> getFieldNameValueMap(List<String> config) {
     Set<String>         usefulLines       = getUsefulLinesFromConfig(config);
     Map<String, String> fieldNameValueMap = new HashMap<>();
     for (String line : usefulLines) {
       int equalsIndex = line.indexOf('=');
       if (equalsIndex < 0) {
         System.err.println("Unable to parse line: " + line);
+        continue;
       }
       String fieldName = line.substring(0, equalsIndex);
       String value     = line.substring(equalsIndex + 1);
@@ -253,7 +250,7 @@ public class Settings {
   
   public static void readSettings() {
     String configFileLocation = getSettingsFileLocation();
-    List<String> lines = Collections.EMPTY_LIST;
+    List<String> lines = Collections.emptyList();
     try {
       lines = Files.readAllLines(Paths.get(configFileLocation));
     } catch(IOException e) {
