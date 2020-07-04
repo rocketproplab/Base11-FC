@@ -5,3 +5,4 @@ WiringPi/
 /dist/
 .project
 .DS_Store
+junit/

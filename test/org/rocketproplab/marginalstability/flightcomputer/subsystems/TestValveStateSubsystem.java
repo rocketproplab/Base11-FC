@@ -10,16 +10,16 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
-import org.rocketproplab.marginalstability.flightcomputer.comm.TestPacketListener;
+import org.rocketproplab.marginalstability.flightcomputer.comm.DummyPacketListener;
 
 public class TestValveStateSubsystem {
-  private TestPacketListener<SCMPacket> testListener;
+  private DummyPacketListener<SCMPacket> testListener;
   PacketRouter                          router;
   ValveStateSubsystem                   valveState;
 
   @Before
   public void init() {
-    this.testListener = new TestPacketListener<SCMPacket>();
+    this.testListener = new DummyPacketListener<SCMPacket>();
     this.router       = new PacketRouter();
     router.addListener(testListener, SCMPacket.class,
         PacketSources.EngineControllerUnit);
