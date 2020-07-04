@@ -60,7 +60,7 @@ public class LandedSMSSubsystem
     double currentTime = time.getSystemTime();
     if (currentTime - lastSMSTime > SMS_INTERVAL) {
       lastSMSTime = currentTime;
-      smsSender.sendMessage(phoneNumber,
+      smsSender.sendTextMessage(phoneNumber,
               getMessage(lastPacket.getLatitude(), lastPacket.getLongitude()));
     }
   }
