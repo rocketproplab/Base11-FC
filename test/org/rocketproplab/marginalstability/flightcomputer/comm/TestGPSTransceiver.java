@@ -11,7 +11,7 @@ public class TestGPSTransceiver {
     PacketRouter   router = new PacketRouter();
     GPSTransceiver tx     = new GPSTransceiver(router);
 
-    TestPacketListener<GPSPacket> listener = new TestPacketListener<GPSPacket>();
+    DummyPacketListener<GPSPacket> listener = new DummyPacketListener<GPSPacket>();
     
     router.addListener(listener, GPSPacket.class, PacketSources.GPS);
     
@@ -27,7 +27,7 @@ public class TestGPSTransceiver {
     PacketRouter   router = new PacketRouter();
     GPSTransceiver tx     = new GPSTransceiver(router);
 
-    TestPacketListener<SCMPacket> listener = new TestPacketListener<SCMPacket>();
+    DummyPacketListener<SCMPacket> listener = new DummyPacketListener<SCMPacket>();
 
     router.addListener(listener, GPSPacket.class,
         PacketSources.EngineControllerUnit);

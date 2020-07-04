@@ -1,0 +1,8 @@
+language: java
+jdk:
+  - oraclejdk9
+
+before_script:
+   - sudo apt-get install ant ant-optional
+
+script: ant test
