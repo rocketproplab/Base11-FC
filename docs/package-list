@@ -1,0 +1,9 @@
+org.rocketproplab.marginalstability.flightcomputer
+org.rocketproplab.marginalstability.flightcomputer.comm
+org.rocketproplab.marginalstability.flightcomputer.commands
+org.rocketproplab.marginalstability.flightcomputer.events
+org.rocketproplab.marginalstability.flightcomputer.hal
+org.rocketproplab.marginalstability.flightcomputer.math
+org.rocketproplab.marginalstability.flightcomputer.mockPi4J
+org.rocketproplab.marginalstability.flightcomputer.subsystems
+org.rocketproplab.marginalstability.flightcomputer.tracking

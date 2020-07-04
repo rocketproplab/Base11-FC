@@ -13,6 +13,9 @@ public class SaraSMSSender implements SMSSender {
 	public SaraSMSSender(SerialPort saraSerialPort) {
 		this.saraSerialPort = saraSerialPort;
 		messageIndex = 0;
+		
+		saraSerialPort.write("AT\n");
+		saraSerialPort.write("AT+CMGF=1\n");
 	}
 	
 	@Override
@@ -20,15 +23,11 @@ public class SaraSMSSender implements SMSSender {
 		//TODO: Add in a listener that would allow us to check if the AT
 		//is on, if it's been switched the SMS mode, and if the message
 		//was sent.
-		if (number == null) {
-			throw new NullPointerException();
-		} else if (number.length() != 11) {
+		if (number.length() != 11 || data.length() > 160) {
 			throw new IllegalArgumentException();
 		} else	{
-			saraSerialPort.write("AT");
-			saraSerialPort.write("AT+CMFG=1");
-			saraSerialPort.write("AT+CMGS=\"+" + number + "\"");
-			saraSerialPort.write(data);
+			saraSerialPort.write("AT+CMGS=\"+" + number + "\"\n");
+			saraSerialPort.write(data + "\r\n");
 		}
 	}
 }
