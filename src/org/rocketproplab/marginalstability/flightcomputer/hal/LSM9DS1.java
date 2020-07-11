@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 
 import com.pi4j.io.i2c.I2CDevice;
@@ -441,8 +443,9 @@ public class LSM9DS1 implements PollingSensor, IMU {
       int    samplesRead = this.i2c.read(data, Registers.OUT_X_L_G.getAddress(), dataLength);
       this.parseReadings(data, samplesRead);
     } catch (IOException e) {
-      // TODO Report IO Error
-      e.printStackTrace();
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Unable to read from IMU IO Exception";
+      errorReporter.reportError(Errors.IMU_IO_ERROR, e, errorMsg);
     }
   }
 
