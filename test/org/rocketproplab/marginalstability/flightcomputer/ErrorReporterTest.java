@@ -87,4 +87,15 @@ public class ErrorReporterTest {
     assertEquals(1, this.telemetry.errorsReported.size());
     assertEquals(Errors.TOP_LEVEL_EXCEPTION, this.telemetry.errorsReported.get(0));
   }
+  
+  @Test
+  public void doesNotThowAnExceptionWithNoArgCtor() {
+    ErrorReporter reporter = new ErrorReporter();
+    reporter.reportError(Errors.TOP_LEVEL_EXCEPTION, null, "");
+  }
+  
+  @Test
+  public void doesNotThowAnExceptionWithNullArgs() {
+    this.reporter.reportError(null, null, null);
+  }
 }
