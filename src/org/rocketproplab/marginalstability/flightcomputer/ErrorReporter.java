@@ -43,10 +43,15 @@ public class ErrorReporter {
     instance = reporter;
   }
 
+  private PrintStream stream;
+  private Telemetry   telemetry;
+
   /**
    * No arg constructor that should print to stderr and not send telemetry.
    */
+
   public ErrorReporter() {
+    this(System.err, null);
   }
 
   /**
@@ -57,7 +62,8 @@ public class ErrorReporter {
    * @param telemetry the telemetry object to use to send telemetry.
    */
   public ErrorReporter(PrintStream stream, Telemetry telemetry) {
-
+    this.stream    = stream;
+    this.telemetry = telemetry;
   }
 
   /**
@@ -112,7 +118,21 @@ public class ErrorReporter {
    * @param extraInfo Additional useful text related to the error, may be null.
    */
   public void reportError(Errors error, Exception exception, String extraInfo) {
-
+    if (extraInfo != null) {
+      stream.print(extraInfo);
+      stream.print("\n");
+    }
+    
+    if (error != null) {
+      stream.print(error);
+      stream.print("\n");
+      if (telemetry != null) {
+        telemetry.reportError(error);
+      }
+    }
+    
+    if (exception != null) {
+      exception.printStackTrace(stream);
+    }
   }
-
 }

@@ -71,7 +71,7 @@ public class ErrorReporterTest {
     Exception             exception       = new BrokenBarrierException();
     ByteArrayOutputStream exceptionStream = new ByteArrayOutputStream();
     exception.printStackTrace(new PrintStream(exceptionStream));
-    this.reporter.reportError(Errors.UNKNOWN_ERROR, exception);
+    this.reporter.reportError(Errors.UNKNOWN_ERROR, exception, null);
     String expected = Errors.UNKNOWN_ERROR.toString() + "\n" + exceptionStream.toString();
     assertEquals(expected, this.outputStream.toString());
     assertEquals(1, this.telemetry.errorsReported.size());
@@ -81,7 +81,7 @@ public class ErrorReporterTest {
   @Test
   public void reportingErrorAndInfoJoinsTheTwoToOutputStream() {
     String errorMessage = "Bad alloc";
-    this.reporter.reportError(Errors.TOP_LEVEL_EXCEPTION, errorMessage);
+    this.reporter.reportError(Errors.TOP_LEVEL_EXCEPTION, null, errorMessage);
     String expected = errorMessage + "\n" + Errors.TOP_LEVEL_EXCEPTION.toString() + "\n";
     assertEquals(expected, this.outputStream.toString());
     assertEquals(1, this.telemetry.errorsReported.size());

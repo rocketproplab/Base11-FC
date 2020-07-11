@@ -1,5 +1,6 @@
 package org.rocketproplab.marginalstability.flightcomputer.commands;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Valves;
@@ -22,10 +23,12 @@ public class SetValveCommand implements Command {
   @Override
   public void execute() {
     try {
-      boolean valvestate = getValveState();
-      valves.setValve(getValveID(), valvestate);
-    } catch (IllegalArgumentException DataOnOffException) {
-      System.err.println("Data from SCMPacket was not On or Off. Data was actually: " + scmpacket.getData());
+      boolean valveState = getValveState();
+      valves.setValve(getValveID(), valveState);
+    } catch (IllegalArgumentException dataOnOffException) {
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Data from SCMPacket was not On or Off. Data was actually: " + scmpacket.getData();
+      errorReporter.reportError(null, dataOnOffException, errorMsg);
     }
   }
 
