@@ -6,3 +6,4 @@ WiringPi/
 .project
 .DS_Store
 junit/
+TEST-*
