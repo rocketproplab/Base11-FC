@@ -30,6 +30,16 @@ public class FramedSCMTest {
 
   }
 
+  private class FakeFramedPacketProcessor implements FramedPacketProcessor {
+    public ArrayList<String> sentFrames = new ArrayList<>();
+
+    @Override
+    public void processFramedPacket(String framedPacket) {
+      this.sentFrames.add(framedPacket);
+    }
+
+  }
+
   @Test
   public void noCompletedMessageWithoutPackets() {
     FramedSCM framedSCM = new FramedSCM(null, null);
@@ -175,48 +185,50 @@ public class FramedSCMTest {
 
   @Test
   public void onPacketAlsoRelaysPacketsToPacketRelay() {
-    FakePacketRelay packetRelay = new FakePacketRelay();
-    FramedSCM framedSCM       = new FramedSCM(packetRelay, null);
-    SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "5|ABC");
-    SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "2|CDE");
+    FakePacketRelay           packetRelay           = new FakePacketRelay();
+    FakeFramedPacketProcessor framedPacketProcessor = new FakeFramedPacketProcessor();
+    FramedSCM                 framedSCM             = new FramedSCM(packetRelay, framedPacketProcessor);
+    SCMPacket                 incomingPacket        = new SCMPacket(SCMPacketType.XS, "5|ABC");
+    SCMPacket                 incomingPacket2       = new SCMPacket(SCMPacketType.X0, "2|CDE");
     framedSCM.onPacket(PacketDirection.RECIVE, incomingPacket);
-    assertFalse(framedSCM.hasCompletedMessage());
+    assertEquals(0, framedPacketProcessor.sentFrames.size());
     framedSCM.onPacket(PacketDirection.RECIVE, incomingPacket2);
-    assertTrue(framedSCM.hasCompletedMessage());
-    assertEquals("ABC2|", framedSCM.getCompletedMessage());
-    
+    assertEquals(1, framedPacketProcessor.sentFrames.size());
+    assertEquals("ABC2|", framedPacketProcessor.sentFrames.get(0));
+
     assertEquals(2, packetRelay.sentPackets.size());
-    
+
     SCMPacket ack0 = (SCMPacket) packetRelay.sentPackets.get(0).o;
     assertEquals(SCMPacketType.X1, ack0.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(0).source);
-    
+
     SCMPacket ack1 = (SCMPacket) packetRelay.sentPackets.get(1).o;
     assertEquals(SCMPacketType.X0, ack1.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(1).source);
   }
-  
+
   @Test
   public void packetDirectionSendDoesNotCauseError() {
-    FakePacketRelay packetRelay = new FakePacketRelay();
-    FramedSCM framedSCM       = new FramedSCM(packetRelay, null);
-    SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "5|ABC");
-    SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "XYZWW");
-    SCMPacket incomingPacket3 = new SCMPacket(SCMPacketType.X0, "2|CDE");
+    FakePacketRelay           packetRelay           = new FakePacketRelay();
+    FakeFramedPacketProcessor framedPacketProcessor = new FakeFramedPacketProcessor();
+    FramedSCM                 framedSCM             = new FramedSCM(packetRelay, framedPacketProcessor);
+    SCMPacket                 incomingPacket        = new SCMPacket(SCMPacketType.XS, "5|ABC");
+    SCMPacket                 incomingPacket2       = new SCMPacket(SCMPacketType.X0, "XYZWW");
+    SCMPacket                 incomingPacket3       = new SCMPacket(SCMPacketType.X0, "2|CDE");
     framedSCM.onPacket(PacketDirection.RECIVE, incomingPacket);
-    assertFalse(framedSCM.hasCompletedMessage());
+    assertEquals(0, framedPacketProcessor.sentFrames.size());
     framedSCM.onPacket(PacketDirection.SEND, incomingPacket2);
-    assertFalse(framedSCM.hasCompletedMessage());
+    assertEquals(0, framedPacketProcessor.sentFrames.size());
     framedSCM.onPacket(PacketDirection.RECIVE, incomingPacket3);
-    assertTrue(framedSCM.hasCompletedMessage());
-    assertEquals("ABC2|", framedSCM.getCompletedMessage());
-    
+    assertEquals(1, framedPacketProcessor.sentFrames.size());
+    assertEquals("ABC2|", framedPacketProcessor.sentFrames.get(0));
+
     assertEquals(2, packetRelay.sentPackets.size());
-    
+
     SCMPacket ack0 = (SCMPacket) packetRelay.sentPackets.get(0).o;
     assertEquals(SCMPacketType.X1, ack0.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(0).source);
-    
+
     SCMPacket ack1 = (SCMPacket) packetRelay.sentPackets.get(1).o;
     assertEquals(SCMPacketType.X0, ack1.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(1).source);
