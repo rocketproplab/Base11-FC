@@ -1,5 +1,8 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 
 /**
@@ -24,6 +27,9 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  *
  */
 public class FramedSCM implements PacketListener<SCMPacket> {
+  private Queue<String> outputQueue;
+  private String activeString; 
+  private int frameLength;
 
   /**
    * Create a new SCM de-framer. SCMOutput is used to send replied to incoming SCM packets while
@@ -32,7 +38,9 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * @param framedOutput the callback to output framed packets to
    */
   public FramedSCM(PacketRelay sCMOutput, FramedPacketProcessor framedOutput) {
-
+    this.outputQueue = new LinkedList<String>();
+    this.activeString = "";
+    this.frameLength = 0;
   }
 
   @Override
@@ -49,7 +57,25 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * @return the packet to reply with
    */
   protected SCMPacket processNextPacket(SCMPacket incomingPacket) {
-    return new SCMPacket("");
+    SCMPacket returnpacket = new SCMPacket(SCMPacketType.XB,"     ");
+    String finalmessage = "";
+    if(incomingPacket.getID() == SCMPacketType.XS) {
+      String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
+      activeString += SCMmessagesplit[1].trim();
+      frameLength = Integer.parseInt(SCMmessagesplit[0]);
+     returnpacket = new SCMPacket(SCMPacketType.XB, "     ");
+    
+    }else if(incomingPacket.getID() == SCMPacketType.X0){
+      activeString += incomingPacket.getData();
+     returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
+    }
+    
+    if (activeString.length() == frameLength) {
+    finalmessage = activeString;
+   this.outputQueue.add(finalmessage);
+    }
+    return returnpacket;
+    
   }
 
   /**
@@ -57,7 +83,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * @return if there is a completed message to read by {@link #getCompletedMessage()}
    */
   protected boolean hasCompletedMessage() {
-    return false;
+    return !this.outputQueue.isEmpty();
   }
 
   /**
@@ -65,7 +91,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * @return the next completed message
    */
   protected String getCompletedMessage() {
-    return "";
+    return this.outputQueue.poll();
   }
 
 }
