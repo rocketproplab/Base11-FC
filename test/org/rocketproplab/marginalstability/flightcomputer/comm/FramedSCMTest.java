@@ -32,13 +32,13 @@ public class FramedSCMTest {
 
   @Test
   public void noCompletedMessageWithoutPackets() {
-    FramedSCM framedSCM = new FramedSCM(null);
+    FramedSCM framedSCM = new FramedSCM(null, null);
     assertFalse(framedSCM.hasCompletedMessage());
   }
 
   @Test
   public void singleFramePacketIsImmediatlyAvaliable() {
-    FramedSCM framedSCM      = new FramedSCM(null);
+    FramedSCM framedSCM      = new FramedSCM(null, null);
     SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "1|A  ");
     SCMPacket ack            = framedSCM.processNextPacket(incomingPacket);
     assertEquals(SCMPacketType.X1, ack.getID());
@@ -49,7 +49,7 @@ public class FramedSCMTest {
 
   @Test
   public void afterRemovingCompletedMessageNoLongerHasMessage() {
-    FramedSCM framedSCM      = new FramedSCM(null);
+    FramedSCM framedSCM      = new FramedSCM(null, null);
     SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "1|A  ");
     framedSCM.processNextPacket(incomingPacket);
     framedSCM.getCompletedMessage();
@@ -58,7 +58,7 @@ public class FramedSCMTest {
 
   @Test
   public void twoFramePacketIsReconstructedAcrossFrames() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "8|ABC");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "DEFGH");
     SCMPacket ack             = framedSCM.processNextPacket(incomingPacket);
@@ -74,7 +74,7 @@ public class FramedSCMTest {
 
   @Test
   public void twoFramePacketIsCutShort() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "4|ABC");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "D    ");
     framedSCM.processNextPacket(incomingPacket);
@@ -87,7 +87,7 @@ public class FramedSCMTest {
 
   @Test
   public void threeFramePacketIsReconstructed() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "11|He");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "llo W");
     SCMPacket incomingPacket3 = new SCMPacket(SCMPacketType.X1, "orld ");
@@ -108,7 +108,7 @@ public class FramedSCMTest {
 
   @Test
   public void repeatedPacketIsIgnored() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "4|ABC");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "D    ");
     framedSCM.processNextPacket(incomingPacket);
@@ -124,7 +124,7 @@ public class FramedSCMTest {
 
   @Test
   public void restartInMiddleIsTolerated() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "4|ABC");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.XS, "2|ABC");
     framedSCM.processNextPacket(incomingPacket);
@@ -137,7 +137,7 @@ public class FramedSCMTest {
 
   @Test
   public void numberOverTwoFramesIsTolerated() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "00000");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "3|ABC");
     framedSCM.processNextPacket(incomingPacket);
@@ -149,7 +149,7 @@ public class FramedSCMTest {
 
   @Test
   public void badPacketIsIgnored() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "00000");
     SCMPacket incomingPacket2 = new SCMPacket("X0,3|ABC,98;");
     framedSCM.processNextPacket(incomingPacket);
@@ -160,7 +160,7 @@ public class FramedSCMTest {
 
   @Test
   public void canQueueMultipleMessages() {
-    FramedSCM framedSCM       = new FramedSCM(null);
+    FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "2|ABC");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.XS, "2|CDE");
     framedSCM.processNextPacket(incomingPacket);
@@ -176,7 +176,7 @@ public class FramedSCMTest {
   @Test
   public void onPacketAlsoRelaysPacketsToPacketRelay() {
     FakePacketRelay packetRelay = new FakePacketRelay();
-    FramedSCM framedSCM       = new FramedSCM(packetRelay);
+    FramedSCM framedSCM       = new FramedSCM(packetRelay, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "5|ABC");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "2|CDE");
     framedSCM.onPacket(PacketDirection.RECIVE, incomingPacket);
@@ -199,7 +199,7 @@ public class FramedSCMTest {
   @Test
   public void packetDirectionSendDoesNotCauseError() {
     FakePacketRelay packetRelay = new FakePacketRelay();
-    FramedSCM framedSCM       = new FramedSCM(packetRelay);
+    FramedSCM framedSCM       = new FramedSCM(packetRelay, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "5|ABC");
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "XYZWW");
     SCMPacket incomingPacket3 = new SCMPacket(SCMPacketType.X0, "2|CDE");

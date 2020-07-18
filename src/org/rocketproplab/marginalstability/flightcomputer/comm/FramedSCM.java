@@ -25,7 +25,13 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  */
 public class FramedSCM implements PacketListener<SCMPacket> {
 
-  public FramedSCM(PacketRelay relay) {
+  /**
+   * Create a new SCM de-framer. SCMOutput is used to send replied to incoming SCM packets while
+   * framedOutput 
+   * @param sCMOutput the packet relay to send X0 and X1 packets to
+   * @param framedOutput the callback to output framed packets to
+   */
+  public FramedSCM(PacketRelay sCMOutput, FramedPacketProcessor framedOutput) {
 
   }
 
