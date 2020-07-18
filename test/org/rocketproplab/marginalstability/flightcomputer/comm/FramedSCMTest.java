@@ -51,7 +51,7 @@ public class FramedSCMTest {
     FramedSCM framedSCM      = new FramedSCM(null, null);
     SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "1|A  ");
     SCMPacket ack            = framedSCM.processNextPacket(incomingPacket);
-    assertEquals(SCMPacketType.X1, ack.getID());
+    assertEquals(SCMPacketType.XB, ack.getID());
     assertTrue(framedSCM.hasCompletedMessage());
     assertEquals("A", framedSCM.getCompletedMessage());
 
@@ -199,11 +199,11 @@ public class FramedSCMTest {
     assertEquals(2, packetRelay.sentPackets.size());
 
     SCMPacket ack0 = (SCMPacket) packetRelay.sentPackets.get(0).o;
-    assertEquals(SCMPacketType.X1, ack0.getID());
+    assertEquals(SCMPacketType.XB, ack0.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(0).source);
 
     SCMPacket ack1 = (SCMPacket) packetRelay.sentPackets.get(1).o;
-    assertEquals(SCMPacketType.X0, ack1.getID());
+    assertEquals(SCMPacketType.XA, ack1.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(1).source);
   }
 
@@ -226,11 +226,11 @@ public class FramedSCMTest {
     assertEquals(2, packetRelay.sentPackets.size());
 
     SCMPacket ack0 = (SCMPacket) packetRelay.sentPackets.get(0).o;
-    assertEquals(SCMPacketType.X1, ack0.getID());
+    assertEquals(SCMPacketType.XB, ack0.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(0).source);
 
     SCMPacket ack1 = (SCMPacket) packetRelay.sentPackets.get(1).o;
-    assertEquals(SCMPacketType.X0, ack1.getID());
+    assertEquals(SCMPacketType.XA, ack1.getID());
     assertEquals(PacketSources.CommandBox, packetRelay.sentPackets.get(1).source);
   }
 
