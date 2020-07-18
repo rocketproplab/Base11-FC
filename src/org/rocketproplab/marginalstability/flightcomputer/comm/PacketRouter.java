@@ -3,6 +3,8 @@ package org.rocketproplab.marginalstability.flightcomputer.comm;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 
 /**
@@ -74,8 +76,9 @@ public class PacketRouter implements PacketRelay {
         }
       }
     } catch (ClassCastException classExecption) {
-      // TODO have actual error handling (hash conflict)
-      System.out.println("Packet " + o + " is not of suttiable type.");
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Packet " + o + " is not of suitable type";
+      errorReporter.reportError(null, classExecption, errorMsg);
     }
 
   }
