@@ -173,7 +173,32 @@ public enum SCMPacketType {
   /**
    * Main Chute Deploy
    */
-  MD("Main Chute Deploy");
+  MD("Main Chute Deploy"),
+  
+  /**
+   * A packet to indicate the start of an extra long transmission, @see {@link FramedSCM}
+   */
+  XS("Start extra long transmission"),
+  
+  /**
+   * Indicates data for the extra long transmission, @see {@link FramedSCM}
+   */
+  X0("Extra long data frame zero"),
+  
+  /**
+   * Indicates data for the extra long transmission, @see {@link FramedSCM}
+   */
+  X1("Extra long data frame one"),
+  
+  /**
+   * Acknowledges the receipt of the {@link #X0} packet
+   */
+  XA("Extra long ack to X0"),
+  
+  /**
+   * Acknowledges the receipt of the {@link #X1} packet
+   */
+  XB("Extra long ack to X1");
 
   private String name;
 
