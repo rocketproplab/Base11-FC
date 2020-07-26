@@ -29,6 +29,11 @@ public class Quaternion {
 		this.z = z;
 	}
 	
+	/**
+	 * Adds two quaternions together.
+	 * @param other Quaternion to add to this quaternion.
+	 * @return Result of addition.
+	 */
 	public Quaternion add(Quaternion other)
 	{
 		Quaternion result = new Quaternion();
@@ -39,6 +44,11 @@ public class Quaternion {
 		return result;
 	}
 	
+	/**
+	 * Subtracts another quaternion from this quaternion.
+	 * @param other The quaternion to subtract.
+	 * @return Result of subtraction.
+	 */
 	public Quaternion subtract(Quaternion other)
 	{
 		Quaternion result = new Quaternion();
@@ -49,6 +59,11 @@ public class Quaternion {
 		return result;
 	}
 	
+	/**
+	 * Multiplies this quaternion with another quaternion.
+	 * @param other Quaternion to multiply with this quaternion.
+	 * @return Result of multiplication.
+	 */
 	public Quaternion multiply(Quaternion other)
 	{
 		Quaternion result = new Quaternion();
@@ -59,6 +74,11 @@ public class Quaternion {
 		return result;
 	}
 	
+	/**
+	 * Scale this quaternion by multiplying it with a scalar.
+	 * @param scalar to multiply with quaternion.
+	 * @return Result of multiplication.
+	 */
 	public Quaternion multiply(double scalar)
 	{
 		Quaternion result = new Quaternion();
@@ -69,6 +89,9 @@ public class Quaternion {
 		return result;
 	}
 	
+	/**
+	 * @return the conjugate of this quaternion
+	 */
 	public Quaternion conjugate()
 	{
 		Quaternion result = new Quaternion();
@@ -79,12 +102,18 @@ public class Quaternion {
 		return result;
 	}
 	
+	/**
+	 * @return the inverse of this quaternion
+	 */
 	public Quaternion inverse()
 	{
 		double magnitude = this.getMagnitude();
 		return this.conjugate().multiply(1.0 / (magnitude * magnitude));
 	}
 	
+	/**
+	 * @return the magnitude of this quaternion
+	 */
 	public double getMagnitude()
 	{
 		return Math.sqrt(this.w*this.w + this.x*this.x + this.y*this.y + this.z*this.z);
