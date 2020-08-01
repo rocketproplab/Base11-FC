@@ -27,25 +27,50 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  *
  */
 public class FramedSCM implements PacketListener<SCMPacket> {
-  private Queue<String> outputQueue;
-  private String activeString; 
-  private int frameLength;
+  private Queue<String>         outputQueue;
+  private String                activeString;
+  private int                   frameLength;
+  private PacketRelay           sCMOutput;
+  private FramedPacketProcessor framedPacketOutput;
 
   /**
-   * Create a new SCM de-framer. SCMOutput is used to send replied to incoming SCM packets while
-   * framedOutput 
-   * @param sCMOutput the packet relay to send X0 and X1 packets to
+   * Create a new SCM de-framer. SCMOutput is used to send replied to incoming SCM
+   * packets while framedOutput
+   * 
+   * @param sCMOutput    the packet relay to send X0 and X1 packets to
    * @param framedOutput the callback to output framed packets to
    */
   public FramedSCM(PacketRelay sCMOutput, FramedPacketProcessor framedOutput) {
-    this.outputQueue = new LinkedList<String>();
-    this.activeString = "";
-    this.frameLength = 0;
+    this.outputQueue   = new LinkedList<String>();
+    this.activeString  = "";
+    this.frameLength   = -1;
+    framedPacketOutput = framedOutput;
+    this.sCMOutput     = sCMOutput;
   }
 
   @Override
   public void onPacket(PacketDirection direction, SCMPacket packet) {
+    
+    if(direction == PacketDirection.SEND) {
+      //sCMOutput.sendPacket(packet, PacketSources.CommandBox);
+      return;
+    }
+    
+   // this.processNextPacket(packet);
+    if(direction == PacketDirection.RECIVE) {
+      this.processNextPacket(packet);
+    if (this.hasCompletedMessage() == true) {
+      String frompacket = this.getCompletedMessage();
+      framedPacketOutput.processFramedPacket(frompacket);
+      sCMOutput.sendPacket(this.processNextPacket(packet), PacketSources.CommandBox);
+    }else {
+      sCMOutput.sendPacket(this.processNextPacket(packet), PacketSources.CommandBox);
+    }
 
+  //  sCMOutput.sendPacket(this.processNextPacket(packet), PacketSources.CommandBox);
+    }
+    
+    
   }
 
   /**
@@ -59,15 +84,47 @@ public class FramedSCM implements PacketListener<SCMPacket> {
   protected SCMPacket processNextPacket(SCMPacket incomingPacket) {
     SCMPacket returnpacket = new SCMPacket(SCMPacketType.XB,"     ");
     String finalmessage = "";
+    if(!incomingPacket.isValid()) {
+      return null;
+    }
     if(incomingPacket.getID() == SCMPacketType.XS) {
+      if(incomingPacket.getData().contains("|")) {
       String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
-      activeString += SCMmessagesplit[1].trim();
       frameLength = Integer.parseInt(SCMmessagesplit[0]);
+      activeString = SCMmessagesplit[1].trim();
+      if (frameLength < 3) {
+        activeString = SCMmessagesplit[1].trim().substring(0, frameLength);
+        
+      }
+      }
      returnpacket = new SCMPacket(SCMPacketType.XB, "     ");
     
     }else if(incomingPacket.getID() == SCMPacketType.X0){
-      activeString += incomingPacket.getData();
-     returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
+      if(frameLength == -1 ) {
+       if(incomingPacket.getData().contains("|")) {
+        String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
+        frameLength = Integer.parseInt(SCMmessagesplit[0]);
+        activeString = SCMmessagesplit[1].trim();
+        returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
+      }  
+      }else if(incomingPacket.getData().contains("|")){
+        activeString+= incomingPacket.getData().trim().substring(0, frameLength - activeString.length());
+        returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
+      }else  {
+        /*
+        activeString += incomingPacket.getData().trim().substring(0, frameLength - activeString.length());
+        returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
+        }*/
+          int lengthofdata = incomingPacket.getData().trim().length();
+          activeString+= incomingPacket.getData().trim().substring(0, lengthofdata);
+          returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
+        
+      }
+    
+      
+     }else if(incomingPacket.getID() == SCMPacketType.X1) {
+      activeString += incomingPacket.getData().trim();
+      returnpacket = new SCMPacket(SCMPacketType.XB,"     ");
     }
     
     if (activeString.length() == frameLength) {
@@ -80,7 +137,9 @@ public class FramedSCM implements PacketListener<SCMPacket> {
 
   /**
    * Determines if there is a completed message in the output queue.
-   * @return if there is a completed message to read by {@link #getCompletedMessage()}
+   * 
+   * @return if there is a completed message to read by
+   *         {@link #getCompletedMessage()}
    */
   protected boolean hasCompletedMessage() {
     return !this.outputQueue.isEmpty();
@@ -88,6 +147,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
 
   /**
    * Returns the next completed message from the completed message queue.
+   * 
    * @return the next completed message
    */
   protected String getCompletedMessage() {

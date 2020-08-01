@@ -31,6 +31,7 @@ public class FramedSCMTest {
   }
 
   private class FakeFramedPacketProcessor implements FramedPacketProcessor {
+    public int foo = 8;
     public ArrayList<String> sentFrames = new ArrayList<>();
 
     @Override
@@ -152,7 +153,7 @@ public class FramedSCMTest {
     SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "3|ABC");
     framedSCM.processNextPacket(incomingPacket);
     SCMPacket ack = framedSCM.processNextPacket(incomingPacket2);
-    assertEquals(SCMPacketType.XB, ack.getID());
+    assertEquals(SCMPacketType.XA, ack.getID());
     assertTrue(framedSCM.hasCompletedMessage());
     assertEquals("ABC", framedSCM.getCompletedMessage());
   }
