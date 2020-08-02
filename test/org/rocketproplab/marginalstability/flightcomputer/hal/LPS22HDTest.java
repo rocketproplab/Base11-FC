@@ -12,7 +12,7 @@ import java.util.HashMap;
 import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
-import org.rocketproplab.marginalstability.flightcomputer.comm.TestPacketListener;
+import org.rocketproplab.marginalstability.flightcomputer.comm.DummyPacketListener;
 
 import com.pi4j.io.i2c.I2CDevice;
 

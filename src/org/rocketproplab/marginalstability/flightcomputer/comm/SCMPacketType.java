@@ -11,7 +11,14 @@ public enum SCMPacketType {
    * Change the state of the valves, each index in data is a 1 or 0 that
    * Specifies valve 5-7.
    */
-  V1("Valve State"), HB("HB"), // TODO fill this packet in
+  V1("Valve State"),
+  
+  V2("Valve State"), 
+  
+  V3("Valve State"), 
+  
+  HB("HB"), // TODO fill this packet in
+  
 
   /**
    * Position of the GPS x coordinate. Bits are hex integer value (m)

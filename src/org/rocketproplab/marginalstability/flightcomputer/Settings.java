@@ -40,6 +40,10 @@ public class Settings {
   @UserSetting(comment = "Time threshold needed to exceed to deploy the main chute", units = "s")
   public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to
                                                                // deploy main chute
+  
+  public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
+  
+  public static boolean[] ENGINE_ABORT_VALVE_STATES = {true, true, true, true, true};
 
   // Unit conversions
 
@@ -71,6 +75,9 @@ public class Settings {
   @UserSetting(comment = "'c' constant for quadratic regression for pressure transducers", units = "hPa")
   public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0 };
+  
+  @UserSetting(comment = "Phone number to text position to", units = "1xxxyyyyyyy")
+  public static String PHONE_NUMBER = "13150001111";
 
   @SettingSectionHeader(name = "MAX14830 settings")
 
@@ -96,7 +103,7 @@ public class Settings {
     return result;
   }
 
-  private static String fieldAsString(Field field) {
+  public static String fieldAsString(Field field) {
     String result = "";
     if (field.isAnnotationPresent(SettingSectionHeader.class)) {
 
@@ -113,11 +120,7 @@ public class Settings {
       } else {
         result += field.getType() + "\n";
       }
-    } catch (IllegalArgumentException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      // TODO Auto-generated catch block
+    } catch (IllegalArgumentException | IllegalAccessException e) {
       e.printStackTrace();
     }
 
@@ -155,7 +158,7 @@ public class Settings {
     return annotatedName;
   }
 
-  private static Set<String> getUsefulLinesFromConfig(List<String> config) {
+  protected static Set<String> getUsefulLinesFromConfig(List<String> config) {
     Set<String> usefulLines = new HashSet<>();
     for (String line : config) {
       String lineWithoutComment = line;
@@ -172,13 +175,14 @@ public class Settings {
     return usefulLines;
   }
 
-  private static Map<String, String> getFieldNameValueMap(List<String> config) {
+  protected static Map<String, String> getFieldNameValueMap(List<String> config) {
     Set<String>         usefulLines       = getUsefulLinesFromConfig(config);
     Map<String, String> fieldNameValueMap = new HashMap<>();
     for (String line : usefulLines) {
       int equalsIndex = line.indexOf('=');
       if (equalsIndex < 0) {
         System.err.println("Unable to parse line: " + line);
+        continue;
       }
       String fieldName = line.substring(0, equalsIndex);
       String value     = line.substring(equalsIndex + 1);
@@ -187,7 +191,7 @@ public class Settings {
     return fieldNameValueMap;
   }
 
-  private static void setFieldDoubleArray(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldDoubleArray(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
     line = line.trim().replace("[", "").replace("]", "");
     String[] newValues = line.split(",");
     double[] fieldValues = (double[]) field.get(null);
@@ -200,19 +204,19 @@ public class Settings {
     }
   }
 
-  private static void setFieldDouble(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldDouble(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
     line = line.trim();
     double value = Double.parseDouble(line);
     field.set(null, value);
   }
 
-  private static void setFieldInt(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldInt(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
     line = line.trim();
     int value = Integer.parseInt(line);
     field.set(null, value);
   }
 
-  private static void setFieldFromConfigLine(Field field, String line) {
+  protected static void setFieldFromConfigLine(Field field, String line) {
     Class<?> fieldType = field.getType();
     try {
       if (fieldType.equals(double[].class)) {
@@ -250,10 +254,10 @@ public class Settings {
     String home = System.getProperty("user.home");
     return home + "/settings.cfg";
   }
-  
+
   public static void readSettings() {
     String configFileLocation = getSettingsFileLocation();
-    List<String> lines = Collections.EMPTY_LIST;
+    List<String> lines = Collections.emptyList();
     try {
       lines = Files.readAllLines(Paths.get(configFileLocation));
     } catch(IOException e) {
@@ -277,9 +281,5 @@ public class Settings {
   public static void main(String[] args) {
     readSettings();
     System.out.println(Settings.MAX14830_F_REF);
-//    String config = getConfigContents();
-//    readSettingsFromConfig(Arrays.asList(config.split("\n")));
-//    config = getConfigContents();
-//    System.out.println(config);
   }
 }

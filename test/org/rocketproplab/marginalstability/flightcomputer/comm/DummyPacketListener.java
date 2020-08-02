@@ -7,7 +7,7 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  * variables.
  * @author Max Apodaca
  */
-public class TestPacketListener<E> implements PacketListener<E> {
+public class DummyPacketListener<E> implements PacketListener<E> {
 
   /**
    * The last packet received
