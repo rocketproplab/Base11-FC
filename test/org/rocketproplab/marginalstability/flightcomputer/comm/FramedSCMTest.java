@@ -31,7 +31,7 @@ public class FramedSCMTest {
   }
 
   private class FakeFramedPacketProcessor implements FramedPacketProcessor {
-    public int foo = 8;
+    public int               foo        = 8;
     public ArrayList<String> sentFrames = new ArrayList<>();
 
     @Override
@@ -55,6 +55,17 @@ public class FramedSCMTest {
     assertEquals(SCMPacketType.XB, ack.getID());
     assertTrue(framedSCM.hasCompletedMessage());
     assertEquals("A", framedSCM.getCompletedMessage());
+
+  }
+
+  @Test
+  public void singleSpacePacketIsImmediatlyAvaliable() {
+    FramedSCM framedSCM      = new FramedSCM(null, null);
+    SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "1|   ");
+    SCMPacket ack            = framedSCM.processNextPacket(incomingPacket);
+    assertEquals(SCMPacketType.XB, ack.getID());
+    assertTrue(framedSCM.hasCompletedMessage());
+    assertEquals(" ", framedSCM.getCompletedMessage());
 
   }
 
@@ -159,6 +170,101 @@ public class FramedSCMTest {
   }
 
   @Test
+  public void framelengthOverTwoPackets() {
+    FramedSCM framedSCM       = new FramedSCM(null, null);
+    SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "00001");
+    SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "0|ABC");
+    SCMPacket incomingPacket3 = new SCMPacket(SCMPacketType.X1, "DEFGH");
+    SCMPacket incomingPacket4 = new SCMPacket(SCMPacketType.X0, "IJ   ");
+    framedSCM.processNextPacket(incomingPacket);
+    SCMPacket ack = framedSCM.processNextPacket(incomingPacket2);
+    assertEquals(SCMPacketType.XA, ack.getID());
+
+    SCMPacket ack2 = framedSCM.processNextPacket(incomingPacket3);
+    assertEquals(SCMPacketType.XB, ack2.getID());
+
+    SCMPacket ack3 = framedSCM.processNextPacket(incomingPacket4);
+    assertEquals(SCMPacketType.XA, ack3.getID());
+
+    assertTrue(framedSCM.hasCompletedMessage());
+    assertEquals("ABCDEFGHIJ", framedSCM.getCompletedMessage());
+  }
+
+  @Test
+  public void framelengthOverTwoPacketsDouble() {
+    FramedSCM framedSCM       = new FramedSCM(null, null);
+    SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "00001");
+    SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "0|ABC");
+    SCMPacket incomingPacket3 = new SCMPacket(SCMPacketType.X1, "DEFGH");
+    SCMPacket incomingPacket4 = new SCMPacket(SCMPacketType.X0, "IJ   ");
+    framedSCM.processNextPacket(incomingPacket);
+    SCMPacket ack = framedSCM.processNextPacket(incomingPacket2);
+    assertEquals(SCMPacketType.XA, ack.getID());
+
+    SCMPacket ack2 = framedSCM.processNextPacket(incomingPacket3);
+    assertEquals(SCMPacketType.XB, ack2.getID());
+
+    SCMPacket ack3 = framedSCM.processNextPacket(incomingPacket4);
+    assertEquals(SCMPacketType.XA, ack3.getID());
+
+    assertTrue(framedSCM.hasCompletedMessage());
+    assertEquals("ABCDEFGHIJ", framedSCM.getCompletedMessage());
+
+    incomingPacket  = new SCMPacket(SCMPacketType.XS, "00001");
+    incomingPacket2 = new SCMPacket(SCMPacketType.X0, "0|ABC");
+    incomingPacket3 = new SCMPacket(SCMPacketType.X1, "DEFGH");
+    incomingPacket4 = new SCMPacket(SCMPacketType.X0, "IJ   ");
+    framedSCM.processNextPacket(incomingPacket);
+    ack = framedSCM.processNextPacket(incomingPacket2);
+    assertEquals(SCMPacketType.XA, ack.getID());
+
+    ack2 = framedSCM.processNextPacket(incomingPacket3);
+    assertEquals(SCMPacketType.XB, ack2.getID());
+
+    ack3 = framedSCM.processNextPacket(incomingPacket4);
+    assertEquals(SCMPacketType.XA, ack3.getID());
+
+    assertTrue(framedSCM.hasCompletedMessage());
+    assertEquals("ABCDEFGHIJ", framedSCM.getCompletedMessage());
+  }
+
+  @Test
+  public void invalidCharacaterInFrameLength() {
+    FramedSCM framedSCM      = new FramedSCM(null, null);
+    SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "z3|AB");
+    SCMPacket ack            = framedSCM.processNextPacket(incomingPacket);
+    assertNull(ack);
+    assertFalse(framedSCM.hasCompletedMessage());
+  }
+
+  @Test
+  public void negFrameLengthIgnored() {
+    FramedSCM framedSCM      = new FramedSCM(null, null);
+    SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "-3|AB");
+    SCMPacket ack            = framedSCM.processNextPacket(incomingPacket);
+    assertNull(ack);
+    assertFalse(framedSCM.hasCompletedMessage());
+  }
+
+  @Test
+  public void leadingZeroIsValid() {
+    FramedSCM framedSCM      = new FramedSCM(null, null);
+    SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "03|AB");
+    SCMPacket ack            = framedSCM.processNextPacket(incomingPacket);
+    assertFalse(framedSCM.hasCompletedMessage());
+  }
+
+  @Test
+  public void zeroFrameLengthWorks() {
+    FramedSCM framedSCM      = new FramedSCM(null, null);
+    SCMPacket incomingPacket = new SCMPacket(SCMPacketType.XS, "0|ABC");
+    SCMPacket ack            = framedSCM.processNextPacket(incomingPacket);
+    assertTrue(framedSCM.hasCompletedMessage());
+    assertEquals("", framedSCM.getCompletedMessage());
+    assertEquals(SCMPacketType.XB, ack.getID());
+  }
+
+  @Test
   public void badPacketIsIgnored() {
     FramedSCM framedSCM       = new FramedSCM(null, null);
     SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "00000");
@@ -166,6 +272,17 @@ public class FramedSCMTest {
     framedSCM.processNextPacket(incomingPacket);
     SCMPacket ack = framedSCM.processNextPacket(incomingPacket2);
     assertNull(ack);
+    assertFalse(framedSCM.hasCompletedMessage());
+  }
+
+  @Test
+  public void pipeAsLastChar() {
+    FramedSCM framedSCM       = new FramedSCM(null, null);
+    SCMPacket incomingPacket  = new SCMPacket(SCMPacketType.XS, "1354|");
+    SCMPacket incomingPacket2 = new SCMPacket(SCMPacketType.X0, "3|ABC");
+    framedSCM.processNextPacket(incomingPacket);
+    SCMPacket ack = framedSCM.processNextPacket(incomingPacket2);
+    assertEquals(SCMPacketType.XA, ack.getID());
     assertFalse(framedSCM.hasCompletedMessage());
   }
 

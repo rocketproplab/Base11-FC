@@ -50,27 +50,19 @@ public class FramedSCM implements PacketListener<SCMPacket> {
 
   @Override
   public void onPacket(PacketDirection direction, SCMPacket packet) {
-    
-    if(direction == PacketDirection.SEND) {
-      //sCMOutput.sendPacket(packet, PacketSources.CommandBox);
+
+    if (direction == PacketDirection.SEND) {
+
       return;
     }
-    
-   // this.processNextPacket(packet);
-    if(direction == PacketDirection.RECIVE) {
-      this.processNextPacket(packet);
-    if (this.hasCompletedMessage() == true) {
+
+    SCMPacket replypacket = this.processNextPacket(packet);
+    if (this.hasCompletedMessage()) {
       String frompacket = this.getCompletedMessage();
       framedPacketOutput.processFramedPacket(frompacket);
-      sCMOutput.sendPacket(this.processNextPacket(packet), PacketSources.CommandBox);
-    }else {
-      sCMOutput.sendPacket(this.processNextPacket(packet), PacketSources.CommandBox);
     }
+    sCMOutput.sendPacket(replypacket, PacketSources.CommandBox);
 
-  //  sCMOutput.sendPacket(this.processNextPacket(packet), PacketSources.CommandBox);
-    }
-    
-    
   }
 
   /**
@@ -82,57 +74,72 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * @return the packet to reply with
    */
   protected SCMPacket processNextPacket(SCMPacket incomingPacket) {
-    SCMPacket returnpacket = new SCMPacket(SCMPacketType.XB,"     ");
-    String finalmessage = "";
-    if(!incomingPacket.isValid()) {
+    boolean   completed    = (activeString.length() == frameLength);
+    SCMPacket returnpacket = new SCMPacket(SCMPacketType.XB, "     ");
+    String    finalmessage = "";
+    if (!incomingPacket.isValid()) {
       return null;
     }
-    if(incomingPacket.getID() == SCMPacketType.XS) {
-      if(incomingPacket.getData().contains("|")) {
-      String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
-      frameLength = Integer.parseInt(SCMmessagesplit[0]);
-      activeString = SCMmessagesplit[1].trim();
-      if (frameLength < 3) {
-        activeString = SCMmessagesplit[1].trim().substring(0, frameLength);
-        
-      }
-      }
-     returnpacket = new SCMPacket(SCMPacketType.XB, "     ");
-    
-    }else if(incomingPacket.getID() == SCMPacketType.X0){
-      if(frameLength == -1 ) {
-       if(incomingPacket.getData().contains("|")) {
-        String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
-        frameLength = Integer.parseInt(SCMmessagesplit[0]);
-        activeString = SCMmessagesplit[1].trim();
-        returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
-      }  
-      }else if(incomingPacket.getData().contains("|")){
-        activeString+= incomingPacket.getData().trim().substring(0, frameLength - activeString.length());
-        returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
-      }else  {
-        /*
-        activeString += incomingPacket.getData().trim().substring(0, frameLength - activeString.length());
-        returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
-        }*/
-          int lengthofdata = incomingPacket.getData().trim().length();
-          activeString+= incomingPacket.getData().trim().substring(0, lengthofdata);
-          returnpacket = new SCMPacket(SCMPacketType.XA, "     ");
-        
-      }
-    
-      
-     }else if(incomingPacket.getID() == SCMPacketType.X1) {
+    if (incomingPacket.getID() == SCMPacketType.XS) {
+      returnpacket = processXSPacket(incomingPacket);
+      completed    = false;
+    } else if (incomingPacket.getID() == SCMPacketType.X0) {
+      returnpacket = processX0Packet(incomingPacket);
+
+    } else {
       activeString += incomingPacket.getData().trim();
-      returnpacket = new SCMPacket(SCMPacketType.XB,"     ");
+      returnpacket  = new SCMPacket(SCMPacketType.XB, "     ");
     }
-    
-    if (activeString.length() == frameLength) {
-    finalmessage = activeString;
-   this.outputQueue.add(finalmessage);
+
+    if ((activeString.length() == frameLength) && (!completed)) {
+      finalmessage = activeString;
+      this.outputQueue.add(finalmessage);
     }
     return returnpacket;
-    
+
+  }
+
+  private SCMPacket processX0Packet(SCMPacket incomingPacket) {
+    int lengthofframeleft = frameLength - activeString.length();
+    if (frameLength == -1) {  
+      String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
+      activeString +=   SCMmessagesplit[0];
+      frameLength = Integer.parseInt(activeString);
+      activeString = SCMmessagesplit[1];
+      // TODO Similar to XS, where if the frameLength is still less than 0 or 
+      // does not split into several indices
+    }else if (lengthofframeleft < incomingPacket.getData().length()) {
+      activeString += incomingPacket.getData().substring(0, lengthofframeleft);
+    } else {
+      activeString += incomingPacket.getData().trim();
+    }
+    return new SCMPacket(SCMPacketType.XA, "     ");
+  }
+
+  private SCMPacket processXSPacket(SCMPacket incomingPacket) {
+    if (incomingPacket.getData().contains("|")) {
+      String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
+      try {
+        frameLength = Integer.parseInt(SCMmessagesplit[0]);
+      } catch (NumberFormatException exception) {
+        return null;
+      }
+      if (SCMmessagesplit.length == 2) {
+        if (frameLength < 0) {
+          return null;
+        } else if (frameLength < SCMmessagesplit[1].length()) {
+          activeString = SCMmessagesplit[1].substring(0, frameLength);
+        } else {
+          activeString = SCMmessagesplit[1];
+        }
+      }
+    } else {
+      String getint = incomingPacket.getData();
+      activeString = "" + Integer.parseInt(getint);
+      frameLength = -1;
+    }
+
+    return new SCMPacket(SCMPacketType.XB, "     ");
   }
 
   /**
