@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1Mag.MODE;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1Mag.ODR;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1Mag.PERFORMANCE_XY;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1Mag.PERFORMANCE_Z;
@@ -47,6 +48,19 @@ public class LSM9DS1MagTest {
     sensor.setScale(SCALE.GAUSS_12);
     ctrlReg2M = mockI2C.writeMap.get(Registers.CTRL_REG2_M.getAddress());
     assertEquals((byte) 0b11011111, ctrlReg2M);
+  }
+  
+  @Test
+  public void setModeSetsModeInREG3M() throws IOException {
+    mockI2C.readMap.put(Registers.CTRL_REG3_M.getAddress(), (byte) 0);
+    sensor.setMode(MODE.SINGLE_CONVERSION);
+    byte ctrlReg3M = mockI2C.writeMap.get(Registers.CTRL_REG3_M.getAddress());
+    assertEquals((byte) 0b00000001, ctrlReg3M);
+    
+    mockI2C.readMap.put(Registers.CTRL_REG3_M.getAddress(), (byte) 0xFF);
+    sensor.setMode(MODE.POWER_DOWN);
+    ctrlReg3M = mockI2C.writeMap.get(Registers.CTRL_REG3_M.getAddress());
+    assertEquals((byte) 0b11111110, ctrlReg3M);
   }
   
   @Test

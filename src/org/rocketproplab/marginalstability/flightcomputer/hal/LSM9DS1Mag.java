@@ -27,6 +27,8 @@ public class LSM9DS1Mag implements PollingSensor, IMU {
   private static final int ODR_LSB_POS                  = 2;
   private static final int SCALE_MASK                   = 0b11;
   private static final int SCALE_LSB_POS                = 5;
+  private static final int MODE_MASK                    = 0b11;
+  private static final int MODE_LSB_POS                 = 0;
   private static final int PERFORMANCE_MASK             = 0b11;
   private static final int PERFORMANCE_XY_LSB_POS       = 5;
   private static final int PERFORMANCE_Z_LSB_POS        = 2;
@@ -124,6 +126,22 @@ public class LSM9DS1Mag implements PollingSensor, IMU {
     }
   }
   
+  public enum MODE implements RegisterValue {
+    CONTINUOUS_CONVERSION,
+    SINGLE_CONVERSION,
+    POWER_DOWN;
+    
+    @Override
+    public int getValueMask() {
+      return MODE_MASK;
+    }
+
+    @Override
+    public int getValueLSBPos() {
+      return MODE_LSB_POS;
+    }
+  }
+  
   public enum PERFORMANCE_XY implements RegisterValue {
     LOW,
     MEDIUM,
@@ -189,6 +207,16 @@ public class LSM9DS1Mag implements PollingSensor, IMU {
    */
   public void setScale(SCALE scale) throws IOException {
     genericRegisterWrite(Registers.CTRL_REG2_M, scale);
+  }
+  
+  /**
+   * Sets the operating mode of the magnetometer sensor
+   * 
+   * @param mode Operating mode of sensor
+   * @throws IOException if we are unable to access the i2c device
+   */
+  public void setMode(MODE mode) throws IOException {
+    genericRegisterWrite(Registers.CTRL_REG3_M, mode);
   }
   
   /**
