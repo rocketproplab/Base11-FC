@@ -162,7 +162,7 @@ public class LSM9DS1Test {
     imu.poll();
     assertTrue(imu.hasNext());
     assertEquals(12, mockI2C.size);
-    assertEquals(Registers.OUT_X_L_G.getAddress(), mockI2C.offset);
+    assertEquals(Registers.OUT_X_L_G.getAddress(), mockI2C.address);
   }
 
   @Test

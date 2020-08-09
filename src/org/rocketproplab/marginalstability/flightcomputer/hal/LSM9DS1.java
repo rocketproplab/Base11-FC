@@ -440,7 +440,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
       }
       int    dataLength  = samplesInFIFO * BYTES_PER_FIFO_LINE;
       byte[] data        = new byte[dataLength];
-      int    samplesRead = this.i2c.read(data, Registers.OUT_X_L_G.getAddress(), dataLength);
+      int    samplesRead = this.i2c.read(Registers.OUT_X_L_G.getAddress(), data, 0, dataLength);
       this.parseReadings(data, samplesRead);
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
