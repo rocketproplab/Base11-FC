@@ -13,16 +13,42 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 public class FlightComputer {
   private ArrayList<Subsystem> subsystems;
   private Telemetry            telemetry;
+  private Time                 time;
 
-  public FlightComputer(Telemetry telemetry) {
+  /**
+   * Create a new flight computer that will log to the given telemetry and use the
+   * given time
+   * 
+   * @param telemetry the telemetry to log to
+   * @param time      the time to use for the flight
+   */
+  public FlightComputer(Telemetry telemetry, Time time) {
     this.subsystems = new ArrayList<>();
     this.telemetry  = telemetry;
+    this.time       = time;
   }
 
+  /**
+   * Add a new subsystem so that it will be ticked
+   * 
+   * @param subsystem the subsystem to tick
+   */
   public void registerSubsystem(Subsystem subsystem) {
     this.subsystems.add(subsystem);
   }
 
+  /**
+   * Get the time of the flight computer
+   * 
+   * @return the time to use for all calculations
+   */
+  public Time getTime() {
+    return this.time;
+  }
+
+  /**
+   * Do one cycle of the subsystems
+   */
   public void tick() {
     try {
       for (Subsystem subsystem : this.subsystems) {

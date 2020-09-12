@@ -3,8 +3,8 @@ package org.rocketproplab.marginalstability.flightcomputer;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.subsystems.PTSubsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.ParachuteSubsystem;
+import org.rocketproplab.marginalstability.flightcomputer.subsystems.SensorSubsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.ValveStateSubsystem;
 
@@ -49,7 +49,8 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.ValveStateS
 public class Main {
 
   public static void main(String[] args) {
-    FlightComputer flightComputer = new FlightComputer(Telemetry.getInstance());
+    Time           time           = new Time();
+    FlightComputer flightComputer = new FlightComputer(Telemetry.getInstance(), time);
     Main.registerSubsystems(flightComputer);
     Main.registerPacketListeners();
 
@@ -60,10 +61,23 @@ public class Main {
 
   private static void registerSubsystems(FlightComputer flightComputer) {
     Telemetry telemetry = Telemetry.getInstance();
+
     telemetry.logInfo(Info.INIT_SUBSYSTEMS_START);
+
     flightComputer.registerSubsystem(ParachuteSubsystem.getInstance());
     ValveStateSubsystem.getInstance();
+
+    SensorSubsystem sensorSubsystem = new SensorSubsystem(flightComputer.getTime());
+    Main.addSensors(sensorSubsystem);
+    flightComputer.registerSubsystem(sensorSubsystem);
+
     telemetry.logInfo(Info.FINISH_SUBSYSTEM_START);
+  }
+
+  private static void addSensors(SensorSubsystem sensorSubsystem) {
+    Telemetry telemetry = Telemetry.getInstance();
+
+    telemetry.logInfo(Info.DONE_CREATING_SENSORS);
   }
 
   private static void registerPacketListeners() {
