@@ -11,34 +11,34 @@ public class SensorPollerTest {
   private static int staticCounter = 0;
 
   @Test
-  public void sensorpollerShouldAlwaysTickAtStart() {
+  public void sensorPollerShouldAlwaysPollAtStart() {
     SensorPoller poller = new SensorPoller(null, 1);
     assertTrue(poller.shouldPollSensor(0));
   }
   
   @Test
-  public void afterCallToTickSensorShouldNotTickAtSameTime() {
+  public void afterCallToPollSensorShouldNotPollAtSameTime() {
     SensorPoller poller = new SensorPoller(() -> {} , 1);
     poller.update(0);
     assertFalse(poller.shouldPollSensor(0));
   }
   
   @Test
-  public void afterCallToUpdateAndWaitpollerTicksAgain() {
+  public void afterCallToUpdateAndWaitMakesPollerPollAgain() {
     SensorPoller poller = new SensorPoller(() -> {} , 1);
     poller.update(0);
     assertTrue(poller.shouldPollSensor(1.1));
   }
   
   @Test
-  public void tooShortDurationDoesNotRetick() {
+  public void tooShortDurationDoesNotRepoll() {
     SensorPoller poller = new SensorPoller(() -> {} , 1);
     poller.update(0);
     assertFalse(poller.shouldPollSensor(0.9));
   }
   
   @Test
-  public void invalidUpdateDoesNotDeferValidTick() {
+  public void invalidUpdateDoesNotDeferValidPoll() {
     SensorPoller poller = new SensorPoller(() -> {} , 1);
     poller.update(0);
     poller.update(0.9);
@@ -46,7 +46,7 @@ public class SensorPollerTest {
   }
   
   @Test
-  public void ticksIncrementAtRateNotFromLastTick() {
+  public void polledBasedOnRateNotFromLastPoll() {
     SensorPoller poller = new SensorPoller(() -> {} , 1);
     poller.update(0);
     poller.update(1.1);
