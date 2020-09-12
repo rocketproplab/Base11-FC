@@ -71,7 +71,7 @@ public class SensorPollerTest {
   }
   
   @Test
-  public void tickingAtReallyLongRateDoesNotTickTwice() {
+  public void pollingAtReallyLongRateDoesNotPollTwice() {
     SensorPollerTest.staticCounter = 0;
     SensorPoller poller = new SensorPoller(() -> SensorPollerTest.staticCounter++, 1);
     poller.update(0);
