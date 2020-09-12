@@ -3,7 +3,7 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 
 /**
- * An AccelGyroReading is the accelerometer and magnetometer data read by an
+ * An AccelGyroReading is the accelerometer and gyroscope data read by an
  * IMU at an instant. It consists of an acceleration vector as well as a
  * rotation difference. <br>
  * 
@@ -16,7 +16,7 @@ import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
  * @author Max Apodaca
  *
  */
-public class AccelGyroReading implements IMUReading {
+public class AccelGyroReading {
 
   private Vector3 acc;
   private Vector3 rotation;

@@ -12,7 +12,7 @@ import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
  * @author Enlil Odisho
  *
  */
-public class MagReading implements IMUReading {
+public class MagReading {
   
   private Vector3 magField;
   

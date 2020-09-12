@@ -24,7 +24,7 @@ import com.pi4j.io.i2c.I2CDevice;
  * @author Enlil Odisho
  *
  */
-public class LSM9DS1Mag implements PollingSensor, IMU {
+public class LSM9DS1Mag implements PollingSensor, Magnetometer {
   private static final int ODR_MASK                     = 0b111;
   private static final int ODR_LSB_POS                  = 2;
   private static final int SCALE_MASK                   = 0b11;

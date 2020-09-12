@@ -29,7 +29,7 @@ import com.pi4j.io.i2c.I2CDevice;
  * @author Max Apodaca
  *
  */
-public class LSM9DS1AccelGyro implements PollingSensor, IMU {
+public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   private static final int ODR_MASK                    = 0b111;
   private static final int ODR_LSB_POS                 = 5;
   private static final int ACCELEROMETER_SCALE_MASK    = 0b11;
