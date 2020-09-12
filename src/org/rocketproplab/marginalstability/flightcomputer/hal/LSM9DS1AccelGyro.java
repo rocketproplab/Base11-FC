@@ -230,7 +230,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * @throws IOException if unable to read
    */
   public void setODR(ODR odr) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG1_G, odr);
+    modifyRegister(Registers.CTRL_REG1_G, odr);
   }
 
   /**
@@ -240,7 +240,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setAccelerometerScale(AccelerometerScale scale) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG6_XL, scale);
+    modifyRegister(Registers.CTRL_REG6_XL, scale);
   }
 
   /**
@@ -250,7 +250,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setGyroscopeScale(GyroScale scale) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG1_G, scale);
+    modifyRegister(Registers.CTRL_REG1_G, scale);
   }
 
   /**
@@ -272,7 +272,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setFIFOMode(FIFOMode mode) throws IOException {
-    genericRegisterWrite(Registers.FIFO_CTRL, mode);
+    modifyRegister(Registers.FIFO_CTRL, mode);
   }
 
   /**
@@ -339,7 +339,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    *                 {@link RegisterValue}
    * @throws IOException if we are unable to access the i2c device
    */
-  private void genericRegisterWrite(Registers register, RegisterValue value) throws IOException {
+  private void modifyRegister(Registers register, RegisterValue value) throws IOException {
     int registerValue = this.i2c.read(register.getAddress());
     int result        = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
     this.i2c.write(register.getAddress(), (byte) result);

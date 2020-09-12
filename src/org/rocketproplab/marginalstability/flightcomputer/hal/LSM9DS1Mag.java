@@ -198,7 +198,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setODR(ODR odr) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG1_M, odr);
+    modifyRegister(Registers.CTRL_REG1_M, odr);
   }
   
   /**
@@ -208,7 +208,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setScale(SCALE scale) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG2_M, scale);
+    modifyRegister(Registers.CTRL_REG2_M, scale);
   }
   
   /**
@@ -218,7 +218,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setMode(MODE mode) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG3_M, mode);
+    modifyRegister(Registers.CTRL_REG3_M, mode);
   }
   
   /**
@@ -228,7 +228,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setXYPerformance(PERFORMANCE_XY performance) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG1_M, performance);
+    modifyRegister(Registers.CTRL_REG1_M, performance);
   }
   
   /**
@@ -238,7 +238,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setZPerformance(PERFORMANCE_Z performance) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG4_M, performance);
+    modifyRegister(Registers.CTRL_REG4_M, performance);
   }
   
   /**
@@ -284,7 +284,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    *                 {@link RegisterValue}
    * @throws IOException if we are unable to access the i2c device
    */
-  private void genericRegisterWrite(Registers register, RegisterValue value) throws IOException {
+  private void modifyRegister(Registers register, RegisterValue value) throws IOException {
     int registerValue = this.i2c.read(register.getAddress());
     int result        = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
     this.i2c.write(register.getAddress(), (byte) result);
