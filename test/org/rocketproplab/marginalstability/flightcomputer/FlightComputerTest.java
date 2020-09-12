@@ -47,7 +47,7 @@ public class FlightComputerTest {
   
   @Test
   public void flightComputerCallsSubsystemUpdateOnTick() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry);
+    FlightComputer flightComputer = new FlightComputer(this.telemetry, new Time());
     MockSubsystem mockSubsystem = new MockSubsystem();
     flightComputer.registerSubsystem(mockSubsystem);
     flightComputer.tick();
@@ -56,7 +56,7 @@ public class FlightComputerTest {
   
   @Test
   public void flightComputerRecoversFromException() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry);
+    FlightComputer flightComputer = new FlightComputer(this.telemetry, new Time());
     MockSubsystem mockSubsystem = new MockSubsystem();
     mockSubsystem.throwError = true;
     flightComputer.registerSubsystem(mockSubsystem);
@@ -69,7 +69,7 @@ public class FlightComputerTest {
   
   @Test
   public void flightComputerReportsErrorToTelemetry() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry);
+    FlightComputer flightComputer = new FlightComputer(this.telemetry, new Time());
     MockSubsystem mockSubsystem = new MockSubsystem();
     mockSubsystem.throwError = true;
     flightComputer.registerSubsystem(mockSubsystem);
@@ -80,7 +80,7 @@ public class FlightComputerTest {
   
   @Test
   public void errorInReportErrorAllowConintuedExecution() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry);
+    FlightComputer flightComputer = new FlightComputer(this.telemetry, new Time());
     MockSubsystem mockSubsystem = new MockSubsystem();
     mockSubsystem.throwError = true;
     this.throwErrorOnError = true;
