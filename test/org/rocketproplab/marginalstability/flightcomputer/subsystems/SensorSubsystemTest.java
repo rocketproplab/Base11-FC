@@ -10,6 +10,7 @@ public class SensorSubsystemTest {
   private class TestTime extends Time {
     public double time = 0;
 
+    @Override
     public double getSystemTime() {
       return time;
     }

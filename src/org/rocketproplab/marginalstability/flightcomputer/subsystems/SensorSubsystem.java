@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.hal.PollingSensor;
-import org.rocketproplab.marginalstability.flightcomputer.hal.SensorTicker;
+import org.rocketproplab.marginalstability.flightcomputer.hal.SensorPoller;
 
 /**
  * A subsystem to handle ticking the sensors at a fixed rate.
@@ -15,7 +15,7 @@ import org.rocketproplab.marginalstability.flightcomputer.hal.SensorTicker;
  *
  */
 public class SensorSubsystem implements Subsystem {
-  private List<SensorTicker> sensorTickers;
+  private List<SensorPoller> sensorPollers;
   private Time               time;
 
   /**
@@ -24,14 +24,14 @@ public class SensorSubsystem implements Subsystem {
    * @param time the time to use
    */
   public SensorSubsystem(Time time) {
-    this.sensorTickers = Collections.synchronizedList(new ArrayList<>());
+    this.sensorPollers = Collections.synchronizedList(new ArrayList<>());
     this.time          = time;
   }
 
   @Override
   public void update() {
-    for (SensorTicker ticker : this.sensorTickers) {
-      ticker.tick(this.time.getSystemTime());
+    for (SensorPoller poller : this.sensorPollers) {
+      poller.update(this.time.getSystemTime());
     }
   }
 
@@ -43,8 +43,8 @@ public class SensorSubsystem implements Subsystem {
    * @param rate   the rate in seconds to be polled at
    */
   public void addSensor(PollingSensor sensor, double rate) {
-    SensorTicker ticker = new SensorTicker(sensor, rate);
-    this.sensorTickers.add(ticker);
+    SensorPoller poller = new SensorPoller(sensor, rate);
+    this.sensorPollers.add(poller);
   }
 
 }
