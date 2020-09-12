@@ -1,6 +1,8 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayDeque;
 
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
@@ -369,12 +371,10 @@ public class LSM9DS1Mag implements PollingSensor, IMU {
    * @return array of the shorts
    */
   private int[] getData(byte[] data) {
+    ByteBuffer byteBuffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
     int[] results = new int[data.length / 2];
     for (int i = 0; i < data.length / 2; i++) {
-      short low    = (short) (char) data[i * 2];
-      short high   = (short) (char) data[i * 2 + 1];
-      short result = (short) (low | (high << BITS_PER_BYTE));
-      results[i] = result;
+      results[i] = byteBuffer.getShort(i * 2); // i * 2 = index of low byte
     }
     return results;
   }
