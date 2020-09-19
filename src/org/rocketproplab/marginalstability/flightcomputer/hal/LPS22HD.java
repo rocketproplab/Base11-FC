@@ -91,6 +91,10 @@ public class LPS22HD implements Barometer, PollingSensor {
 
   /**
    * Read the current pressure form the sensor using a one shot read method.
+   * 
+   *                            MSB                     LSB
+   * Complete 24-bit word: | buffer[2] | buffer[1] | buffer[0] |
+   * Registers:            | 0x2A      | 0x29      | 0x28      |
    */
   private void readPressure() {
     // TODO Read at once so we don't read high on sample 1 and low on sample 2. As
@@ -99,12 +103,11 @@ public class LPS22HD implements Barometer, PollingSensor {
       byte[] buffer = {0, 0, 0};
       i2cDevice.read(REG_PRESSURE_EXTRA_LOW, buffer, 0, 3);
 
-      // Perform 2's complement if value is negative
+      // Out of range if MSB = 1
       byte mask = (byte)0b10000000;
       if((buffer[2] & mask) > 0){
-          buffer[0] = (byte)(~buffer[0] + 1);
-          buffer[1] = (byte)~buffer[1];
-          buffer[2] = (byte)~buffer[2];
+        pressure = -1;
+        return;
       }
 
       int rawPressure = (Byte.toUnsignedInt(buffer[2])<<16) + (Byte.toUnsignedInt(buffer[1])<<8) + Byte.toUnsignedInt(buffer[0]);
