@@ -195,7 +195,15 @@ public class TestParachuteSubsystem {
     looper.tick();
     assertFalse(main.active);
     assertTrue(drogue.active);
+
+    // chute does not deploy immediately when pressure drops below threshold
     time.time = 20;
+    looper.tick();
+    assertFalse(main.active);
+    assertTrue(drogue.active);
+
+    // chute deploys after the pressure has been below the threshold for some time
+    time.time = 30;
     looper.tick();
     assertTrue(main.active);
     assertTrue(drogue.active);
