@@ -82,7 +82,7 @@ public class FlightComputerTest {
   }
 
   @Test
-  public void errorInReportErrorAllowConintuedExecution() {
+  public void errorInReportErrorAllowContinuedExecution() {
     FlightComputer flightComputer = new FlightComputer(this.telemetry, null);
     MockSubsystem  mockSubsystem  = new MockSubsystem();
     mockSubsystem.throwError = true;
@@ -95,4 +95,16 @@ public class FlightComputerTest {
     assertTrue(mockSubsystem.hasUpdateCalled);
   }
 
+  @Test
+  public void errorAllowContinuedExecutionInSameTick() {
+    FlightComputer flightComputer = new FlightComputer(this.telemetry, null);
+    MockSubsystem mockSubsystem1 = new MockSubsystem();
+    mockSubsystem1.throwError = true;
+    flightComputer.registerSubsystem(mockSubsystem1);
+    MockSubsystem mockSubsystem2 = new MockSubsystem();
+    mockSubsystem2.throwError = false;
+    flightComputer.registerSubsystem(mockSubsystem2);
+    flightComputer.tick();
+    assertTrue(mockSubsystem2.hasUpdateCalled);
+  }
 }

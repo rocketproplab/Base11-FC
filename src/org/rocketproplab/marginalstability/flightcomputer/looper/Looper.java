@@ -1,5 +1,6 @@
 package org.rocketproplab.marginalstability.flightcomputer.looper;
 
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 
 import java.util.HashMap;
@@ -36,30 +37,33 @@ public class Looper {
   }
 
   /**
-   * Infinite loop to update all events in this Looper.
-   */
-  public void loop() {
-    // TODO: correct implementation of looping
-    while (true) {
-      tick();
-    }
-  }
-
-  /**
    * Iterate through events in this Looper and checks if
    * callbacks should be emitted.
    */
   @SuppressWarnings("WhileLoopReplaceableByForEach")
-  public void tick() {
+  public void tick(LooperErrorListener errorListener) {
     Iterator<Map.Entry<Object, Event>> entryIterator = callbackMap.entrySet().iterator();
     while (entryIterator.hasNext()) {
       Map.Entry<Object, Event> entry = entryIterator.next();
       Object                   tag   = entry.getKey();
       Event                    event = entry.getValue();
-      if (event.shouldEmit()) {
-        event.onLooperCallback(tag, this);
+      try {
+        if (event.shouldEmit()) {
+          event.onLooperCallback(tag, this);
+        }
+      } catch (Exception e) {
+        if (errorListener != null) {
+          errorListener.onError(tag, this);
+        }
       }
     }
+  }
+
+  /**
+   * Simple tick() method for ticks that do not require error reporting
+   */
+  public void tick() {
+    tick(null);
   }
 
   /**
@@ -167,14 +171,22 @@ public class Looper {
     return callbackMap.remove(tag);
   }
 
+  @FunctionalInterface
+  public interface LooperErrorListener {
+    void onError(Object tag, Looper from);
+  }
+
   /**
-   *
+   * Callback when condition to invoke an event is true.
    */
   @FunctionalInterface
   public interface Callback {
     void onLooperCallback(Object tag, Looper from);
   }
 
+  /**
+   * Condition to determine whether a callback should be invoked.
+   */
   @FunctionalInterface
   public interface CallbackCondition {
     boolean shouldEmit();
@@ -182,6 +194,10 @@ public class Looper {
     CallbackCondition TRUE = () -> true;
   }
 
+  /**
+   * Event that contains all the information needed to determine
+   * when and why a callback is invoked.
+   */
   public static class Event implements CallbackCondition, Callback {
     private CallbackCondition condition;
     private Callback          callback;

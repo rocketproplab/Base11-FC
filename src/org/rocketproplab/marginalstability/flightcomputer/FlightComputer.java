@@ -4,6 +4,8 @@ import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 
+import javax.annotation.processing.SupportedSourceVersion;
+
 public class FlightComputer {
   private Telemetry telemetry;
   private Time      time;
@@ -25,15 +27,13 @@ public class FlightComputer {
   }
 
   public void tick() {
-    try {
-      this.looper.tick();
-    } catch (Exception looperException) {
+    this.looper.tick(((tag, from) -> {
       try {
         this.telemetry.reportError(Errors.TOP_LEVEL_EXCEPTION);
-      } catch (Exception telemetryException) {
+      } catch (Exception e) {
         System.err.println("Unable to log errors!");
-        telemetryException.printStackTrace();
+        e.printStackTrace();
       }
-    }
+    }));
   }
 }
