@@ -71,7 +71,6 @@ public class Looper {
    */
   public void emitAlways(Object tag, Callback callback) {
     registerEvent(tag, new Event(CallbackCondition.TRUE, callback, time));
-    emitScheduled(tag, 0.0, callback);
   }
 
   /**

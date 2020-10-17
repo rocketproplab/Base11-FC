@@ -53,7 +53,7 @@ public class LandedSMSSubsystem
    */
   private void sendSMSMessage() {
     if (phoneNumber != null && lastPacket != null) {
-      smsSender.sendMessage(phoneNumber,
+      smsSender.sendTextMessage(phoneNumber,
               getMessage(lastPacket.getLatitude(), lastPacket.getLongitude()));
     }
   }

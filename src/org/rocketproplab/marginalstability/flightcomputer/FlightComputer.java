@@ -7,25 +7,31 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 
 public class FlightComputer {
-  private Telemetry telemetry;
-  private Looper    looper;
+    private Telemetry telemetry;
+    private Time      time;
+    private Looper    looper;
 
 
-  public FlightComputer(Telemetry telemetry) {
-    this.telemetry = telemetry;
-    this.looper    = Looper.getInstance();
-  }
-
-  public void registerSubsystem(Subsystem subsystem) {
-    subsystem.prepare(this.looper);
-  }
-
-  public void tick() {
-    try {
-      this.looper.tick();
-    } catch (Exception e) {
-      this.telemetry.reportError(Errors.TOP_LEVEL_EXCEPTION);
+    public FlightComputer(Telemetry telemetry, Time time) {
+        this.telemetry = telemetry;
+        this.time = time;
+        this.looper = new Looper(time);
     }
+
+    public void registerSubsystem(Subsystem subsystem) {
+        subsystem.prepare(this.looper);
+    }
+
+    public Time getTime() {
+        return time;
+    }
+
+    public void tick() {
+        try {
+            this.looper.tick();
+        } catch (Exception e) {
+            this.telemetry.reportError(Errors.TOP_LEVEL_EXCEPTION);
+        }
 //    try {
 //      for(Subsystem subsystem : this.subsystems) {
 //        try {
@@ -39,5 +45,5 @@ public class FlightComputer {
 //      e.printStackTrace();
 //    }
 
-  }
+    }
 }
