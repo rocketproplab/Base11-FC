@@ -11,7 +11,14 @@ public enum SCMPacketType {
    * Change the state of the valves, each index in data is a 1 or 0 that
    * Specifies valve 5-7.
    */
-  V1("Valve State"), HB("HB"), // TODO fill this packet in
+  V1("Valve State"),
+  
+  V2("Valve State"), 
+  
+  V3("Valve State"), 
+  
+  HB("HB"), // TODO fill this packet in
+  
 
   /**
    * Position of the GPS x coordinate. Bits are hex integer value (m)
@@ -166,7 +173,32 @@ public enum SCMPacketType {
   /**
    * Main Chute Deploy
    */
-  MD("Main Chute Deploy");
+  MD("Main Chute Deploy"),
+  
+  /**
+   * A packet to indicate the start of an extra long transmission, @see {@link FramedSCM}
+   */
+  XS("Start extra long transmission"),
+  
+  /**
+   * Indicates data for the extra long transmission, @see {@link FramedSCM}
+   */
+  X0("Extra long data frame zero"),
+  
+  /**
+   * Indicates data for the extra long transmission, @see {@link FramedSCM}
+   */
+  X1("Extra long data frame one"),
+  
+  /**
+   * Acknowledges the receipt of the {@link #X0} packet
+   */
+  XA("Extra long ack to X0"),
+  
+  /**
+   * Acknowledges the receipt of the {@link #X1} packet
+   */
+  XB("Extra long ack to X1");
 
   private String name;
 

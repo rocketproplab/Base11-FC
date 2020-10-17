@@ -1,5 +1,8 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
@@ -8,15 +11,13 @@ import org.rocketproplab.marginalstability.flightcomputer.hal.SMSSender;
 import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 
 public class TestLandedSMSSubsystem {
   private static class TestSMSSender implements SMSSender {
     private boolean smsSent = false;
 
     @Override
-    public void sendMessage(String number, String message) {
+    public void sendTextMessage(String number, String message) {
       smsSent = true;
       String expected = String.format("Landed! https://www.google.com/maps/place/%f+%f",
               TestGPSPacket.LAT, TestGPSPacket.LON);

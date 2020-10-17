@@ -37,7 +37,7 @@ public class TestSCMTransceiver {
     SCMTransceiver                tx       = new SCMTransceiver(port, router,
         PacketSources.EngineControllerUnit);
     
-    TestPacketListener<SCMPacket> listener = new TestPacketListener<SCMPacket>();
+    DummyPacketListener<SCMPacket> listener = new DummyPacketListener<SCMPacket>();
     
     router.addListener(listener, SCMPacket.class,
         PacketSources.EngineControllerUnit);
@@ -58,7 +58,7 @@ public class TestSCMTransceiver {
     SCMTransceiver                tx       = new SCMTransceiver(port, router,
         PacketSources.EngineControllerUnit);
     
-    TestPacketListener<SCMPacket> listener = new TestPacketListener<SCMPacket>();
+    DummyPacketListener<SCMPacket> listener = new DummyPacketListener<SCMPacket>();
     
     router.addListener(listener, SCMPacket.class,
         PacketSources.EngineControllerUnit);
@@ -80,7 +80,7 @@ public class TestSCMTransceiver {
     SCMTransceiver                tx       = new SCMTransceiver(port, router,
         PacketSources.CommandBox);
     
-    TestPacketListener<SCMPacket> listener = new TestPacketListener<SCMPacket>();
+    DummyPacketListener<SCMPacket> listener = new DummyPacketListener<SCMPacket>();
     
     router.addListener(listener, SCMPacket.class,
         PacketSources.EngineControllerUnit);

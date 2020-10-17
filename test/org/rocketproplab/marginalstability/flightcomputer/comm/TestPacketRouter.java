@@ -9,8 +9,8 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 public class TestPacketRouter {
 
   private PacketRouter            router;
-  private TestPacketListener<SCMPacket> scmListener;
-  private TestPacketListener<GPSPacket> gpsListener;
+  private DummyPacketListener<SCMPacket> scmListener;
+  private DummyPacketListener<GPSPacket> gpsListener;
 
   private class TestListenerTyped implements PacketListener<SCMPacket> {
 
@@ -24,8 +24,8 @@ public class TestPacketRouter {
   @Before
   public void before() {
     router      = new PacketRouter();
-    scmListener = new TestPacketListener<SCMPacket>();
-    gpsListener = new TestPacketListener<GPSPacket>();
+    scmListener = new DummyPacketListener<SCMPacket>();
+    gpsListener = new DummyPacketListener<GPSPacket>();
   }
 
   @Test

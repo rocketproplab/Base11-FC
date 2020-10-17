@@ -2,7 +2,6 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -13,32 +12,32 @@ import java.util.HashMap;
 import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
-import org.rocketproplab.marginalstability.flightcomputer.comm.TestPacketListener;
+import org.rocketproplab.marginalstability.flightcomputer.comm.DummyPacketListener;
 
 import com.pi4j.io.i2c.I2CDevice;
 
 public class LPS22HDTest {
   private class MockI2CDevice implements I2CDevice {
-    public HashMap<Integer, Integer> readMap = new HashMap<>();
+    public HashMap<Integer, Byte> readMap = new HashMap<>();
     
     private int address;
     
     public void initValuesOne() {
-    	readMap.put(0x2A, 0b0);
-    	readMap.put(0x29, 0b10);
-    	readMap.put(0x28, 0b100010);
+    	readMap.put(0x2A, (byte)0b0);
+    	readMap.put(0x29, (byte)0b10);
+    	readMap.put(0x28, (byte)0b100010);
     }
     
     public void initValuesTwo() {
-    	readMap.put(0x2A, 0b111111111111);
-    	readMap.put(0x29, 0);
-    	readMap.put(0x28, 0b111111111111111);
+    	readMap.put(0x2A, (byte)0b01111111);
+    	readMap.put(0x29, (byte)0b11111111);
+    	readMap.put(0x28, (byte)0b11111111);
     }
     
     public void initValuesThree() {
-    	readMap.put(0x2A, 0b0);
-    	readMap.put(0x29, 0b1);
-    	readMap.put(0x28, 0b111111111111111111111);
+    	readMap.put(0x2A, (byte)0b111111);
+    	readMap.put(0x29, (byte)0b11111111);
+    	readMap.put(0x28, (byte)0b11111111);
     }
     
     
@@ -50,8 +49,7 @@ public class LPS22HDTest {
     @Override
     public void write(byte b) throws IOException {
     	address = 0;
-    	String value = "" + b;
-    	readMap.put(0, Integer.parseInt(value));
+    	readMap.put(0, b);
     	
     }
 
@@ -67,13 +65,12 @@ public class LPS22HDTest {
     @Override
     public void write(int address, byte b) throws IOException {
     	this.address = address;
-    	readMap.put(address, (int)b);
+    	readMap.put(address, b);
     }
 
     @Override
     public void write(int address, byte[] buffer, int offset, int size)
         throws IOException {
-      
     }
 
     @Override
@@ -99,7 +96,10 @@ public class LPS22HDTest {
     @Override
     public int read(int address, byte[] buffer, int offset, int size)
         throws IOException {
-      return 0;
+      for(int i = 0; i < size; i++){
+        buffer[i+offset] = readMap.get(address+i);
+      }
+      return size;
     }
 
     @Override
@@ -126,6 +126,32 @@ public class LPS22HDTest {
 		  return 105;
 	  }
   }
+  
+  @Test
+  public void getPressureLowerBound() {
+    MockI2CDevice i2c = new MockI2CDevice();
+    BarometerTime time = new BarometerTime();
+    LPS22HD barometer = new LPS22HD(i2c, time);
+      
+    i2c.readMap.put(0x2A, (byte) 0b10000);
+    i2c.readMap.put(0x29, (byte) 0b01000000);
+    i2c.readMap.put(0x28, (byte) 0);
+    barometer.poll();
+    assertEquals(260, barometer.getPressure(), 0.0005);
+  } 
+  
+  @Test
+  public void getPressureUpperBound() {
+    MockI2CDevice i2c = new MockI2CDevice();
+    BarometerTime time = new BarometerTime();
+    LPS22HD barometer = new LPS22HD(i2c, time);
+      
+    i2c.readMap.put(0x2A, (byte) 0b1001110);
+    i2c.readMap.put(0x29, (byte) 0b11000000);
+    i2c.readMap.put(0x28, (byte) 0);
+    barometer.poll();
+    assertEquals(1260, barometer.getPressure(), 0.0005);
+  } 
   
   @Test
   public void readsOutsideOfBoundsOnStartup() {
@@ -157,11 +183,11 @@ public class LPS22HDTest {
 	  BarometerTime time = new BarometerTime();
 	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  
-	  i2c.initValuesOne();
+	  i2c.initValuesThree();
 	  barometer.poll();
-	  assertNotEquals(0.0, barometer.getPressure(), 0.000005);
+	  assertEquals(1024, barometer.getPressure(), 0.0005);
   }
-  
+
   @Test
   public void getLastMeasurementTime() {
 	  MockI2CDevice i2c = new MockI2CDevice();
@@ -207,7 +233,7 @@ public class LPS22HDTest {
 	  BarometerTime time = new BarometerTime();
 	  LPS22HD barometer = new LPS22HD(i2c, time);
 	  barometer.init();
-	  byte val = 0b01100000;
+	  byte val = 0b00111110;
 	  byte readMapVal = i2c.readMap.get(0x10).byteValue();
 	  
 	  assertEquals(val, readMapVal);

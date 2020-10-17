@@ -2,7 +2,22 @@ package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 /**
  * A packet for the SCMProtocol to convert between the object and string
- * representation.
+ * representation. <br>
+ * The Simple Checksum Messaging (SCM) protocol consists of three sections. The
+ * id, data and checksum organized as a plaintext string. <br>
+ * 
+ * <pre>
+ * {@code | Id | Data  | Checksum |}
+ * {@code   AA , BBBBB ,    FF    ;}
+ * </pre>
+ * 
+ * An example of a heartbeat packet would be {@code HB,12345,81;} where the ID
+ * is HB, data is 12345 and checksum is 81. <br>
+ * The checksum is calculated by summing the char code of each character up the
+ * and including the second comma and taking modulo 100. The result is stored as
+ * a character sequence from 00 to 99 and then a semicolon is appended. See
+ * {@link #calculateChecksum(String)} for implementation details of the checksum
+ * algorithm.
  * 
  * @author Daniel Walder, Max Apodaca
  *
@@ -40,26 +55,24 @@ public class SCMPacket {
   }
 
   /**
-   * Takes the packet assigns its id and data to the instance variables Also
-   * calls verifyChecksum to confirm packet accuracy
+   * Takes the packet assigns its id and data to the instance variables Also calls
+   * verifyChecksum to confirm packet accuracy
    * 
    * @param packet the received packet to work with
    */
   private void parsepacket(String packet) {
     String[] packetComponents = packet.split(",");
 
-    if (packet.toCharArray().length != NUM_CHARS_PACKET
-        || packetComponents.length != NUM_COMPONENTS_PACKET) {
+    if (packet.toCharArray().length != NUM_CHARS_PACKET || packetComponents.length != NUM_COMPONENTS_PACKET) {
       this.isValid = false;
       return;
     }
-    String strChecksum = packetComponents[2].substring(0,
-        packetComponents[2].length() - 1);
-    
+    String strChecksum = packetComponents[2].substring(0, packetComponents[2].length() - 1);
+
     int checksum = -1;
-    
+
     try {
-      checksum    = Integer.parseInt(strChecksum);
+      checksum = Integer.parseInt(strChecksum);
     } catch (NumberFormatException exception) {
       // System.out.println("Unable to parse checksum in " + packet);
       // TODO report error
@@ -123,8 +136,8 @@ public class SCMPacket {
   }
 
   /**
-   * Gets the ID of this packet. Only valid if {@link SCMPacket#isValid()}
-   * returns true.
+   * Gets the ID of this packet. Only valid if {@link SCMPacket#isValid()} returns
+   * true.
    * 
    * @return the id of the packet
    */
@@ -152,8 +165,8 @@ public class SCMPacket {
   }
 
   /**
-   * Encodes id and data into a packet string. Will attempt to encode even with
-   * an invalid state.
+   * Encodes id and data into a packet string. Will attempt to encode even with an
+   * invalid state.
    * 
    * @return the packet as String
    */
@@ -170,36 +183,36 @@ public class SCMPacket {
     packet = packet + Integer.toString(calculatedChecksum) + ";";
     return packet;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     SCMPacket packet;
-    if(obj instanceof SCMPacket) {
+    if (obj instanceof SCMPacket) {
       packet = (SCMPacket) obj;
     } else {
       return false;
     }
-    
-    if(packet.isValid != this.isValid) {
+
+    if (packet.isValid != this.isValid) {
       return false;
     }
-    
-    if(packet.id == null) {
-      if(this.id != null) {
+
+    if (packet.id == null) {
+      if (this.id != null) {
         return false;
       }
-    } else if(!packet.id.equals(this.id)) {
+    } else if (!packet.id.equals(this.id)) {
       return false;
     }
-    
-    if(packet.data == null) {
-      if(this.data != null) {
+
+    if (packet.data == null) {
+      if (this.data != null) {
         return false;
       }
-    } else if(!packet.data.equals(this.data)){
+    } else if (!packet.data.equals(this.data)) {
       return false;
     }
-    
+
     return true;
   }
 }

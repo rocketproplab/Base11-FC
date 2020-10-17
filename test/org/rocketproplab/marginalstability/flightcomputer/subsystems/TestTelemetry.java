@@ -14,11 +14,11 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
-import org.rocketproplab.marginalstability.flightcomputer.comm.TestPacketListener;
+import org.rocketproplab.marginalstability.flightcomputer.comm.DummyPacketListener;
 
 public class TestTelemetry {
 
-  private TestPacketListener<SCMPacket> testListener;
+  private DummyPacketListener<SCMPacket> testListener;
   TestLog                               logger;
   PacketRouter                          router;
   Telemetry                             telemetry;
@@ -41,7 +41,7 @@ public class TestTelemetry {
 
   @Before
   public void init() {
-    this.testListener = new TestPacketListener<SCMPacket>();
+    this.testListener = new DummyPacketListener<SCMPacket>();
     this.logger       = new TestLog();
     this.router       = new PacketRouter();
     this.telemetry    = new Telemetry(logger, router);
