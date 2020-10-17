@@ -1,25 +1,28 @@
 package org.rocketproplab.marginalstability.flightcomputer.looper;
 
-public class ScheduledConditionEvent extends Event {
+import org.rocketproplab.marginalstability.flightcomputer.Time;
+
+public class ScheduledConditionEvent extends Looper.Event {
   private double interval;
   private double lastInvoked;
 
   public ScheduledConditionEvent(
-          Object tag, double interval, Looper.CallbackCondition condition, Looper.Callback callback) {
-    super(tag, condition, callback);
+          double interval, Looper.CallbackCondition condition, Looper.Callback callback, Time time) {
+    super(condition, callback, time);
     this.interval    = interval;
     this.lastInvoked = Double.NaN;
   }
 
   @Override
-  public void tick(double time) {
+  public boolean shouldEmit() {
+    double currentTime = getCurrentTime();
     if (Double.isNaN(lastInvoked)) {
-      lastInvoked = time;
+      lastInvoked = currentTime;
     }
-
-    if (condition.shouldEmit() && time - lastInvoked >= interval) {
-      callback.onCallback(tag);
-      lastInvoked = time;
+    if (super.shouldEmit() && currentTime - lastInvoked >= interval) {
+      lastInvoked = currentTime;
+      return true;
     }
+    return false;
   }
 }

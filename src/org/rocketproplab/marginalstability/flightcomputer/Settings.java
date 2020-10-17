@@ -30,7 +30,7 @@ public class Settings {
   /**
    * Time threshold needed to exceed to deploy the main chute
    */
-  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to deploy main chute
+  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 10; // TODO: set time exceeding the threshold needed to deploy main chute
 
   // Unit conversions
 

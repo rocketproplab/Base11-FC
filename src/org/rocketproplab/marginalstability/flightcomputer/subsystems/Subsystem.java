@@ -1,16 +1,18 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
+
 /**
- * The basic interface of a subsystem.
+ * The basic super class of a subsystem.
  * 
- * @author Max Apodaca
+ * @author Max Apodaca, Chi Chow
  *
  */
 public interface Subsystem {
 
   /**
-   * Called every ms to update the subsystem state. Heavy computation should be
-   * avoided in this method.
+   * Called when the subsystem is initialized.
+   * Looper can be used to register events.
    */
-  public void update();
+  void prepare(Looper looper);
 }
