@@ -96,7 +96,7 @@ public class StatsSubsystem implements Subsystem, ParachuteListener, FlightState
     // TODO Auto-generated method stub
     for(StatisticCollector collector: this.collectors) {
       if(collector.hasNext()) {
-        SCMPacket packet = collector.getNext();
+//        SCMPacket packet = collector.getNext();
 //        this.telemetry.reportTelemetry(type, data);
       }
     }
