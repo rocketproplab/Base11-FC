@@ -8,7 +8,8 @@ import java.util.Map;
 
 /**
  * Looper that allows events to be registered and triggered
- * when conditions are met
+ * when conditions are met, and automatically handles timing
+ * and ticking for Subsystems.
  *
  * @author Chi Chow
  */
