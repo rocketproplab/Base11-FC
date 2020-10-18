@@ -53,7 +53,7 @@ public class Looper {
         }
       } catch (Exception e) {
         if (errorListener != null) {
-          errorListener.onError(tag, this);
+          errorListener.onError(tag, this, e);
         }
       }
     }
@@ -173,7 +173,7 @@ public class Looper {
 
   @FunctionalInterface
   public interface LooperErrorListener {
-    void onError(Object tag, Looper from);
+    void onError(Object tag, Looper from, Exception e);
   }
 
   /**

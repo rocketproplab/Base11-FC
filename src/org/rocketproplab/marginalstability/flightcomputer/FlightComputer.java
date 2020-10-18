@@ -27,13 +27,13 @@ public class FlightComputer {
   }
 
   public void tick() {
-    this.looper.tick(((tag, from) -> {
+    this.looper.tick((tag, from, exception) -> {
       try {
         this.telemetry.reportError(Errors.TOP_LEVEL_EXCEPTION);
       } catch (Exception e) {
         System.err.println("Unable to log errors!");
         e.printStackTrace();
       }
-    }));
+    });
   }
 }
