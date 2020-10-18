@@ -4,8 +4,6 @@ import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 
-import javax.annotation.processing.SupportedSourceVersion;
-
 public class FlightComputer {
   private Telemetry telemetry;
   private Time      time;

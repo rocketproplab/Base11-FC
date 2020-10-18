@@ -22,21 +22,21 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  * {@link SCMPacketType#XB} in response to the {@link SCMPacketType#XS} and
  * {@link SCMPacketType#X1} types and with a {@link SCMPacketType#XA} in
  * response to the {@link SCMPacketType#X0} type.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class FramedSCM implements PacketListener<SCMPacket> {
-  private Queue<String>         outputQueue;
-  private String                activeString;
-  private int                   frameLength;
-  private PacketRelay           sCMOutput;
-  private FramedPacketProcessor framedPacketOutput;
+  private Queue<String>            outputQueue;
+  private String                   activeString;
+  private int                      frameLength;
+  private PacketRelay              sCMOutput;
+  private FramedPacketProcessor    framedPacketOutput;
+  private MessageCompletedListener messageCompletedListener;
 
   /**
    * Create a new SCM de-framer. SCMOutput is used to send replied to incoming SCM
    * packets while framedOutput
-   * 
+   *
    * @param sCMOutput    the packet relay to send X0 and X1 packets to
    * @param framedOutput the callback to output framed packets to
    */
@@ -69,7 +69,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * Process the given incoming packet. If the packet is the same as the previous
    * packet the ack should be repeated. The string should be built by this method.
    * See the class javadoc for info on the protocol.
-   * 
+   *
    * @param incomingPacket the new packet from the ground.
    * @return the packet to reply with
    */
@@ -88,12 +88,15 @@ public class FramedSCM implements PacketListener<SCMPacket> {
 
     } else {
       activeString += incomingPacket.getData().trim();
-      returnpacket  = new SCMPacket(SCMPacketType.XB, "     ");
+      returnpacket = new SCMPacket(SCMPacketType.XB, "     ");
     }
 
     if ((activeString.length() == frameLength) && (!completed)) {
       finalmessage = activeString;
       this.outputQueue.add(finalmessage);
+      if (messageCompletedListener != null) {
+        messageCompletedListener.onMessageCompleted(finalmessage);
+      }
     }
     return returnpacket;
 
@@ -101,14 +104,14 @@ public class FramedSCM implements PacketListener<SCMPacket> {
 
   private SCMPacket processX0Packet(SCMPacket incomingPacket) {
     int lengthofframeleft = frameLength - activeString.length();
-    if (frameLength == -1) {  
+    if (frameLength == -1) {
       String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
-      activeString +=   SCMmessagesplit[0];
-      frameLength = Integer.parseInt(activeString);
+      activeString += SCMmessagesplit[0];
+      frameLength  = Integer.parseInt(activeString);
       activeString = SCMmessagesplit[1];
       // TODO Similar to XS, where if the frameLength is still less than 0 or 
       // does not split into several indices
-    }else if (lengthofframeleft < incomingPacket.getData().length()) {
+    } else if (lengthofframeleft < incomingPacket.getData().length()) {
       activeString += incomingPacket.getData().substring(0, lengthofframeleft);
     } else {
       activeString += incomingPacket.getData().trim();
@@ -136,7 +139,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
     } else {
       String getint = incomingPacket.getData();
       activeString = "" + Integer.parseInt(getint);
-      frameLength = -1;
+      frameLength  = -1;
     }
 
     return new SCMPacket(SCMPacketType.XB, "     ");
@@ -144,9 +147,9 @@ public class FramedSCM implements PacketListener<SCMPacket> {
 
   /**
    * Determines if there is a completed message in the output queue.
-   * 
+   *
    * @return if there is a completed message to read by
-   *         {@link #getCompletedMessage()}
+   * {@link #getCompletedMessage()}
    */
   protected boolean hasCompletedMessage() {
     return !this.outputQueue.isEmpty();
@@ -154,11 +157,19 @@ public class FramedSCM implements PacketListener<SCMPacket> {
 
   /**
    * Returns the next completed message from the completed message queue.
-   * 
+   *
    * @return the next completed message
    */
   protected String getCompletedMessage() {
     return this.outputQueue.poll();
   }
 
+  @FunctionalInterface
+  public interface MessageCompletedListener {
+    void onMessageCompleted(String message);
+  }
+
+  public void setMessageCompletedListener(MessageCompletedListener messageCompletedListener) {
+    this.messageCompletedListener = messageCompletedListener;
+  }
 }

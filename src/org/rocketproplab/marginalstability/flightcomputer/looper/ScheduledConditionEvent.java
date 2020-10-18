@@ -2,6 +2,11 @@ package org.rocketproplab.marginalstability.flightcomputer.looper;
 
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 
+/**
+ * An event that is scheduled to be triggered by a specific condition.
+ *
+ * @author Chi Chow
+ */
 public class ScheduledConditionEvent extends Looper.Event {
   private double interval;
   private double lastInvoked;

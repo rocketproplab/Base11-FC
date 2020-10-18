@@ -2,6 +2,12 @@ package org.rocketproplab.marginalstability.flightcomputer.looper;
 
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 
+/**
+ * An event that is triggered if some condition is true for a
+ * certain amount of time.
+ *
+ * @author Chi Chow
+ */
 public class DurationRequiredEvent extends Looper.Event {
   private final double durationTrue;
   private       double sinceTrueTime;
