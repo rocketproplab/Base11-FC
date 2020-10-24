@@ -7,6 +7,7 @@ import java.util.List;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.hal.PollingSensor;
 import org.rocketproplab.marginalstability.flightcomputer.hal.SensorPoller;
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 
 /**
  * A subsystem to handle ticking the sensors at a fixed rate.
@@ -20,7 +21,7 @@ public class SensorSubsystem implements Subsystem {
 
   /**
    * Create the subsystem using the given time.
-   * 
+   *
    * @param time the time to use
    */
   public SensorSubsystem(Time time) {
@@ -29,7 +30,11 @@ public class SensorSubsystem implements Subsystem {
   }
 
   @Override
-  public void update() {
+  public void prepare(Looper looper) {
+    looper.emitAlways(this, (tag, from) -> updateSenorPollers());
+  }
+
+  private void updateSenorPollers() {
     for (SensorPoller poller : this.sensorPollers) {
       poller.update(this.time.getSystemTime());
     }
@@ -38,7 +43,7 @@ public class SensorSubsystem implements Subsystem {
   /**
    * Add the sensor to be polled at the given rate. If the same sensor is added
    * twice it will be polled twice.
-   * 
+   *
    * @param sensor the sensor to poll
    * @param rate   the rate in seconds to be polled at
    */
@@ -46,5 +51,4 @@ public class SensorSubsystem implements Subsystem {
     SensorPoller poller = new SensorPoller(sensor, rate);
     this.sensorPollers.add(poller);
   }
-
 }

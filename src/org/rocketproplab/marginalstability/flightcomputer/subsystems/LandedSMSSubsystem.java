@@ -1,11 +1,11 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
-import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.comm.GPSPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
 import org.rocketproplab.marginalstability.flightcomputer.events.FlightStateListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.SMSSender;
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
 
 /**
@@ -20,24 +20,26 @@ public class LandedSMSSubsystem
 
   private String    phoneNumber;
   private SMSSender smsSender;
-  private Time      time;
 
-  private GPSPacket  lastPacket;
+  private GPSPacket  lastPacket = null;
   private FlightMode flightMode = null;
-  private double     lastSMSTime;
 
   /**
    * Create a new LandedSMSSubsystem
    *
    * @param phoneNumber phone number to send SMS messages
    * @param smsSender   handles sending SMS messages
-   * @param time        the rocket time
    */
-  public LandedSMSSubsystem(String phoneNumber, SMSSender smsSender, Time time) {
+  public LandedSMSSubsystem(String phoneNumber, SMSSender smsSender) {
     this.phoneNumber = phoneNumber;
     this.smsSender   = smsSender;
-    this.time        = time;
-    this.lastSMSTime = time.getSystemTime();
+  }
+
+  @Override
+  public void prepare(Looper looper) {
+    looper.emitScheduledIf(this, SMS_INTERVAL,
+            () -> flightMode == FlightMode.Landed,
+            (tag, from) -> sendSMSMessage());
   }
 
   @Override
@@ -45,21 +47,12 @@ public class LandedSMSSubsystem
     this.flightMode = newMode;
   }
 
-  @Override
-  public void update() {
-    if (flightMode == FlightMode.Landed) {
-      trySendSMSMessage();
-    }
-  }
-
   /**
    * Sends SMS message if the time elapsed since the last SMS message sent
    * is greater than the set time interval.
    */
-  private void trySendSMSMessage() {
-    double currentTime = time.getSystemTime();
-    if (currentTime - lastSMSTime > SMS_INTERVAL) {
-      lastSMSTime = currentTime;
+  private void sendSMSMessage() {
+    if (phoneNumber != null && lastPacket != null) {
       smsSender.sendTextMessage(phoneNumber,
               getMessage(lastPacket.getLatitude(), lastPacket.getLongitude()));
     }

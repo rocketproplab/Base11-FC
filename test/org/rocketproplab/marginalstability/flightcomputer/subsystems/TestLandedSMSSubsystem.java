@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.comm.GPSPacket;
 import org.rocketproplab.marginalstability.flightcomputer.hal.SMSSender;
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
 
 
@@ -62,12 +63,15 @@ public class TestLandedSMSSubsystem {
   private TestSMSSender      smsSender;
   private TestSMSTime        smsTime;
   private LandedSMSSubsystem landedSMSSubsystem;
+  private Looper             looper;
 
   @Before
   public void init() {
     this.smsSender          = new TestSMSSender();
     this.smsTime            = new TestSMSTime();
-    this.landedSMSSubsystem = new LandedSMSSubsystem(null, smsSender, smsTime);
+    this.landedSMSSubsystem = new LandedSMSSubsystem("0000000000", smsSender);
+    this.looper             = new Looper(smsTime);
+    this.landedSMSSubsystem.prepare(looper);
   }
 
   @Test
@@ -79,7 +83,7 @@ public class TestLandedSMSSubsystem {
       smsTime.addTime(LandedSMSSubsystem.SMS_INTERVAL + 1);
       smsSender.smsSent = false;
       landedSMSSubsystem.onFlightModeChange(flightMode);
-      landedSMSSubsystem.update();
+      looper.tick();
 
       if (flightMode != FlightMode.Landed && smsSender.smsSent ||
               flightMode == FlightMode.Landed && !smsSender.smsSent) {
@@ -95,18 +99,18 @@ public class TestLandedSMSSubsystem {
 
     // start time
     smsSender.smsSent = false;
-    landedSMSSubsystem.update();
+    looper.tick();
     if (smsSender.smsSent) fail();
 
     // add time and test if sms sent
     smsTime.addTime(LandedSMSSubsystem.SMS_INTERVAL + 1);
     smsSender.smsSent = false;
-    landedSMSSubsystem.update();
+    looper.tick();
     if (!smsSender.smsSent) fail();
 
     // immediately update again and test if sms sent
     smsSender.smsSent = false;
-    landedSMSSubsystem.update();
+    looper.tick();
     if (smsSender.smsSent) fail();
   }
 }
