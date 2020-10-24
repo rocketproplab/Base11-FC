@@ -6,19 +6,8 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-/**
- * The settings class contains constants that will be loaded form disk on
- * startup. All constant values that might need to change in a debugging session
- * should be put here.
- */
 public class Settings {
 
   @SettingSectionHeader(name = "Flight State Settings")
@@ -37,12 +26,15 @@ public class Settings {
   @UserSetting(comment = "The pressure at which we should deploy the main chute", units = "hPa")
   public static double MAIN_CHUTE_PRESSURE = 0; // TODO: set main chute pressure
 
+  /**
+   * Time threshold needed to exceed to deploy the main chute
+   */
   @UserSetting(comment = "Time threshold needed to exceed to deploy the main chute", units = "s")
-  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to
+  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 10; // TODO: set time exceeding the threshold needed to
                                                                // deploy main chute
-  
+
   public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
-  
+
   public static boolean[] ENGINE_ABORT_VALVE_STATES = {true, true, true, true, true};
 
   // Unit conversions
@@ -75,7 +67,7 @@ public class Settings {
   @UserSetting(comment = "'c' constant for quadratic regression for pressure transducers", units = "hPa")
   public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0 };
-  
+
   @UserSetting(comment = "Phone number to text position to", units = "1xxxyyyyyyy")
   public static String PHONE_NUMBER = "13150001111";
 
@@ -249,7 +241,7 @@ public class Settings {
     }
     return outOfDate;
   }
-  
+
   private static String getSettingsFileLocation() {
     String home = System.getProperty("user.home");
     return home + "/settings.cfg";

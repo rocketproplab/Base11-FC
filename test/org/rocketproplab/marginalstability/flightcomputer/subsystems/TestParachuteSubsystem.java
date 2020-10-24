@@ -1,9 +1,5 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.Settings;
@@ -13,9 +9,13 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Barometer;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Solenoid;
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestParachuteSubsystem {
 
@@ -92,20 +92,22 @@ public class TestParachuteSubsystem {
   private TestSolenoid       drogue;
   private TestTime           time;
   private TestBarometer      barometer;
+  private Looper             looper;
 
   @Before
   public void init() {
-    main       = new TestSolenoid();
-    drogue     = new TestSolenoid();
-    time       = new TestTime();
-    barometer  = new TestBarometer();
-    paraSystem = new ParachuteSubsystem(main, drogue, time, barometer);
+    this.main       = new TestSolenoid();
+    this.drogue     = new TestSolenoid();
+    this.time       = new TestTime();
+    this.barometer  = new TestBarometer();
+    this.paraSystem = new ParachuteSubsystem(main, drogue, time, barometer);
+    this.looper     = new Looper(time);
+    this.paraSystem.prepare(looper);
   }
 
   @Test
   public void parachuteDoesNotOpenInSitting() {
     paraSystem.onFlightModeChange(FlightMode.Sitting);
-    paraSystem.update();
     assertFalse(main.active);
     assertFalse(drogue.active);
   }
@@ -113,7 +115,6 @@ public class TestParachuteSubsystem {
   @Test
   public void parachuteDoesNotOpenInBurn() {
     paraSystem.onFlightModeChange(FlightMode.Burn);
-    paraSystem.update();
     assertFalse(main.active);
     assertFalse(drogue.active);
   }
@@ -121,7 +122,6 @@ public class TestParachuteSubsystem {
   @Test
   public void parachuteDoesNotOpenInCoast() {
     paraSystem.onFlightModeChange(FlightMode.Coasting);
-    paraSystem.update();
     assertFalse(main.active);
     assertFalse(drogue.active);
   }
@@ -130,7 +130,6 @@ public class TestParachuteSubsystem {
   public void drogueOpensAtApogee() {
     paraSystem.onFlightModeChange(FlightMode.Coasting);
     paraSystem.onFlightModeChange(FlightMode.Apogee);
-    paraSystem.update();
     assertFalse(main.active);
     assertTrue(drogue.active);
   }
@@ -139,7 +138,6 @@ public class TestParachuteSubsystem {
   public void drogueOpensEvenIfApogeeIsSkipped() {
     paraSystem.onFlightModeChange(FlightMode.Coasting);
     paraSystem.onFlightModeChange(FlightMode.Falling);
-    paraSystem.update();
     assertFalse(main.active);
     assertTrue(drogue.active);
   }
@@ -149,7 +147,7 @@ public class TestParachuteSubsystem {
     paraSystem.onFlightModeChange(FlightMode.Burn);
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
-    paraSystem.update();
+    looper.tick();
     assertFalse(main.active);
     assertFalse(drogue.active);
   }
@@ -159,20 +157,20 @@ public class TestParachuteSubsystem {
     paraSystem.onFlightModeChange(FlightMode.Coasting);
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
-    paraSystem.update();
+    looper.tick();
     assertFalse(main.active);
     assertFalse(drogue.active);
   }
 
   @Test
   public void mainDeploysOnWayDownFalling() {
-    paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+    paraSystem.onFlightModeChange(FlightMode.Falling);
     barometer.pressure = -1;
-    paraSystem.update();
+    looper.tick();
     time.time = 20;
-    paraSystem.update();
+    looper.tick();
     assertTrue(main.active);
     assertTrue(drogue.active);
   }
@@ -182,22 +180,31 @@ public class TestParachuteSubsystem {
     paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT * 2));
-    paraSystem.update();
+    looper.tick();
     assertFalse(main.active);
     assertTrue(drogue.active);
   }
 
   @Test
   public void mainDeploysThroughInterpolationWhileFalling() {
-    paraSystem.onFlightModeChange(FlightMode.Falling);
     TestIntVec testVec = new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT * 2);
     testVec.setAfter(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2, 10);
     paraSystem.onPositionEstimate(testVec);
-    paraSystem.update();
+    paraSystem.onFlightModeChange(FlightMode.Falling);
+    barometer.pressure = -1;
+    looper.tick();
     assertFalse(main.active);
     assertTrue(drogue.active);
+
+    // chute does not deploy immediately when pressure drops below threshold
     time.time = 20;
-    paraSystem.update();
+    looper.tick();
+    assertFalse(main.active);
+    assertTrue(drogue.active);
+
+    // chute deploys after the pressure has been below the threshold for some time
+    time.time = 30;
+    looper.tick();
     assertTrue(main.active);
     assertTrue(drogue.active);
   }
@@ -222,23 +229,23 @@ public class TestParachuteSubsystem {
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
     barometer.pressure = 1;
-    paraSystem.update();
+    looper.tick();
     assertFalse(main.active);
     time.time = 20;
-    paraSystem.update();
+    looper.tick();
     assertFalse(main.active);
   }
 
   @Test
   public void parachuteOpensAfterTimeThreshold() {
-    paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
             new TestIntVec(0, 0, Settings.MAIN_CHUTE_HEIGHT / 2));
+    paraSystem.onFlightModeChange(FlightMode.Falling);
     barometer.pressure = -1;
-    paraSystem.update();
+    looper.tick();
     assertFalse(main.active);
     time.time = 20;
-    paraSystem.update();
+    looper.tick();
     assertTrue(main.active);
   }
 }
