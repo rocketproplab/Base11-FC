@@ -114,8 +114,6 @@ public class ParachuteSubsystem
     // remove main chute open event from Looper
     if (this.looper.removeEvent(MAIN_CHUTE_TAG) == null) {
       // TODO: Log that main chute was deployed because of pressure
-    } else {
-      // TODO: Log that main chute was deployed because of packet
     }
 
     boolean wasActive = mainChute.isActive();
@@ -125,6 +123,35 @@ public class ParachuteSubsystem
         listener.onMainChuteOpen();
       }
     }
+  }
+
+  /**
+   * Attempt to open the main chute
+   *
+   * @return    if the deployment was successful
+   */
+  public boolean attemptMainChuteOpen() {
+    /* TODO: Find a better way to check if the drogue chute is currently open,
+        and if the main chute deployed successfully */
+    if(drogueChute.isActive())
+      mainChuteOpen();
+    else {
+      return false;
+    }
+
+    return mainChute.isActive();
+  }
+
+  /**
+   * Attempt to open the drogue chute
+   *
+   * @return    if the deployment was successful
+   */
+  public boolean attemptDrogueChuteOpen() {
+    drogueChuteOpen();
+
+    // TODO: Find a better way to check if the drogue chute deployed successfully
+    return drogueChute.isActive();
   }
 
   @Override
