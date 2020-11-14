@@ -62,7 +62,7 @@ public class StatisticCollector {
    * Reset the internal counters to zero
    */
   private void reset() {
-    this.currentArray = new StatisticArray();
+    this.currentArray = new StatisticArray(5);
   }
 
   /**
