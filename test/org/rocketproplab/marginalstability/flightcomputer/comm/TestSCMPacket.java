@@ -132,4 +132,10 @@ public class TestSCMPacket {
     SCMPacket packetOne = new SCMPacket("``,10000,21;");
     assertFalse(packetOne.isValid());
   }
+  
+  @Test
+  public void testToStringSingleDigitChecksum() {
+	  SCMPacket packetOne = new SCMPacket("HB,Kdddd,01;");
+	  assertTrue(packetOne.toString(), packetOne.toString().equals("HB,Kdddd,01;"));
+  }
 }
