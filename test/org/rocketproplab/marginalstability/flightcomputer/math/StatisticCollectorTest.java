@@ -30,7 +30,7 @@ public class StatisticCollectorTest {
     collector.sampleStatistic(0, 1);
     collector.sampleStatistic(1.1, 1);
     assertTrue(collector.hasNext());
-    assertEquals(1.0, collector.getNext(), EPSILON);
+    assertEquals(1.0, collector.getNext().getMean(), EPSILON);
     assertFalse(collector.hasNext());
   }
   
@@ -40,7 +40,7 @@ public class StatisticCollectorTest {
     collector.sampleStatistic(0, 5);
     collector.sampleStatistic(1.1, 1);
     assertTrue(collector.hasNext());
-    assertEquals(5.0, collector.getNext(), EPSILON);
+    assertEquals(5.0, collector.getNext().getMean(), EPSILON);
     assertFalse(collector.hasNext());
   }
   
@@ -51,7 +51,7 @@ public class StatisticCollectorTest {
     collector.sampleStatistic(0.5, 1);
     collector.sampleStatistic(1.1, 1);
     assertTrue(collector.hasNext());
-    assertEquals(3.0, collector.getNext(), EPSILON);
+    assertEquals(3.0, collector.getNext().getMean(), EPSILON);
     assertFalse(collector.hasNext());
   }
   
@@ -63,7 +63,7 @@ public class StatisticCollectorTest {
     collector.sampleStatistic(1.1, 1);
     collector.sampleStatistic(2.1, 1);
     assertTrue(collector.hasNext());
-    assertEquals(7/3D, collector.getNext(), EPSILON);
+    assertEquals(7/3D, collector.getNext().getMean(), EPSILON);
     assertFalse(collector.hasNext());
   }
   
@@ -75,9 +75,9 @@ public class StatisticCollectorTest {
     collector.sampleStatistic(1.1, 1);
     collector.sampleStatistic(2.1, 1);
     assertTrue(collector.hasNext());
-    assertEquals(3.0, collector.getNext(), EPSILON);
+    assertEquals(3.0, collector.getNext().getMean(), EPSILON);
     assertTrue(collector.hasNext());
-    assertEquals(1.0, collector.getNext(), EPSILON);
+    assertEquals(1.0, collector.getNext().getMean(), EPSILON);
     assertFalse(collector.hasNext());
   }
   
@@ -89,7 +89,7 @@ public class StatisticCollectorTest {
     collector.sampleStatistic(5.1, 1);
     collector.sampleStatistic(5.9, 1);
     assertTrue(collector.hasNext());
-    assertEquals(3.0, collector.getNext(), EPSILON);
+    assertEquals(3.0, collector.getNext().getMean(), EPSILON);
     assertFalse(collector.hasNext());
   }
   

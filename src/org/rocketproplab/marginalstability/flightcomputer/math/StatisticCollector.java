@@ -12,11 +12,10 @@ import java.util.Queue;
  *
  */
 public class StatisticCollector {
-  private Queue<Double> outgoingPackets;
+  private Queue<StatisticArray> outgoingPackets;
   private double        nextSampleTime;
 
-  private double statisticAccumulator;
-  private int    accumulatorCount;
+  private StatisticArray currentArray;
 
   private boolean firstSample;
   private double  timeIncrement;
@@ -46,7 +45,7 @@ public class StatisticCollector {
     }
 
     if (this.nextSampleTime < time) {
-      this.outgoingPackets.add(this.statisticAccumulator / this.accumulatorCount);
+      this.outgoingPackets.add(this.currentArray);
       this.reset();
       this.nextSampleTime += this.timeIncrement;
       if (this.nextSampleTime < time) {
@@ -55,8 +54,7 @@ public class StatisticCollector {
       }
     }
 
-    this.statisticAccumulator += value;
-    this.accumulatorCount++;
+    this.currentArray.addSample(value);
     this.firstSample = false;
   }
 
@@ -64,8 +62,7 @@ public class StatisticCollector {
    * Reset the internal counters to zero
    */
   private void reset() {
-    this.statisticAccumulator = 0;
-    this.accumulatorCount     = 0;
+    this.currentArray = new StatisticArray();
   }
 
   /**
@@ -84,7 +81,7 @@ public class StatisticCollector {
    * 
    * @return the next averaged value
    */
-  public double getNext() {
+  public StatisticArray getNext() {
     return this.outgoingPackets.poll();
   }
 

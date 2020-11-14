@@ -53,6 +53,11 @@ public class Settings {
 
   @UserSetting(comment = "Threshold for periodic heart beat signal", units = "s")
   public static double HEARTBEAT_THRESHOLD = 1;
+  
+  @SettingSectionHeader(name = "Statistic Collection")
+  
+  @UserSetting(comment = "Period at which sensores are sampled for statistic reporting.", units = "s")
+  public static double STATISTIC_SENSORE_SAMPLE_RATE = 0.01;
 
   @SettingSectionHeader(name = "PT Quadratic Regression")
 

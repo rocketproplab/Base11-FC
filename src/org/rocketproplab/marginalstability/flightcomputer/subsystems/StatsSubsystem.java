@@ -10,6 +10,7 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PositionListene
 import org.rocketproplab.marginalstability.flightcomputer.events.VelocityListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Barometer;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Thermocouple;
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
 import org.rocketproplab.marginalstability.flightcomputer.math.StatisticCollector;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
@@ -92,7 +93,7 @@ public class StatsSubsystem implements Subsystem, ParachuteListener, FlightState
   }
 
   @Override
-  public void update() {
+  public void prepare(Looper looper) {
     // TODO Auto-generated method stub
     for(StatisticCollector collector: this.collectors) {
       if(collector.hasNext()) {
