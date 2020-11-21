@@ -48,8 +48,11 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   public static final int  FIFO_THRESHOLD_STATUS_POS   = 7;
   public static final int  FIFO_SAMPLES_STORED_MASK    = 0b111111;
 
-  private static final int BYTES_PER_FIFO_LINE = 12;
-  private static final int BITS_PER_BYTE       = 8;
+  private static final int   BYTES_PER_FIFO_LINE    = 12;
+  private static final int   BITS_PER_BYTE          = 8;
+  
+  private static final int    MAX_RAW_SENSOR_READING = 32767;
+  private static final double G_FORCE                = 9.80665;  // gravity at Earth's surface
 
   /**
    * All the registers that can be found in the LSM9DS1 imu for the accelerometer
@@ -161,6 +164,11 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       return ACCELEROMETER_SCALE_LSB_POS;
     }
   }
+  /**
+   * The current accelerometer scale the sensor is set to.
+   * Initialize to default value as specified in sensor datasheet.
+   */
+  private AccelerometerScale accelScale = AccelerometerScale.G_2;
 
   public enum GyroScale implements RegisterValue {
     DPS_245,
@@ -182,6 +190,11 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       return GYRO_SCALE_LSB_POS;
     }
   }
+  /**
+   * The current gyroscope scale the sensor is set to.
+   * Initialize to default value as specified in sensor datasheet.
+   */
+  private GyroScale gyroScale = GyroScale.DPS_NA;
 
   public enum FIFOMode implements RegisterValue {
     BYPASS,
@@ -241,6 +254,15 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public void setAccelerometerScale(AccelerometerScale scale) throws IOException {
     modifyRegister(Registers.CTRL_REG6_XL, scale);
+    accelScale = scale;
+  }
+  
+  /**
+   * Returns the scale of the accelerometer
+   * @return the set accelerometer scale
+   */
+  public AccelerometerScale getAccelerometerScale() {
+    return accelScale;
   }
 
   /**
@@ -251,6 +273,15 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public void setGyroscopeScale(GyroScale scale) throws IOException {
     modifyRegister(Registers.CTRL_REG1_G, scale);
+    gyroScale = scale;
+  }
+  
+  /**
+   * Returns the scale of the gyroscope
+   * @return the set gyroscope scale
+   */
+  public GyroScale getGyroscopeScale() {
+    return gyroScale;
   }
 
   /**
@@ -467,6 +498,43 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   @Override
   public boolean hasNext() {
     return !samples.isEmpty();
+  }
+  
+  /**
+   * Get's sensor output and converts it to m/s^2. Uses the current sensor scale setting.
+   * @param accVec the accelerometer sensor output
+   * @return the acceleration in m/s^2
+   */
+  public Vector3 computeAcceleration(Vector3 accVec)
+  {
+    // Get the accelerometer scale as a double.
+    double scale;
+    switch(accelScale)
+    {
+    case G_2:
+      scale = 2.0;
+      break;
+    case G_4:
+      scale = 4.0;
+      break;
+    case G_8:
+      scale = 8.0;
+      break;
+    case G_16:
+      scale = 16.0;
+      break;
+    default:
+      throw new IllegalStateException("Sensor has an unknown accelerometer scale.");
+    }
+    
+    // This factor converts accelerometer readings to m/s^2
+    double conversionFactor = (scale / MAX_RAW_SENSOR_READING) * G_FORCE;
+    
+    return new Vector3(
+        accVec.getX() * conversionFactor,
+        accVec.getY() * conversionFactor,
+        accVec.getZ() * conversionFactor
+    );
   }
 
 }

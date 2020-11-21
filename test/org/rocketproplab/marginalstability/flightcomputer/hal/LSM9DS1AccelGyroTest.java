@@ -1,6 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -50,6 +51,22 @@ public class LSM9DS1AccelGyroTest {
     ctrlReg6XL = mockI2C.writeMap.get(Registers.CTRL_REG6_XL.getAddress());
     assertEquals((byte) 0b11110111, ctrlReg6XL);
   }
+  
+  @Test
+  public void getAccScaleReturnsCorrectScale() throws IOException {
+    mockI2C.readMap.put(LSM9DS1AccelGyro.Registers.CTRL_REG6_XL.getAddress(), (byte) 0);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_2);
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_4);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_4);
+    assertNotEquals(imu.getAccelerometerScale(), AccelerometerScale.G_2);
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_8);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_8);
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_16);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_16);
+  }
 
   @Test
   public void setGyroScaleSetsScaleInREG1G() throws IOException {
@@ -62,6 +79,22 @@ public class LSM9DS1AccelGyroTest {
     imu.setGyroscopeScale(GyroScale.DPS_245);
     ctrlReg1G = mockI2C.writeMap.get(Registers.CTRL_REG1_G.getAddress());
     assertEquals((byte) 0b11100111, ctrlReg1G);
+  }
+  
+  @Test
+  public void getGyroScaleReturnsCorrectScale() throws IOException {
+    mockI2C.readMap.put(LSM9DS1AccelGyro.Registers.CTRL_REG1_G.getAddress(), (byte) 0);
+    assertEquals(imu.getGyroscopeScale(), GyroScale.DPS_NA);
+    
+    imu.setGyroscopeScale(GyroScale.DPS_245);
+    assertEquals(imu.getGyroscopeScale(), GyroScale.DPS_245);
+    assertNotEquals(imu.getGyroscopeScale(), GyroScale.DPS_NA);
+    
+    imu.setGyroscopeScale(GyroScale.DPS_500);
+    assertEquals(imu.getGyroscopeScale(), GyroScale.DPS_500);
+    
+    imu.setGyroscopeScale(GyroScale.DPS_2000);
+    assertEquals(imu.getGyroscopeScale(), GyroScale.DPS_2000);
   }
 
   @Test
@@ -227,5 +260,18 @@ public class LSM9DS1AccelGyroTest {
     expectedGyro = new Vector3(0x300, 0x100, 0);
     assertEquals(expectedGyro, gyro);
     assertFalse(imu.hasNext());
+  }
+  
+  @Test
+  public void computeAccelerationReturnsCorrectAcceleration() throws IOException {
+    mockI2C.readMap.put(LSM9DS1AccelGyro.Registers.CTRL_REG6_XL.getAddress(), (byte) 0);
+    Vector3 accReading = new Vector3(53.153, 28135.182, 18343.5465);
+    assertEquals(imu.computeAcceleration(accReading), new Vector3(0.03181572115, 16.84083880491, 10.97987244998));
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_16);
+    assertEquals(imu.computeAcceleration(accReading), new Vector3(0.25452576919, 134.72671043931, 87.83897959983));
+    
+    accReading = new Vector3(32767, 32767, 32767);
+    assertEquals(imu.computeAcceleration(accReading), new Vector3(156.9064, 156.9064, 156.9064));
   }
 }

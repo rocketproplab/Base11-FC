@@ -50,8 +50,11 @@ public class Vector3 {
     if (!(other instanceof Vector3)) {
       return false;
     }
+    final double EQUAL_TOLERANCE = 0.000000001; // TODO may need adjusting
     Vector3 otherVector = (Vector3) other;
-    return this.x == otherVector.x && this.y == otherVector.y && this.z == otherVector.z;
+    return (Math.abs(this.x - otherVector.x) < EQUAL_TOLERANCE) &&
+           (Math.abs(this.y - otherVector.y) < EQUAL_TOLERANCE) &&
+           (Math.abs(this.z - otherVector.z) < EQUAL_TOLERANCE);
   }
 
   @Override
