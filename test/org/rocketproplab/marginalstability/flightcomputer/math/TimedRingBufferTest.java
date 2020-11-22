@@ -1,6 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.math;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,6 +206,38 @@ public class TimedRingBufferTest {
     assertEquals(2, list.size());
     assertEquals(6.0, list.get(0), EPSILON);
     assertEquals(7.0, list.get(1), EPSILON);
+  }
+  
+  @Test
+  public void indexOutOfBoundsWithNegativeGet() {
+    TimedRingBuffer<Double> ringBuffer = new TimedRingBuffer<>(10);
+    ringBuffer.add(3.0, 0);
+    ringBuffer.add(4.0, 0);
+    ringBuffer.add(5.0, 0);
+    ringBuffer.add(6.0, 0.5);
+    ringBuffer.add(7.0, 1.5);
+    assertThrows(IndexOutOfBoundsException.class, () ->{
+      ringBuffer.get(-1);
+    });
+    assertThrows(IndexOutOfBoundsException.class, () ->{
+      ringBuffer.get(-2);
+    });
+    assertThrows(IndexOutOfBoundsException.class, () ->{
+      ringBuffer.get(-9);
+    });
+  }
+  
+  @Test
+  public void getWithNegativeTimeReturnsZero() {
+    TimedRingBuffer<Double> ringBuffer = new TimedRingBuffer<>(10);
+    ringBuffer.add(3.0, 0);
+    ringBuffer.add(4.0, 0);
+    ringBuffer.add(5.0, 0);
+    ringBuffer.add(6.0, 0.5);
+    ringBuffer.add(7.0, 1.5);
+    List<Double> list = new ArrayList<Double>();
+    ringBuffer.get(-1.0).forEachRemaining(list::add);
+    assertEquals(0, list.size());
   }
 
 }

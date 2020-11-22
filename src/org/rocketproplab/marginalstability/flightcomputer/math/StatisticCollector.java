@@ -54,7 +54,7 @@ public class StatisticCollector {
       }
     }
 
-    this.currentArray.addSample(value);
+    this.currentArray.addSample(value, time);
     this.firstSample = false;
   }
 

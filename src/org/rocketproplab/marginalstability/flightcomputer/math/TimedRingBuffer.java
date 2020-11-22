@@ -46,14 +46,10 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
     @Override
     public E next() {
-      if (!this.hasNext()) {
-        return null;
-      }
       if (this.sublistIterator.hasNext()) {
         return this.sublistIterator.next();
       }
-      this.sublistIterator = this.nextSublistIterator;
-      return this.sublistIterator.next();
+      return this.nextSublistIterator.next();
     }
 
     @Override
@@ -143,12 +139,21 @@ public class TimedRingBuffer<E> implements Iterable<E> {
    * number of elements all the elements are returned. The elements are iterated
    * in increasing order of time.
    * 
+   * Returns size if n > size.
+   * 
+   * @throws IndexOutOfBoundsException if n < 0.
    * @param n the number of elements to get
    * @return an iterator for the most recent n elements
    */
   public RingBufferIterator get(int n) {
+    if (n < 0) {
+      throw new IndexOutOfBoundsException("Tried to get index " + n);
+    }
     if (n > this.size()) {
       n = this.size();
+    }
+    if (n == 0) {
+      return new RingBufferIterator(Collections.emptyIterator(), Collections.emptyIterator());
     }
     int start = this.trueMod(this.insertPointer - n, this.capacity);
     int end   = this.insertPointer;
@@ -179,6 +184,9 @@ public class TimedRingBuffer<E> implements Iterable<E> {
       if (timeDelta > pastTime) {
         break;
       }
+    }
+    if (pastTime < 0) {
+      numberToGet = 0;
     }
     return this.get(numberToGet);
   }
