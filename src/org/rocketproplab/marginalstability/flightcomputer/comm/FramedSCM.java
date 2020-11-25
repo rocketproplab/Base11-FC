@@ -31,7 +31,6 @@ public class FramedSCM implements PacketListener<SCMPacket> {
   private int                      frameLength;
   private PacketRelay              sCMOutput;
   private FramedPacketProcessor    framedPacketOutput;
-  private MessageCompletedListener messageCompletedListener;
 
   /**
    * Create a new SCM de-framer. SCMOutput is used to send replied to incoming SCM
@@ -94,9 +93,6 @@ public class FramedSCM implements PacketListener<SCMPacket> {
     if ((activeString.length() == frameLength) && (!completed)) {
       finalmessage = activeString;
       this.outputQueue.add(finalmessage);
-      if (messageCompletedListener != null) {
-        messageCompletedListener.onMessageCompleted(finalmessage);
-      }
     }
     return returnpacket;
 
@@ -162,14 +158,5 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    */
   protected String getCompletedMessage() {
     return this.outputQueue.poll();
-  }
-
-  @FunctionalInterface
-  public interface MessageCompletedListener {
-    void onMessageCompleted(String message);
-  }
-
-  public void setMessageCompletedListener(MessageCompletedListener messageCompletedListener) {
-    this.messageCompletedListener = messageCompletedListener;
   }
 }

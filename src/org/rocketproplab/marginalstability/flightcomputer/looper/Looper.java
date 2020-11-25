@@ -1,30 +1,52 @@
 package org.rocketproplab.marginalstability.flightcomputer.looper;
 
 import org.rocketproplab.marginalstability.flightcomputer.Time;
+import org.rocketproplab.marginalstability.flightcomputer.commands.Command;
+import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Looper that allows events to be registered and triggered
- * when conditions are met, and automatically handles timing
- * and ticking for Subsystems.
+ * The Looper class handles 2 types of activities:
  *
- * @author Chi Chow
+ * [Events]
+ * Called immediately when conditions are met, and does not depend on the state
+ * of other subsystems. Can be scheduled based on time and states of other subsystems.
+ *
+ * [Commands]
+ * Called as soon as possible after being queued, but may not be called immediately
+ * if dependent subsystems are unavailable. Each subsystem can have only one command running
+ * at the same time.
+ *
+ * @author Chi Chow, Enlil Odisho
  */
 public class Looper {
   private static Looper mainLooper;
 
   public static Looper getInstance() {
     if (mainLooper == null) {
-      mainLooper = new Looper(null);
+      mainLooper = new Looper(new Time());
     }
     return mainLooper;
   }
 
   private Time                   time;
   private HashMap<Object, Event> callbackMap;
+  /**
+   * List storing all commands that are running.
+   */
+  private ArrayList<Command>     active;
+
+  /**
+   * List storing all commands awaiting execution.
+   */
+  private ArrayList<Command> queue;
+
+  /**
+   * Hash map containing all subsystems that are being used along with the
+   * command that's using them.
+   */
+  private HashMap<Subsystem, Command> busySubsystems;
 
   /**
    * Construct a new Looper with time object.
@@ -32,16 +54,24 @@ public class Looper {
    * @param time the time all events in this Looper will use.
    */
   public Looper(Time time) {
-    this.time   = time;
-    callbackMap = new HashMap<>();
+    this.time      = time;
+    callbackMap    = new HashMap<>();
+    active         = new ArrayList<>();
+    queue          = new ArrayList<>();
+    busySubsystems = new HashMap<>();
   }
 
   /**
    * Iterate through events in this Looper and checks if
    * callbacks should be emitted.
    */
-  @SuppressWarnings("WhileLoopReplaceableByForEach")
   public void tick(LooperErrorListener errorListener) {
+    handleEvents(errorListener);
+    handleCommands();
+  }
+
+  @SuppressWarnings("WhileLoopReplaceableByForEach")
+  private void handleEvents(LooperErrorListener errorListener) {
     Iterator<Map.Entry<Object, Event>> entryIterator = callbackMap.entrySet().iterator();
     while (entryIterator.hasNext()) {
       Map.Entry<Object, Event> entry = entryIterator.next();
@@ -57,6 +87,90 @@ public class Looper {
         }
       }
     }
+  }
+
+  private void handleCommands() {
+    // Process active commands.
+    updateActiveCommands();
+
+    // Process queue.
+    // Stores the list of subsystems not available to be used.
+    HashSet<Subsystem> unavailableSubsystems = new HashSet<Subsystem>(
+            busySubsystems.keySet());
+
+    // Loop through all commands in queue.
+    Iterator<Command> queueIterator = queue.iterator();
+    while (queueIterator.hasNext()) {
+      // Get next command in queue and it's dependencies.
+      Command         command      = queueIterator.next();
+      List<Subsystem> dependencies = Arrays.asList(command.getDependencies());
+
+      // Check if command has no dependencies that are in-use.
+      if (Collections.disjoint(dependencies, unavailableSubsystems)) {
+        // Start running command.
+        queueIterator.remove(); // Remove command from queue.
+        active.add(command); // Add command to active list.
+        command.start(); // Start command execution.
+        command.execute(); // Execute command.
+        // Mark command's dependencies as busy.
+        for (Subsystem s : dependencies) {
+          busySubsystems.put(s, command);
+        }
+      }
+
+      // Add all of command's dependencies to unavailableSubsystems list.
+      // This prevents us from running a command that uses a dependency that
+      // a command earlier in the queue needs.
+      unavailableSubsystems.addAll(dependencies);
+    }
+  }
+
+  /**
+   * Updates the active and busy subsystems lists. Should be called every tick().
+   */
+  private void updateActiveCommands() {
+    // Loop through all active commands.
+    Iterator<Command> activeCmdsIterator = active.iterator();
+    while (activeCmdsIterator.hasNext()) {
+      Command command = activeCmdsIterator.next();
+
+      if (command.isDone()) {
+        // Remove the command from active list.
+        activeCmdsIterator.remove();
+        // Make command's dependencies available for other commands to use.
+        Subsystem[] subsystemsUsed = command.getDependencies();
+        for (Subsystem s : subsystemsUsed) {
+          busySubsystems.remove(s, command);
+        }
+      } else {
+        // Invoke command's execute method.
+        command.execute();
+      }
+    }
+  }
+
+  /**
+   * Add command to command scheduler queue. It will be executed when it's
+   * subsystem dependencies are available.
+   *
+   * @param command Command to add.
+   */
+  public void scheduleCommand(Command command) {
+    // Make sure command is not done and not already in scheduler.
+    if (!command.isDone() && !queue.contains(command)
+            && !active.contains(command)) {
+      queue.add(command);
+    }
+  }
+
+  /**
+   * Retrieves the command that is using a particular subsystem. Returns null if
+   * subsystem is not being used by any command.
+   *
+   * @param subsystem Subsystem that is being used by command.
+   */
+  public Command getCommandUsingSubsystem(Subsystem subsystem) {
+    return busySubsystems.get(subsystem);
   }
 
   /**
@@ -220,7 +334,7 @@ public class Looper {
     }
 
     protected double getCurrentTime() {
-      return time.getSystemTime();
+      return time != null ? time.getSystemTime() : 0.0;
     }
   }
 }
