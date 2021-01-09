@@ -13,8 +13,7 @@ import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import java.util.HashMap;
 
 /**
- * A subsystem that listens for SCMPacket and FrameSCM
- * to schedule commands.
+ * A subsystem that listens for SCMPacket and FrameSCM to schedule commands.
  *
  * @author Chi Chow
  */
@@ -29,10 +28,21 @@ public class SCMCommandSubsystem implements Subsystem,
     return instance;
   }
 
-  private       Looper                                    looper;
-  private final HashMap<SCMPacketType, SCMCommandFactory> SCMMap;
-  private final HashMap<String, FramedSCMCommandFactory>  framedSCMMap;
+  private Looper looper;
 
+  /**
+   * Map associating SCMPacketType to a Command factory.
+   */
+  private final HashMap<SCMPacketType, SCMCommandFactory> SCMMap;
+
+  /**
+   * Map associating FramedSCM data to a Command factory.
+   */
+  private final HashMap<String, FramedSCMCommandFactory> framedSCMMap;
+
+  /**
+   * Creates a new SCMCommandSubsystem
+   */
   public SCMCommandSubsystem() {
     SCMMap = new HashMap<>();
     framedSCMMap = new HashMap<>();
@@ -43,14 +53,31 @@ public class SCMCommandSubsystem implements Subsystem,
     this.looper = looper;
   }
 
+  /**
+   * Associates SCMPacketType with a SCMCommandFactory.
+   *
+   * @param type    SCMPacketType to listen for
+   * @param factory that processes this SCMPacketType
+   */
   public void registerSCMCommand(SCMPacketType type, SCMCommandFactory factory) {
     SCMMap.put(type, factory);
   }
 
+  /**
+   * Associates FramedSCM data with a FramedSCMCommandFactory.
+   *
+   * @param framedSCMData FramedSCM data to listen for
+   * @param factory       that processes this FramedSCM data
+   */
   public void registerFramedSCMCommand(String framedSCMData, FramedSCMCommandFactory factory) {
     framedSCMMap.put(framedSCMData, factory);
   }
 
+  /**
+   * Listen to packets and callback if SCMPacketType is registered.
+   *
+   * @param packet with SCMPacketType corresponding to a SCMCommandFactory
+   */
   @Override
   public void onPacket(PacketDirection direction, SCMPacket packet) {
     SCMCommandFactory factory = SCMMap.get(packet.getID());
@@ -62,9 +89,13 @@ public class SCMCommandSubsystem implements Subsystem,
     }
   }
 
+  /**
+   * Listens to FramedSCM packets and callback if the data is registered.
+   *
+   * @param framedPacket with data corresponding to a FramedSCMCommandFactory
+   */
   @Override
   public void processFramedPacket(String framedPacket) {
-    // schedule command with CommandScheduler
     String data = extractFramedSCMData(framedPacket);
     FramedSCMCommandFactory factory = framedSCMMap.get(data);
     if (factory != null) {
@@ -75,6 +106,12 @@ public class SCMCommandSubsystem implements Subsystem,
     }
   }
 
+  /**
+   * Extract data from a FramedSCM packet.
+   *
+   * @param framedPacket to extract data from
+   * @return data from the FramedSCM
+   */
   public static String extractFramedSCMData(String framedPacket) {
     int index = framedPacket.indexOf('|');
     return framedPacket.substring(index + 1);

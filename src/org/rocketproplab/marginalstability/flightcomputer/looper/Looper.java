@@ -30,23 +30,23 @@ public class Looper {
     return mainLooper;
   }
 
-  private Time                   time;
-  private HashMap<Object, Event> callbackMap;
+  private final Time                   time;
+  private final HashMap<Object, Event> callbackMap;
   /**
    * List storing all commands that are running.
    */
-  private ArrayList<Command>     active;
+  private final ArrayList<Command>     active;
 
   /**
    * List storing all commands awaiting execution.
    */
-  private ArrayList<Command> queue;
+  private final ArrayList<Command> queue;
 
   /**
    * Hash map containing all subsystems that are being used along with the
    * command that's using them.
    */
-  private HashMap<Subsystem, Command> busySubsystems;
+  private final HashMap<Subsystem, Command> busySubsystems;
 
   /**
    * Construct a new Looper with time object.
@@ -62,14 +62,20 @@ public class Looper {
   }
 
   /**
-   * Iterate through events in this Looper and checks if
-   * callbacks should be emitted.
+   * Events and commands are checked whether they should be executed every tick.
+   *
+   * @param errorListener to report errors
    */
   public void tick(LooperErrorListener errorListener) {
     handleEvents(errorListener);
     handleCommands();
   }
 
+  /**
+   * Iterate through events in this Looper and checks if callbacks should be emitted.
+   *
+   * @param errorListener to report errors
+   */
   @SuppressWarnings("WhileLoopReplaceableByForEach")
   private void handleEvents(LooperErrorListener errorListener) {
     Iterator<Map.Entry<Object, Event>> entryIterator = callbackMap.entrySet().iterator();
@@ -89,6 +95,10 @@ public class Looper {
     }
   }
 
+  /**
+   * Commands are queued to run once it's Subsystem dependencies are not busy.
+   * Each subsystem can only have one command running at the same time.
+   */
   private void handleCommands() {
     // Process active commands.
     updateActiveCommands();
@@ -323,9 +333,9 @@ public class Looper {
    * when and why a callback is invoked.
    */
   public static class Event implements CallbackCondition, Callback {
-    private CallbackCondition condition;
-    private Callback          callback;
-    private Time              time;
+    private final CallbackCondition condition;
+    private final Callback callback;
+    private final Time     time;
 
     public Event(CallbackCondition condition, Callback callback, Time time) {
       this.condition = condition;
