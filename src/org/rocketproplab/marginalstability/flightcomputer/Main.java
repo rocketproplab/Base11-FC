@@ -3,10 +3,7 @@ package org.rocketproplab.marginalstability.flightcomputer;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.subsystems.ParachuteSubsystem;
-import org.rocketproplab.marginalstability.flightcomputer.subsystems.SensorSubsystem;
-import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
-import org.rocketproplab.marginalstability.flightcomputer.subsystems.ValveStateSubsystem;
+import org.rocketproplab.marginalstability.flightcomputer.subsystems.*;
 
 /**
  * The main file contains the entry point to the software stack. It is
@@ -71,6 +68,9 @@ public class Main {
     Main.addSensors(sensorSubsystem);
     flightComputer.registerSubsystem(sensorSubsystem);
 
+    SCMCommandSubsystem scmCommandSubsystem = SCMCommandSubsystem.getInstance();
+    flightComputer.registerSubsystem(scmCommandSubsystem); // TODO: should listen to PacketRouter
+
     telemetry.logInfo(Info.FINISH_SUBSYSTEM_START);
   }
 
@@ -81,7 +81,9 @@ public class Main {
   }
 
   private static void registerPacketListeners() {
-    PacketRouter.getInstance().addListener(ValveStateSubsystem.getInstance(), SCMPacket.class,
+    PacketRouter packetRouter = PacketRouter.getInstance();
+
+    packetRouter.addListener(ValveStateSubsystem.getInstance(), SCMPacket.class,
         PacketSources.EngineControllerUnit);
   }
 
