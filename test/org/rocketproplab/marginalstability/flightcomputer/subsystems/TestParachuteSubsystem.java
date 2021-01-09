@@ -210,20 +210,6 @@ public class TestParachuteSubsystem {
   }
 
   @Test
-  public void mainDeploysWhenPacketReceived() {
-    SCMPacket mainDeploy = new SCMPacket(SCMPacketType.MD, "00000");
-    paraSystem.onPacket(PacketDirection.RECIVE, mainDeploy);
-    assertTrue(main.active);
-  }
-
-  @Test
-  public void drogueDeploysWhenPacketsRecived() {
-    SCMPacket drogueDeploy = new SCMPacket(SCMPacketType.DD, "00000");
-    paraSystem.onPacket(PacketDirection.RECIVE, drogueDeploy);
-    assertTrue(drogue.active);
-  }
-
-  @Test
   public void parachuteDoesNotOpenAbovePressure() {
     paraSystem.onFlightModeChange(FlightMode.Falling);
     paraSystem.onPositionEstimate(
