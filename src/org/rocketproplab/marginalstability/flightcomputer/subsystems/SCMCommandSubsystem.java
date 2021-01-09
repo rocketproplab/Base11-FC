@@ -29,9 +29,9 @@ public class SCMCommandSubsystem implements Subsystem,
     return instance;
   }
 
-  private Looper                                    looper;
-  private HashMap<SCMPacketType, SCMCommandFactory> SCMMap;
-  private HashMap<String, FramedSCMCommandFactory>            framedSCMMap;
+  private       Looper                                    looper;
+  private final HashMap<SCMPacketType, SCMCommandFactory> SCMMap;
+  private final HashMap<String, FramedSCMCommandFactory>  framedSCMMap;
 
   public SCMCommandSubsystem() {
     SCMMap = new HashMap<>();
@@ -47,8 +47,8 @@ public class SCMCommandSubsystem implements Subsystem,
     SCMMap.put(type, factory);
   }
 
-  public void registerFramedSCMCommand(String cmdPrefix, FramedSCMCommandFactory factory) {
-    framedSCMMap.put(cmdPrefix, factory);
+  public void registerFramedSCMCommand(String framedSCMData, FramedSCMCommandFactory factory) {
+    framedSCMMap.put(framedSCMData, factory);
   }
 
   @Override

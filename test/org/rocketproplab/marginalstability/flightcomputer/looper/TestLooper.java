@@ -9,6 +9,42 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import static org.junit.Assert.*;
 
 public class TestLooper {
+  private static class TestCallback implements Looper.Callback {
+    private boolean hasCalled = false;
+
+    @Override
+    public void onLooperCallback(Object tag, Looper from) {
+      hasCalled = true;
+    }
+  }
+
+  private static class TestCallbackCondition implements Looper.CallbackCondition {
+    private boolean shouldEmit = false;
+
+    @Override
+    public boolean shouldEmit() {
+      return shouldEmit;
+    }
+  }
+
+  private static class TestTime extends Time {
+
+    private double time = 0;
+
+    public void addTime(double add) {
+      this.time += add;
+    }
+
+    public void setTime(double time) {
+      this.time = time;
+    }
+
+    @Override
+    public double getSystemTime() {
+      return time;
+    }
+
+  }
 
   @Test
   public void checkSingletonInstance() {
@@ -27,7 +63,7 @@ public class TestLooper {
 
   @Test
   public void testScheduleSameCommandMultipleTimes() {
-    Looper       looper   = new Looper(new Time());
+    Looper looper = new Looper(new Time());
     DummyCommand command1 = new DummyCommand();
 
     looper.scheduleCommand(command1);
@@ -154,16 +190,16 @@ public class TestLooper {
     // Create dummy commands.
     DummyCommand command1 = new DummyCommand();
     command1.dependencies = new Subsystem[]{subsystemA};
-    command1.doneAfter    = 2;
+    command1.doneAfter = 2;
     DummyCommand command2 = new DummyCommand();
     command2.dependencies = new Subsystem[]{subsystemA, subsystemB};
-    command2.doneAfter    = 1;
+    command2.doneAfter = 1;
     DummyCommand command3 = new DummyCommand();
     command3.dependencies = new Subsystem[]{subsystemB};
-    command3.doneAfter    = 1;
+    command3.doneAfter = 1;
     DummyCommand command4 = new DummyCommand();
     command4.dependencies = new Subsystem[]{subsystemA, subsystemC};
-    command4.doneAfter    = 1;
+    command4.doneAfter = 1;
     DummyCommand command5 = new DummyCommand();
     command5.doneAfter = 1;
 
@@ -213,4 +249,194 @@ public class TestLooper {
     assertTrue(command5.isDone());
   }
 
+  @Test
+  public void emitAlways() {
+    Looper looper = new Looper(new Time());
+    String tag = "";
+    TestCallback callback = new TestCallback();
+    looper.emitAlways(tag, callback);
+
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    assertNotNull(looper.getEvent(tag));
+  }
+
+  @Test
+  public void emitScheduled() {
+    TestTime time = new TestTime();
+    Looper looper = new Looper(time);
+    TestCallback callback = new TestCallback();
+    String tag = "";
+    double interval = 50.0, add = 30.0;
+    looper.emitScheduled(tag, interval, callback);
+
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    assertNotNull(looper.getEvent(tag));
+  }
+
+  @Test
+  public void emitIf() {
+    Looper looper = new Looper(new Time());
+    TestCallbackCondition condition = new TestCallbackCondition();
+    TestCallback callback = new TestCallback();
+    String tag = "";
+    looper.emitIf(tag, condition, callback);
+
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    condition.shouldEmit = true;
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    assertNotNull(looper.getEvent(tag));
+  }
+
+  @Test
+  public void emitScheduledIf() {
+    TestTime time = new TestTime();
+    Looper looper = new Looper(time);
+    TestCallbackCondition condition = new TestCallbackCondition();
+    TestCallback callback = new TestCallback();
+    String tag = "";
+    double interval = 50.0, add = 30.0;
+    looper.emitScheduledIf(tag, interval, condition, callback);
+
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    condition.shouldEmit = true;
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    condition.shouldEmit = false;
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    assertNotNull(looper.getEvent(tag));
+  }
+
+  @Test
+  public void immediatelyEmitOnceIf() {
+    Looper looper = new Looper(new Time());
+    TestCallbackCondition condition = new TestCallbackCondition();
+    TestCallback callback = new TestCallback();
+    String tag = "";
+    looper.emitOnceIf(tag, condition, callback);
+
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    condition.shouldEmit = true;
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    assertNull(looper.getEvent(tag));
+  }
+
+  @Test
+  public void durationEmitOnceIf() {
+    TestTime time = new TestTime();
+    Looper looper = new Looper(time);
+    TestCallbackCondition condition = new TestCallbackCondition();
+    TestCallback callback = new TestCallback();
+    String tag = "";
+    double duration = 50.0, add = 30.0;
+    looper.emitOnceIf(tag, duration, condition, callback);
+
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    condition.shouldEmit = true;
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    time.addTime(add);
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    time.addTime(add);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    assertNull(looper.getEvent(tag));
+  }
+
+  @Test
+  public void removeEventAndCallback() {
+    Looper looper = new Looper(new Time());
+    String tag = "";
+    TestCallback callback = new TestCallback();
+    looper.emitAlways(tag, callback);
+
+    looper.tick();
+    assertTrue(callback.hasCalled);
+
+    callback.hasCalled = false;
+    looper.removeEvent(tag);
+    looper.tick();
+    assertFalse(callback.hasCalled);
+
+    assertNull(looper.getEvent(tag));
+  }
 }

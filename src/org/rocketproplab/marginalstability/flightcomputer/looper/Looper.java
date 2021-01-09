@@ -8,11 +8,11 @@ import java.util.*;
 
 /**
  * The Looper class handles 2 types of activities:
- *
+ * <p>
  * [Events]
  * Called immediately when conditions are met, and does not depend on the state
  * of other subsystems. Can be scheduled based on time and states of other subsystems.
- *
+ * <p>
  * [Commands]
  * Called as soon as possible after being queued, but may not be called immediately
  * if dependent subsystems are unavailable. Each subsystem can have only one command running
@@ -54,10 +54,10 @@ public class Looper {
    * @param time the time all events in this Looper will use.
    */
   public Looper(Time time) {
-    this.time      = time;
-    callbackMap    = new HashMap<>();
-    active         = new ArrayList<>();
-    queue          = new ArrayList<>();
+    this.time = time;
+    callbackMap = new HashMap<>();
+    active = new ArrayList<>();
+    queue = new ArrayList<>();
     busySubsystems = new HashMap<>();
   }
 
@@ -75,8 +75,8 @@ public class Looper {
     Iterator<Map.Entry<Object, Event>> entryIterator = callbackMap.entrySet().iterator();
     while (entryIterator.hasNext()) {
       Map.Entry<Object, Event> entry = entryIterator.next();
-      Object                   tag   = entry.getKey();
-      Event                    event = entry.getValue();
+      Object tag = entry.getKey();
+      Event event = entry.getValue();
       try {
         if (event.shouldEmit()) {
           event.onLooperCallback(tag, this);
@@ -102,7 +102,7 @@ public class Looper {
     Iterator<Command> queueIterator = queue.iterator();
     while (queueIterator.hasNext()) {
       // Get next command in queue and it's dependencies.
-      Command         command      = queueIterator.next();
+      Command command = queueIterator.next();
       List<Subsystem> dependencies = Arrays.asList(command.getDependencies());
 
       // Check if command has no dependencies that are in-use.
@@ -276,6 +276,16 @@ public class Looper {
   }
 
   /**
+   * Retrieve a registered event from this looper.
+   *
+   * @param tag to identify the event
+   * @return event registered with the given tag
+   */
+  public Event getEvent(Object tag) {
+    return callbackMap.get(tag);
+  }
+
+  /**
    * Remove an event from this Looper.
    *
    * @param tag to identify the event
@@ -319,8 +329,8 @@ public class Looper {
 
     public Event(CallbackCondition condition, Callback callback, Time time) {
       this.condition = condition;
-      this.callback  = callback;
-      this.time      = time;
+      this.callback = callback;
+      this.time = time;
     }
 
     @Override
