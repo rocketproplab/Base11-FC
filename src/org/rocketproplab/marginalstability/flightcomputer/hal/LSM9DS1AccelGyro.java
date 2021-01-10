@@ -50,9 +50,9 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   public static final int  FIFO_SAMPLES_STORED_MASK    = 0b111111;
 
   private static final int BYTES_PER_FIFO_LINE    = 12;
-  private static final int BITS_PER_BYTE          = 8;
   
-  public static final double ACCELEROMETER_OUTPUT_TO_MPS_SQUARED = 9.80665;  // factor to convert sensor output to m/s^2
+  public static final double ACCELEROMETER_OUTPUT_TO_MPS_SQUARED = 9.81;  // factor to multiply acc output by to
+                                                                          // convert sensor output to m/s^2
   private static final double ONE_DEGREE_IN_RADIANS  = Math.PI / 180.0;
 
   /**
