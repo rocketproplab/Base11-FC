@@ -9,7 +9,7 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import static org.junit.Assert.*;
 
 public class TestLooper {
-  private static class TestCallback implements Looper.Callback {
+  private static class TestCallback implements EventCallback {
     private boolean hasCalled = false;
 
     @Override
@@ -18,7 +18,7 @@ public class TestLooper {
     }
   }
 
-  private static class TestCallbackCondition implements Looper.CallbackCondition {
+  private static class TestCallbackCondition implements EventCondition {
     private boolean shouldEmit = false;
 
     @Override

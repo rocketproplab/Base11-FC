@@ -8,12 +8,12 @@ import org.rocketproplab.marginalstability.flightcomputer.Time;
  *
  * @author Chi Chow
  */
-public class DurationRequiredEvent extends Looper.Event {
+public class DurationRequiredEvent extends GenericEvent {
   private final double durationTrue;
   private       double sinceTrueTime;
 
   public DurationRequiredEvent(
-          double durationTrue, Looper.CallbackCondition condition, Looper.Callback callback, Time time) {
+          double durationTrue, EventCondition condition, EventCallback callback, Time time) {
     super(condition, callback, time);
     this.durationTrue  = durationTrue;
     this.sinceTrueTime = Double.NaN;

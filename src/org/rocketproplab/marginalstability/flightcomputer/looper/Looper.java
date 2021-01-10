@@ -30,12 +30,12 @@ public class Looper {
     return mainLooper;
   }
 
-  private final Time                   time;
-  private final HashMap<Object, Event> callbackMap;
+  private final Time                          time;
+  private final HashMap<Object, GenericEvent> callbackMap;
   /**
    * List storing all commands that are running.
    */
-  private final ArrayList<Command>     active;
+  private final ArrayList<Command>            active;
 
   /**
    * List storing all commands awaiting execution.
@@ -78,11 +78,11 @@ public class Looper {
    */
   @SuppressWarnings("WhileLoopReplaceableByForEach")
   private void handleEvents(LooperErrorListener errorListener) {
-    Iterator<Map.Entry<Object, Event>> entryIterator = callbackMap.entrySet().iterator();
+    Iterator<Map.Entry<Object, GenericEvent>> entryIterator = callbackMap.entrySet().iterator();
     while (entryIterator.hasNext()) {
-      Map.Entry<Object, Event> entry = entryIterator.next();
+      Map.Entry<Object, GenericEvent> entry = entryIterator.next();
       Object tag = entry.getKey();
-      Event event = entry.getValue();
+      GenericEvent event = entry.getValue();
       try {
         if (event.shouldEmit()) {
           event.onLooperCallback(tag, this);
@@ -197,8 +197,8 @@ public class Looper {
    * @param tag      to identify the event
    * @param callback to be invoked by Looper
    */
-  public void emitAlways(Object tag, Callback callback) {
-    registerEvent(tag, new Event(CallbackCondition.TRUE, callback, time));
+  public void emitAlways(Object tag, EventCallback callback) {
+    registerEvent(tag, new GenericEvent(EventCondition.TRUE, callback, time));
   }
 
   /**
@@ -209,8 +209,8 @@ public class Looper {
    * @param interval at which callbacks should be emitted
    * @param callback to be invoked by Looper
    */
-  public void emitScheduled(Object tag, double interval, Callback callback) {
-    emitScheduledIf(tag, interval, CallbackCondition.TRUE, callback);
+  public void emitScheduled(Object tag, double interval, EventCallback callback) {
+    emitScheduledIf(tag, interval, EventCondition.TRUE, callback);
   }
 
   /**
@@ -222,7 +222,7 @@ public class Looper {
    * @param condition required for callbacks to be emitted
    * @param callback  to be invoked by Looper
    */
-  public void emitIf(Object tag, CallbackCondition condition, Callback callback) {
+  public void emitIf(Object tag, EventCondition condition, EventCallback callback) {
     emitScheduledIf(tag, 0.0, condition, callback);
   }
 
@@ -237,7 +237,7 @@ public class Looper {
    * @param callback  to be invoked by Looper
    */
   public void emitScheduledIf(Object tag, double interval,
-                              CallbackCondition condition, Callback callback) {
+                              EventCondition condition, EventCallback callback) {
     registerEvent(tag, new ScheduledConditionEvent(interval, condition, callback, time));
   }
 
@@ -250,7 +250,7 @@ public class Looper {
    * @param condition required for callback to be emitted
    * @param callback  to be invoked by Looper
    */
-  public void emitOnceIf(Object tag, CallbackCondition condition, Callback callback) {
+  public void emitOnceIf(Object tag, EventCondition condition, EventCallback callback) {
     emitOnceIf(tag, 0.0, condition, callback);
   }
 
@@ -265,7 +265,7 @@ public class Looper {
    * @param callback             to be invoked by Looper
    */
   public void emitOnceIf(Object tag, double durationTrueRequired,
-                         CallbackCondition condition, Callback callback) {
+                         EventCondition condition, EventCallback callback) {
     registerEvent(tag, new DurationRequiredEvent(
             durationTrueRequired, condition, callback, time));
   }
@@ -276,7 +276,7 @@ public class Looper {
    * @param tag      to identify the event
    * @param newEvent to be registered
    */
-  public void registerEvent(Object tag, Event newEvent) {
+  public void registerEvent(Object tag, GenericEvent newEvent) {
     if (tag == null) {
       throw new IllegalArgumentException("Tag of registered event cannot be null");
     } else if (callbackMap.containsKey(tag)) {
@@ -291,7 +291,7 @@ public class Looper {
    * @param tag to identify the event
    * @return event registered with the given tag
    */
-  public Event getEvent(Object tag) {
+  public GenericEvent getEvent(Object tag) {
     return callbackMap.get(tag);
   }
 
@@ -301,60 +301,12 @@ public class Looper {
    * @param tag to identify the event
    * @return the event removed
    */
-  public Event removeEvent(Object tag) {
+  public GenericEvent removeEvent(Object tag) {
     return callbackMap.remove(tag);
   }
 
   @FunctionalInterface
   public interface LooperErrorListener {
     void onError(Object tag, Looper from);
-  }
-
-  /**
-   * Callback when condition to invoke an event is true.
-   */
-  @FunctionalInterface
-  public interface Callback {
-    void onLooperCallback(Object tag, Looper from);
-  }
-
-  /**
-   * Condition to determine whether a callback should be invoked.
-   */
-  @FunctionalInterface
-  public interface CallbackCondition {
-    boolean shouldEmit();
-
-    CallbackCondition TRUE = () -> true;
-  }
-
-  /**
-   * Event that contains all the information needed to determine
-   * when and why a callback is invoked.
-   */
-  public static class Event implements CallbackCondition, Callback {
-    private final CallbackCondition condition;
-    private final Callback callback;
-    private final Time     time;
-
-    public Event(CallbackCondition condition, Callback callback, Time time) {
-      this.condition = condition;
-      this.callback = callback;
-      this.time = time;
-    }
-
-    @Override
-    public boolean shouldEmit() {
-      return condition.shouldEmit();
-    }
-
-    @Override
-    public void onLooperCallback(Object tag, Looper from) {
-      callback.onLooperCallback(tag, from);
-    }
-
-    protected double getCurrentTime() {
-      return time != null ? time.getSystemTime() : 0.0;
-    }
   }
 }

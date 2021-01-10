@@ -7,12 +7,12 @@ import org.rocketproplab.marginalstability.flightcomputer.Time;
  *
  * @author Chi Chow
  */
-public class ScheduledConditionEvent extends Looper.Event {
+public class ScheduledConditionEvent extends GenericEvent {
   private double interval;
   private double lastInvoked;
 
   public ScheduledConditionEvent(
-          double interval, Looper.CallbackCondition condition, Looper.Callback callback, Time time) {
+          double interval, EventCondition condition, EventCallback callback, Time time) {
     super(condition, callback, time);
     this.interval    = interval;
     this.lastInvoked = Double.NaN;
