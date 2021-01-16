@@ -78,13 +78,17 @@ public class Settings {
   
   @SettingSectionHeader(name = "LSM9DS1 settings")
   
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_2G  = 0.00006103;
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_4G  = 0.00012207;
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_8G  = 0.00024414;
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_16G = 0.000732;
-  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS  = 0.00875;
-  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS  = 0.0175;
-  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS = 0.07;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_2G     = 0.00006103;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_4G     = 0.00012207;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_8G     = 0.00024414;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_16G    = 0.000732;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS     = 0.00875;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS     = 0.0175;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS    = 0.07;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS  = 0.00014;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_8GAUSS  = 0.00029;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_12GAUSS = 0.00043;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS = 0.00058;
 
   private static Set<Field> getSettingFields() {
     Set<Field> result = new LinkedHashSet<>();

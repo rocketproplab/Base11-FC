@@ -454,7 +454,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
 
   /**
    * Parse a set of BYTES_PER_FIFO_LINE bytes into an AccelGyroReading. <br>
-   * TODO Use range to normalize to m/s^2
+   * Use range to normalize to m/s^2
    * 
    * @param data the set of six bytes representing a reading
    * @return the AccelGyroReading which the six bytes belong to.

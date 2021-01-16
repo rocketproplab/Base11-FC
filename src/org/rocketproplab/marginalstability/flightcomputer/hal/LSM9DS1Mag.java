@@ -7,6 +7,7 @@ import java.util.ArrayDeque;
 
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 
 import com.pi4j.io.i2c.I2CDevice;
@@ -127,6 +128,11 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
       return SCALE_LSB_POS;
     }
   }
+  /**
+   * The current scale the magnetometer is set to.
+   * Initialized to the default value that was specified in the datasheet.
+   */
+  private SCALE scale = SCALE.GAUSS_4;
   
   public enum MODE implements RegisterValue {
     CONTINUOUS_CONVERSION,
@@ -204,11 +210,21 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
   /**
    * Sets the scale of the sensor
    * 
-   * @param scale the scale of the magnetometer data
+   * @param newScale the scale of the magnetometer data
    * @throws IOException if we are unable to access the i2c device
    */
-  public void setScale(SCALE scale) throws IOException {
-    modifyRegister(Registers.CTRL_REG2_M, scale);
+  public void setScale(SCALE newScale) throws IOException {
+    modifyRegister(Registers.CTRL_REG2_M, newScale);
+    scale = newScale;
+  }
+  
+  /**
+   * Returns the scale of the magnetometer.
+   * @return the set magnetometer scale
+   */
+  public SCALE getScale()
+  {
+    return scale;
   }
   
   /**
@@ -346,7 +362,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
   
   /**
    * Parse a set of BYTES_PER_SAMPLE bytes into an MagReading.
-   * TODO Normalzie to gauss
+   * Normalzie to gauss
    * 
    * @param data the set of six bytes representing a reading
    * @return the MagReading which the six bytes belong to
@@ -358,7 +374,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
     int yMag = results[1];
     int zMag = results[2];
     
-    Vector3 magVec = new Vector3(xMag, yMag, zMag);
+    Vector3 magVec = computeMagneticField(xMag, yMag, zMag);
     return new MagReading(magVec);
   }
   
@@ -387,6 +403,40 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
   @Override
   public boolean hasNext() {
     return !samples.isEmpty();
+  }
+  
+  /**
+   * Converts magnetometer readings to gauss. Uses the current magnetometer scale setting.
+   * @param magX x-axis reading from magnetometer
+   * @param magY y-axis reading from magnetometer
+   * @param magZ z-axis reading from magnetometer
+   * @return the magnetic field vector in gauss
+   */
+  public Vector3 computeMagneticField(int magX, int magY, int magZ) {
+    // Get the sensitivity of the sensor
+    double sensitivity;
+    switch(scale) {
+    case GAUSS_4:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS;
+      break;
+    case GAUSS_8:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_8GAUSS;
+      break;
+    case GAUSS_12:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_12GAUSS;
+      break;
+    case GAUSS_16:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS;
+      break;
+    default:
+      throw new IllegalStateException("Sensor has an unknown scale.");
+    }
+    
+    // Compute magnetic field in gauss
+    return new Vector3(
+        magX * sensitivity,
+        magY * sensitivity,
+        magZ * sensitivity);
   }
 
 }
