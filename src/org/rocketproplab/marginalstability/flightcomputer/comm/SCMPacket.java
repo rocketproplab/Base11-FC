@@ -179,8 +179,14 @@ public class SCMPacket {
       addedASCII += packet.charAt(i);
     }
     int calculatedChecksum = addedASCII % 100;
-
-    packet = packet + Integer.toString(calculatedChecksum) + ";";
+    
+    if (calculatedChecksum < 10) {
+    	packet = packet + "0" + Integer.toString(calculatedChecksum) + ";";
+    }
+    else {
+    	packet = packet + Integer.toString(calculatedChecksum) + ";";
+    }
+    
     return packet;
   }
 

@@ -5,16 +5,12 @@ import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.events.FlightStateListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.ParachuteListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.PositionListener;
-import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Barometer;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Solenoid;
 import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
-import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +21,7 @@ import java.util.List;
  * @author Max Apodaca, Chi Chow
  */
 public class ParachuteSubsystem
-        implements FlightStateListener, PositionListener, Subsystem,
-        PacketListener<SCMPacket> {
+        implements FlightStateListener, PositionListener, Subsystem {
 
   private static final String             MAIN_CHUTE_TAG = "MainChute";
   private static       ParachuteSubsystem instance;
@@ -75,16 +70,6 @@ public class ParachuteSubsystem
   }
 
   /**
-   * Determine whether the packet should trigger the drogue chute to open.
-   *
-   * @param packet packet to test
-   * @return whether the drogue chute should open
-   */
-  private boolean shouldDrogueChuteOpenByPacket(SCMPacket packet) {
-    return packet != null && packet.getID() == SCMPacketType.DD;
-  }
-
-  /**
    * Determine whether the flight mode should trigger the drogue chute to open.
    *
    * @param flightMode FlightMode to test
@@ -92,16 +77,6 @@ public class ParachuteSubsystem
    */
   private boolean shouldDrogueChuteOpenByFlightMode(FlightMode flightMode) {
     return flightMode.ordinal() >= FlightMode.Apogee.ordinal();
-  }
-
-  /**
-   * Determine whether the packet should trigger the main chute to open.
-   *
-   * @param packet packet to test
-   * @return whether the main chute should open
-   */
-  private boolean shouldMainChuteOpenByPacket(SCMPacket packet) {
-    return packet != null && packet.getID() == SCMPacketType.MD;
   }
 
   private boolean shouldMainChuteOpenByPressure() {
@@ -139,8 +114,6 @@ public class ParachuteSubsystem
     // remove main chute open event from Looper
     if (this.looper.removeEvent(MAIN_CHUTE_TAG) == null) {
       // TODO: Log that main chute was deployed because of pressure
-    } else {
-      // TODO: Log that main chute was deployed because of packet
     }
 
     boolean wasActive = mainChute.isActive();
@@ -152,14 +125,33 @@ public class ParachuteSubsystem
     }
   }
 
-  @Override
-  public void onPacket(PacketDirection direction, SCMPacket packet) {
-    if (shouldDrogueChuteOpenByPacket(packet)) {
-      drogueChuteOpen();
-    }
-    if (shouldMainChuteOpenByPacket(packet)) {
+  /**
+   * Attempt to open the main chute
+   *
+   * @return    if the deployment was successful
+   */
+  public boolean attemptMainChuteOpen() {
+    /* TODO: Find a better way to check if the drogue chute is currently open,
+        and if the main chute deployed successfully */
+    if(drogueChute.isActive())
       mainChuteOpen();
+    else {
+      return false;
     }
+
+    return mainChute.isActive();
+  }
+
+  /**
+   * Attempt to open the drogue chute
+   *
+   * @return    if the deployment was successful
+   */
+  public boolean attemptDrogueChuteOpen() {
+    drogueChuteOpen();
+
+    // TODO: Find a better way to check if the drogue chute deployed successfully
+    return drogueChute.isActive();
   }
 
   @Override

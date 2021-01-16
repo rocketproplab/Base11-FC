@@ -231,7 +231,7 @@ public class Settings {
     }
   }
 
-  private static boolean readSettingsFromConfig(List<String> config) {
+  public static boolean readSettingsFromConfig(List<String> config, boolean checkOutOfDate) {
     Set<Field>          settingFields     = getSettingFields();
     Map<String, String> fieldNameValueMap = getFieldNameValueMap(config);
     boolean outOfDate = false;
@@ -239,12 +239,16 @@ public class Settings {
       String fieldName = getNameFromField(field);
       if (fieldNameValueMap.containsKey(fieldName)) {
         setFieldFromConfigLine(field, fieldNameValueMap.get(fieldName));
-      } else {
+      } else if (checkOutOfDate){
         System.err.println("Can't find key for " + fieldName);
         outOfDate = true;
       }
     }
     return outOfDate;
+  }
+
+  public static boolean readSettingsFromConfig(List<String> config) {
+    return readSettingsFromConfig(config, true);
   }
 
   private static String getSettingsFileLocation() {
