@@ -190,4 +190,13 @@ public class StatisticArrayTest {
     assertFalse(array.isValid());
   }
   
+  @Test
+  public void SingleSampleTimeVarianceReturnsZero() {
+    StatisticArray array = new StatisticArray(10);
+    array.addSample(5.0, 0);
+    array.addSample(6.0, 0.3);
+    array.addSample(7.0, 2);
+    assertEquals(0, array.getVariance(0.5), EPSILON);
+  }
+  
 }

@@ -156,6 +156,9 @@ public class StatisticArray {
       sumSquared += Math.pow(sample - mean, 2);
       samplesCounted++;
     }
+    if(samplesCounted < 2) {
+      return 0;
+    }
     double variance = sumSquared / (samplesCounted - 1);
     return variance;
   }

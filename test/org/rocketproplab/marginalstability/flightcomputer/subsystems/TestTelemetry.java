@@ -127,6 +127,15 @@ public class TestTelemetry {
     assertEquals(testPacket, this.testListener.lastPacket);
     assertEquals(PacketDirection.SEND, this.testListener.lastDirection);
   }
+  
+  @Test
+  public void telemetryReportsNaN() {
+    this.telemetry.reportTelemetry(SCMPacketType.T0, Double.NaN);
+    SCMPacket testPacket = new SCMPacket(SCMPacketType.T0, "  NAN");
+    assertEquals(testPacket, this.testListener.lastPacket);
+    assertEquals(PacketDirection.SEND, this.testListener.lastDirection);
+  }
+
 
   @Test
   public void telemetryGeneratesErrorPacket() {
