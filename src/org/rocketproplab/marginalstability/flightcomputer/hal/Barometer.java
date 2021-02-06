@@ -22,4 +22,11 @@ public interface Barometer {
    * @return the time of the last measurements
    */
   public double getLastMeasurementTime();
+
+  /**
+   * Returns an instance to a standard samplable sensor
+   * 
+   * @return the standard samplable sensor
+   */
+  public SamplableSensor<Double> getSamplable();
 }

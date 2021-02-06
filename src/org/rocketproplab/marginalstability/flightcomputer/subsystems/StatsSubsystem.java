@@ -36,6 +36,7 @@ public class StatsSubsystem implements Subsystem, ParachuteListener, FlightState
   public StatsSubsystem(Telemetry telemetry, PTSubsystem ptSubsystem, Barometer barometer,
       Thermocouple... thermocouples) {
 //    ptSubsystem.getPTValue(ChannelIndex.CH0);
+    
   }
 
   @Override
