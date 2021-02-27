@@ -1,12 +1,12 @@
 package org.rocketproplab.marginalstability.flightcomputer.math;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.rocketproplab.marginalstability.flightcomputer.util.TestMethods;
 
 public class TimedRingBufferTest {
   private static final double EPSILON = 1e-10;
@@ -216,13 +216,13 @@ public class TimedRingBufferTest {
     ringBuffer.add(5.0, 0);
     ringBuffer.add(6.0, 0.5);
     ringBuffer.add(7.0, 1.5);
-    assertThrows(IndexOutOfBoundsException.class, () ->{
+    TestMethods.assertThrows(IndexOutOfBoundsException.class, () ->{
       ringBuffer.get(-1);
     });
-    assertThrows(IndexOutOfBoundsException.class, () ->{
+    TestMethods.assertThrows(IndexOutOfBoundsException.class, () ->{
       ringBuffer.get(-2);
     });
-    assertThrows(IndexOutOfBoundsException.class, () ->{
+    TestMethods.assertThrows(IndexOutOfBoundsException.class, () ->{
       ringBuffer.get(-9);
     });
   }
