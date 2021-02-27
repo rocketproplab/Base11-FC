@@ -3,6 +3,8 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.Settings;
 
 import com.pi4j.io.spi.SpiDevice;
@@ -346,8 +348,9 @@ public class MAX14830 implements PollingSensor {
         pollPort(port);
       }
     } catch (IOException e) {
-      e.printStackTrace();
-      // TODO Handle error
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Unable to access /dev/spix.x via Pi4J";
+      errorReporter.reportError(Errors.MAX14830_IO_ERROR, e, errorMsg);
     }
 
   }
