@@ -1,5 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.math;
 
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
+
 /**
  * A vector class
  * 
@@ -51,7 +53,9 @@ public class Vector3 {
       return false;
     }
     Vector3 otherVector = (Vector3) other;
-    return this.x == otherVector.x && this.y == otherVector.y && this.z == otherVector.z;
+    return (Math.abs(this.x - otherVector.x) < Settings.EQUALS_EPSILON) &&
+           (Math.abs(this.y - otherVector.y) < Settings.EQUALS_EPSILON) &&
+           (Math.abs(this.z - otherVector.z) < Settings.EQUALS_EPSILON);
   }
 
   @Override

@@ -128,6 +128,32 @@ public class LPS22HDTest {
   }
   
   @Test
+  public void getPressureLowerBound() {
+    MockI2CDevice i2c = new MockI2CDevice();
+    BarometerTime time = new BarometerTime();
+    LPS22HD barometer = new LPS22HD(i2c, time);
+      
+    i2c.readMap.put(0x2A, (byte) 0b10000);
+    i2c.readMap.put(0x29, (byte) 0b01000000);
+    i2c.readMap.put(0x28, (byte) 0);
+    barometer.poll();
+    assertEquals(260, barometer.getPressure(), 0.0005);
+  } 
+  
+  @Test
+  public void getPressureUpperBound() {
+    MockI2CDevice i2c = new MockI2CDevice();
+    BarometerTime time = new BarometerTime();
+    LPS22HD barometer = new LPS22HD(i2c, time);
+      
+    i2c.readMap.put(0x2A, (byte) 0b1001110);
+    i2c.readMap.put(0x29, (byte) 0b11000000);
+    i2c.readMap.put(0x28, (byte) 0);
+    barometer.poll();
+    assertEquals(1260, barometer.getPressure(), 0.0005);
+  } 
+  
+  @Test
   public void readsOutsideOfBoundsOnStartup() {
     MockI2CDevice i2c = new MockI2CDevice();
     BarometerTime time = new BarometerTime();

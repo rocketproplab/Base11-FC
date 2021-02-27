@@ -5,15 +5,12 @@ import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.events.FlightStateListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.ParachuteListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.PositionListener;
-import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Barometer;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Solenoid;
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
-import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +21,10 @@ import java.util.List;
  * @author Max Apodaca, Chi Chow
  */
 public class ParachuteSubsystem
-        implements FlightStateListener, PositionListener, Subsystem,
-        PacketListener<SCMPacket> {
+        implements FlightStateListener, PositionListener, Subsystem {
 
-  private static ParachuteSubsystem instance;
+  private static final String             MAIN_CHUTE_TAG = "MainChute";
+  private static       ParachuteSubsystem instance;
 
   public static ParachuteSubsystem getInstance() {
     if (instance == null) {
@@ -38,14 +35,11 @@ public class ParachuteSubsystem
 
   private Solenoid             mainChute;
   private Solenoid             drogueChute;
-  private FlightMode           lastMode;
   private InterpolatingVector3 position;
   private Time                 time;
   private Barometer            barometer;
+  private Looper               looper;
 
-  private double                  lastPressureBelowThresholdTime = Double.NaN;
-  private boolean                 shouldEmitMainChuteOpen        = true;
-  private boolean                 shouldEmitDrogueChuteOpen      = true;
   private List<ParachuteListener> parachuteListeners;
 
   /**
@@ -59,10 +53,121 @@ public class ParachuteSubsystem
                             Time time, Barometer barometer) {
     this.mainChute          = mainChute;
     this.drogueChute        = drogueChute;
-    this.lastMode           = FlightMode.Sitting;
     this.time               = time;
     this.barometer          = barometer;
     this.parachuteListeners = new ArrayList<>();
+  }
+
+  /**
+   * Register drogue chute and main chute open conditions as
+   * events in the provided Looper.
+   *
+   * @param looper to register events to
+   */
+  @Override
+  public void prepare(Looper looper) {
+    this.looper = looper;
+  }
+
+  /**
+   * Determine whether the flight mode should trigger the drogue chute to open.
+   *
+   * @param flightMode FlightMode to test
+   * @return whether the drogue chute should open
+   */
+  private boolean shouldDrogueChuteOpenByFlightMode(FlightMode flightMode) {
+    return flightMode.ordinal() >= FlightMode.Apogee.ordinal();
+  }
+
+  private boolean shouldMainChuteOpenByPressure() {
+    Vector3 currentPos = this.position.getAt(time.getSystemTime());
+    boolean b1 = currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT;
+    boolean b2 = barometer.getPressure() < Settings.MAIN_CHUTE_PRESSURE;
+    return b1 && b2;
+//    return currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT &&
+//            barometer.getPressure() >= Settings.MAIN_CHUTE_PRESSURE;
+  }
+
+  private boolean shouldMainChuteCheckPressure(FlightMode flightMode) {
+    return this.position != null && flightMode == FlightMode.Falling;
+  }
+
+  /**
+   * Set drogueChute to active and
+   * emit drogue chute open event to all listeners.
+   */
+  private void drogueChuteOpen() {
+    boolean wasActive = drogueChute.isActive();
+    drogueChute.set(true);
+    if (!wasActive) {
+      for (ParachuteListener listener : parachuteListeners) {
+        listener.onDrogueOpen();
+      }
+    }
+  }
+
+  /**
+   * Set mainChute to active and
+   * emit main chute open event to all listeners.
+   */
+  private void mainChuteOpen() {
+    // remove main chute open event from Looper
+    if (this.looper.removeEvent(MAIN_CHUTE_TAG) == null) {
+      // TODO: Log that main chute was deployed because of pressure
+    }
+
+    boolean wasActive = mainChute.isActive();
+    mainChute.set(true);
+    if (!wasActive) {
+      for (ParachuteListener listener : parachuteListeners) {
+        listener.onMainChuteOpen();
+      }
+    }
+  }
+
+  /**
+   * Attempt to open the main chute
+   *
+   * @return    if the deployment was successful
+   */
+  public boolean attemptMainChuteOpen() {
+    /* TODO: Find a better way to check if the drogue chute is currently open,
+        and if the main chute deployed successfully */
+    if(drogueChute.isActive())
+      mainChuteOpen();
+    else {
+      return false;
+    }
+
+    return mainChute.isActive();
+  }
+
+  /**
+   * Attempt to open the drogue chute
+   *
+   * @return    if the deployment was successful
+   */
+  public boolean attemptDrogueChuteOpen() {
+    drogueChuteOpen();
+
+    // TODO: Find a better way to check if the drogue chute deployed successfully
+    return drogueChute.isActive();
+  }
+
+  @Override
+  public void onFlightModeChange(FlightMode newMode) {
+    if (shouldDrogueChuteOpenByFlightMode(newMode)) {
+      drogueChuteOpen();
+    }
+    if (shouldMainChuteCheckPressure(newMode)) {
+      looper.emitOnceIf(MAIN_CHUTE_TAG, Settings.MAIN_CHUTE_PRESSURE_TIME_THRESHOLD,
+              this::shouldMainChuteOpenByPressure, (tag, from) -> mainChuteOpen());
+    }
+  }
+
+  @Override
+  public void onPositionEstimate(InterpolatingVector3 positionEstimate) {
+    this.position = positionEstimate;
   }
 
   /**
@@ -72,93 +177,5 @@ public class ParachuteSubsystem
    */
   public void addParachuteListener(ParachuteListener parachuteListener) {
     parachuteListeners.add(parachuteListener);
-  }
-
-  @Override
-  public void onPacket(PacketDirection direction, SCMPacket packet) {
-    if (packet.getID() == SCMPacketType.DD) {
-      drogueChute.set(true);
-      drogueChuteOpenCallback();
-    } else if (packet.getID() == SCMPacketType.MD) {
-      mainChute.set(true);
-      mainChuteOpenCallback();
-    }
-  }
-
-  @Override
-  public void onFlightModeChange(FlightMode newMode) {
-    if (newMode == FlightMode.Apogee ||
-            newMode == FlightMode.Falling) {
-      drogueChute.set(true);
-      drogueChuteOpenCallback();
-    }
-    this.lastMode = newMode;
-  }
-
-  @Override
-  public void onPositionEstimate(InterpolatingVector3 positionEstimate) {
-    this.position = positionEstimate;
-  }
-
-  /**
-   * Update parachute state to determine whether the main chute should be deployed
-   */
-  @Override
-  public void update() {
-    if (this.position == null ||
-            this.lastMode != FlightMode.Falling) {
-      return;
-    }
-
-    Vector3 currentPos              = this.position.getAt(time.getSystemTime());
-    double  sinceBelowThresholdTime = sincePressureBelowThresholdTime();
-    if (currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT
-            && sinceBelowThresholdTime > Settings.MAIN_CHUTE_PRESSURE_TIME_THRESHOLD) {
-      this.mainChute.set(true);
-      mainChuteOpenCallback();
-    }
-  }
-
-  /**
-   * Calculate the time since the pressure was below the threshold to deploy the main chute
-   *
-   * @return time since pressure is below the threshold
-   */
-  private double sincePressureBelowThresholdTime() {
-    if (barometer.getPressure() >= Settings.MAIN_CHUTE_PRESSURE) {
-      lastPressureBelowThresholdTime = Double.NaN;
-      return -1;
-    }
-    if (Double.isNaN(lastPressureBelowThresholdTime)) {
-      lastPressureBelowThresholdTime = time.getSystemTime();
-      System.out.println(lastPressureBelowThresholdTime);
-    }
-    return time.getSystemTime() - lastPressureBelowThresholdTime;
-  }
-
-  /**
-   * Emit main chute open event to all listeners
-   */
-  private void mainChuteOpenCallback() {
-    if (!shouldEmitMainChuteOpen) {
-      return;
-    }
-    shouldEmitMainChuteOpen = false;
-    for (ParachuteListener listener : parachuteListeners) {
-      listener.onMainChuteOpen();
-    }
-  }
-
-  /**
-   * Emit drogue chute open event to all listeners
-   */
-  private void drogueChuteOpenCallback() {
-    if (!shouldEmitDrogueChuteOpen) {
-      return;
-    }
-    shouldEmitDrogueChuteOpen = false;
-    for (ParachuteListener listener : parachuteListeners) {
-      listener.onDrogueOpen();
-    }
   }
 }

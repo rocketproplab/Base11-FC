@@ -6,19 +6,8 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-/**
- * The settings class contains constants that will be loaded form disk on
- * startup. All constant values that might need to change in a debugging session
- * should be put here.
- */
 public class Settings {
 
   @SettingSectionHeader(name = "Flight State Settings")
@@ -37,12 +26,15 @@ public class Settings {
   @UserSetting(comment = "The pressure at which we should deploy the main chute", units = "hPa")
   public static double MAIN_CHUTE_PRESSURE = 0; // TODO: set main chute pressure
 
+  /**
+   * Time threshold needed to exceed to deploy the main chute
+   */
   @UserSetting(comment = "Time threshold needed to exceed to deploy the main chute", units = "s")
-  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 0; // TODO: set time exceeding the threshold needed to
+  public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 10; // TODO: set time exceeding the threshold needed to
                                                                // deploy main chute
-  
+
   public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
-  
+
   public static boolean[] ENGINE_ABORT_VALVE_STATES = {true, true, true, true, true};
 
   // Unit conversions
@@ -75,7 +67,7 @@ public class Settings {
   @UserSetting(comment = "'c' constant for quadratic regression for pressure transducers", units = "hPa")
   public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0 };
-  
+
   @UserSetting(comment = "Phone number to text position to", units = "1xxxyyyyyyy")
   public static String PHONE_NUMBER = "13150001111";
 
@@ -83,6 +75,20 @@ public class Settings {
 
   @UserSetting(comment = "Frequency of reference oscillator for the MAX14830, currently a LFXTAL003260 labeled X1 in the schematic.", units = "Hz")
   public static int MAX14830_F_REF = 3686400;
+  
+  @SettingSectionHeader(name = "LSM9DS1 settings")
+  
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_2G     = 0.00006103;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_4G     = 0.00012207;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_8G     = 0.00024414;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_16G    = 0.000732;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS     = 0.00875;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS     = 0.0175;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS    = 0.07;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS  = 0.00014;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_8GAUSS  = 0.00029;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_12GAUSS = 0.00043;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS = 0.00058;
 
   private static Set<Field> getSettingFields() {
     Set<Field> result = new LinkedHashSet<>();
@@ -234,7 +240,7 @@ public class Settings {
     }
   }
 
-  private static boolean readSettingsFromConfig(List<String> config) {
+  public static boolean readSettingsFromConfig(List<String> config, boolean checkOutOfDate) {
     Set<Field>          settingFields     = getSettingFields();
     Map<String, String> fieldNameValueMap = getFieldNameValueMap(config);
     boolean outOfDate = false;
@@ -242,14 +248,18 @@ public class Settings {
       String fieldName = getNameFromField(field);
       if (fieldNameValueMap.containsKey(fieldName)) {
         setFieldFromConfigLine(field, fieldNameValueMap.get(fieldName));
-      } else {
+      } else if (checkOutOfDate){
         System.err.println("Can't find key for " + fieldName);
         outOfDate = true;
       }
     }
     return outOfDate;
   }
-  
+
+  public static boolean readSettingsFromConfig(List<String> config) {
+    return readSettingsFromConfig(config, true);
+  }
+
   private static String getSettingsFileLocation() {
     String home = System.getProperty("user.home");
     return home + "/settings.cfg";

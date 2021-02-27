@@ -11,7 +11,7 @@ public class MockI2C implements I2CDevice {
   public HashMap<Integer, Byte> readMap  = new HashMap<>();
   public HashMap<Integer, Byte> writeMap = new HashMap<>();
   public byte[] data;
-  public int offset;
+  public int address;
   public int size;
 
   @Override
@@ -56,12 +56,7 @@ public class MockI2C implements I2CDevice {
 
   @Override
   public int read(byte[] buffer, int offset, int size) throws IOException {
-    this.size = size;
-    this.offset = offset;
-    for(int i = 0; i<data.length; i++) {
-      buffer[i] = data[i];
-    }
-    return data.length;
+	throw new UnsupportedOperationException();
   }
 
   @Override
@@ -71,7 +66,12 @@ public class MockI2C implements I2CDevice {
 
   @Override
   public int read(int address, byte[] buffer, int offset, int size) throws IOException {
-    return 0;
+	this.size = size;
+	this.address = address;
+	for(int i = 0; i<data.length && i<size; i++) {
+	  buffer[offset+i] = data[i];
+	}
+	return data.length;
   }
 
   @Override

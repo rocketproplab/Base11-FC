@@ -18,5 +18,4 @@ public class Time {
   public double getSystemTime() {
     return System.currentTimeMillis() / Settings.MS_PER_SECOND;
   }
-
 }

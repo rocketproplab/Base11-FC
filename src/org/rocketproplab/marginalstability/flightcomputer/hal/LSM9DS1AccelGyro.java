@@ -1,17 +1,21 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 
 import com.pi4j.io.i2c.I2CDevice;
 
 /**
- * The HAL implementation for the LSM9DS1, datasheet can be found here: <a
+ * The HAL implementation for the LSM9DS1 accelerometer and gyroscope sensors.
+ * Datasheet can be found here: <a
  * href=https://www.st.com/resource/en/datasheet/lsm9ds1.pdf>https://www.st.com/resource/en/datasheet/lsm9ds1.pdf</a><br>
  * 
  * Every time poll is called this sensor will acquire as many samples as
@@ -26,7 +30,7 @@ import com.pi4j.io.i2c.I2CDevice;
  * @author Max Apodaca
  *
  */
-public class LSM9DS1 implements PollingSensor, IMU {
+public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   private static final int ODR_MASK                    = 0b111;
   private static final int ODR_LSB_POS                 = 5;
   private static final int ACCELEROMETER_SCALE_MASK    = 0b11;
@@ -45,12 +49,15 @@ public class LSM9DS1 implements PollingSensor, IMU {
   public static final int  FIFO_THRESHOLD_STATUS_POS   = 7;
   public static final int  FIFO_SAMPLES_STORED_MASK    = 0b111111;
 
-  private static final int BYTES_PER_FIFO_LINE = 12;
-  private static final int BITS_PER_BYTE       = 8;
+  private static final int BYTES_PER_FIFO_LINE    = 12;
+  
+  public static final double ACCELEROMETER_OUTPUT_TO_MPS_SQUARED = 9.81;  // factor to multiply acc output by to
+                                                                          // convert sensor output to m/s^2
+  private static final double ONE_DEGREE_IN_RADIANS  = Math.PI / 180.0;
 
   /**
-   * All the registers that can be found in the LSM9DS1, this is taken directly
-   * from the datasheet.
+   * All the registers that can be found in the LSM9DS1 imu for the accelerometer
+   * and gyroscope sensors. This is taken directly from the datasheet.
    */
   public enum Registers {
     ACT_THS(0x04),
@@ -121,57 +128,6 @@ public class LSM9DS1 implements PollingSensor, IMU {
     }
   }
 
-  /**
-   * An interface to make accessing each value of a register easier. The
-   * {@link #getValueMask()} returns a bitmask of what section of the register
-   * should be read and the {@link #getValueLSBPos()} method returns how many bits
-   * to the left of the LSB the LSB of the value is.
-   * 
-   * @author Max Apodaca
-   *
-   */
-  public interface RegisterValue {
-
-    /**
-     * Get a mask for the register in which this value is in. The mask will only
-     * cover the specified value. <br>
-     * For instance a register with three values aabbbccc would mean that value a
-     * has a mask of 0b11000000;
-     * 
-     * @return the mask for this value for its register
-     */
-    public int getValueMask();
-
-    /**
-     * Get how many bits to the left of the register's LSB the LSB of the value is.
-     * <br>
-     * For instance if we have a register with three values aabbbccc the LSBPos for
-     * value b would be 3 as the LSB of b is three bits to the left of the LSB of
-     * the register as a whole. The LSBPos of c would be 0 and the LSBPos of a would
-     * be 6.
-     * 
-     * @return how many bits to the left of the register's LSB the LSB of the value
-     *         is
-     */
-    public int getValueLSBPos();
-
-    /**
-     * The value associated with the given register value. Setting the appropriate
-     * bits in the value's register to this value will result in application of the
-     * value. <br>
-     * If this instance corresponds to a value of 01 for a in the register aabbbccc
-     * then ordinal would return 0b01.<br>
-     * <br>
-     * <b>NOTE</b>: the implementation relies on enums which means the enum values
-     * must be ordered correctly to yield a correct return value for ordinal. If the
-     * enum has 2 members A_0 and A_1 and A_0 should have value 0 then A_0 must be
-     * the first element in the enum.
-     * 
-     * @return the value of this value
-     */
-    public int ordinal();
-  }
-
   public enum ODR implements RegisterValue {
     ODR_OFF,
     ODR_14_9,
@@ -209,6 +165,11 @@ public class LSM9DS1 implements PollingSensor, IMU {
       return ACCELEROMETER_SCALE_LSB_POS;
     }
   }
+  /**
+   * The current accelerometer scale the sensor is set to.
+   * Initialize to default value as specified in sensor datasheet.
+   */
+  private AccelerometerScale accelScale = AccelerometerScale.G_2;
 
   public enum GyroScale implements RegisterValue {
     DPS_245,
@@ -230,6 +191,11 @@ public class LSM9DS1 implements PollingSensor, IMU {
       return GYRO_SCALE_LSB_POS;
     }
   }
+  /**
+   * The current gyroscope scale the sensor is set to.
+   * Initialize to default value as specified in sensor datasheet.
+   */
+  private GyroScale gyroScale = GyroScale.DPS_245;
 
   public enum FIFOMode implements RegisterValue {
     BYPASS,
@@ -260,15 +226,15 @@ public class LSM9DS1 implements PollingSensor, IMU {
   }
 
   private I2CDevice              i2c;
-  private ArrayDeque<IMUReading> samples = new ArrayDeque<>();
+  private ArrayDeque<AccelGyroReading> samples = new ArrayDeque<>();
 
   /**
-   * Create a new LSM9DS1 on the given {@link I2CDevice}. There is no validation
-   * for the {@link I2CDevice} address.
+   * Create a new LSM9DS1AccelGyro on the given {@link I2CDevice}. There is no
+   * validation for the {@link I2CDevice} address.
    * 
    * @param device the device to use for I2C communication
    */
-  public LSM9DS1(I2CDevice device) {
+  public LSM9DS1AccelGyro(I2CDevice device) {
     this.i2c = device;
   }
 
@@ -278,7 +244,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
    * @throws IOException if unable to read
    */
   public void setODR(ODR odr) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG1_G, odr);
+    modifyRegister(Registers.CTRL_REG1_G, odr);
   }
 
   /**
@@ -288,7 +254,16 @@ public class LSM9DS1 implements PollingSensor, IMU {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setAccelerometerScale(AccelerometerScale scale) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG6_XL, scale);
+    modifyRegister(Registers.CTRL_REG6_XL, scale);
+    accelScale = scale;
+  }
+  
+  /**
+   * Returns the scale of the accelerometer
+   * @return the set accelerometer scale
+   */
+  public AccelerometerScale getAccelerometerScale() {
+    return accelScale;
   }
 
   /**
@@ -298,7 +273,16 @@ public class LSM9DS1 implements PollingSensor, IMU {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setGyroscopeScale(GyroScale scale) throws IOException {
-    genericRegisterWrite(Registers.CTRL_REG1_G, scale);
+    modifyRegister(Registers.CTRL_REG1_G, scale);
+    gyroScale = scale;
+  }
+  
+  /**
+   * Returns the scale of the gyroscope
+   * @return the set gyroscope scale
+   */
+  public GyroScale getGyroscopeScale() {
+    return gyroScale;
   }
 
   /**
@@ -320,7 +304,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
    * @throws IOException if we are unable to access the i2c device
    */
   public void setFIFOMode(FIFOMode mode) throws IOException {
-    genericRegisterWrite(Registers.FIFO_CTRL, mode);
+    modifyRegister(Registers.FIFO_CTRL, mode);
   }
 
   /**
@@ -387,7 +371,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
    *                 {@link RegisterValue}
    * @throws IOException if we are unable to access the i2c device
    */
-  private void genericRegisterWrite(Registers register, RegisterValue value) throws IOException {
+  private void modifyRegister(Registers register, RegisterValue value) throws IOException {
     int registerValue = this.i2c.read(register.getAddress());
     int result        = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
     this.i2c.write(register.getAddress(), (byte) result);
@@ -440,7 +424,7 @@ public class LSM9DS1 implements PollingSensor, IMU {
       }
       int    dataLength  = samplesInFIFO * BYTES_PER_FIFO_LINE;
       byte[] data        = new byte[dataLength];
-      int    samplesRead = this.i2c.read(data, Registers.OUT_X_L_G.getAddress(), dataLength);
+      int    samplesRead = this.i2c.read(Registers.OUT_X_L_G.getAddress(), data, 0, dataLength);
       this.parseReadings(data, samplesRead);
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
@@ -463,19 +447,19 @@ public class LSM9DS1 implements PollingSensor, IMU {
       int        start   = i * BYTES_PER_FIFO_LINE;
       int        end     = (i + 1) * BYTES_PER_FIFO_LINE;
       byte[]     samples = Arrays.copyOfRange(data, start, end);
-      IMUReading reading = this.buildReading(samples);
+      AccelGyroReading reading = this.buildReading(samples);
       this.samples.add(reading);
     }
   }
 
   /**
-   * Parse a set of BYTES_PER_FIFO_LINE bytes into an IMUReading. <br>
-   * TODO Use range to normalize to m/s^2
+   * Parse a set of BYTES_PER_FIFO_LINE bytes into an AccelGyroReading. <br>
+   * Use range to normalize to m/s^2
    * 
-   * @param data the set of six bites representing a reading
-   * @return the IMUReading which the six bytes belong to.
+   * @param data the set of six bytes representing a reading
+   * @return the AccelGyroReading which the six bytes belong to.
    */
-  public IMUReading buildReading(byte[] data) {
+  public AccelGyroReading buildReading(byte[] data) {
     int[] results = this.getData(data);
 
     int xGyro = results[0];
@@ -485,9 +469,9 @@ public class LSM9DS1 implements PollingSensor, IMU {
     int yAcc  = results[4];
     int zAcc  = results[5];
 
-    Vector3 gyroVec = new Vector3(xGyro, yGyro, zGyro);
-    Vector3 accVec  = new Vector3(xAcc, yAcc, zAcc);
-    return new IMUReading(accVec, gyroVec);
+    Vector3 gyroVec = computeAngularAcceleration(xGyro, yGyro, zGyro);
+    Vector3 accVec  = computeAcceleration(xAcc, yAcc, zAcc);
+    return new AccelGyroReading(accVec, gyroVec);
   }
 
   /**
@@ -499,24 +483,93 @@ public class LSM9DS1 implements PollingSensor, IMU {
    * @return array of the shorts
    */
   private int[] getData(byte[] data) {
+    ByteBuffer byteBuffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
     int[] results = new int[data.length / 2];
     for (int i = 0; i < data.length / 2; i++) {
-      short low    = (short) (char) data[i * 2];
-      short high   = (short) (char) data[i * 2 + 1];
-      short result = (short) (low | (high << BITS_PER_BYTE));
-      results[i] = result;
+      results[i] = byteBuffer.getShort(i * 2); // i * 2 = index of low byte
     }
     return results;
   }
 
   @Override
-  public IMUReading getNext() {
+  public AccelGyroReading getNext() {
     return samples.pollFirst();
   }
 
   @Override
   public boolean hasNext() {
     return !samples.isEmpty();
+  }
+  
+  /**
+   * Converts accelerometer readings to m/s^2. Uses the current accelerometer scale setting.
+   * @param accX x-axis reading from accelerometer
+   * @param accY y-axis reading from accelerometer
+   * @param accZ z-axis reading from accelerometer
+   * @return the acceleration vector in m/s^2
+   */
+  public Vector3 computeAcceleration(int accX, int accY, int accZ) {
+    // Get the accelerometer sensitivity.
+    double sensitivity;
+    switch(accelScale) {
+    case G_2:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_2G;
+      break;
+    case G_4:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_4G;
+      break;
+    case G_8:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_8G;
+      break;
+    case G_16:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G;
+      break;
+    default:
+      throw new IllegalStateException("Sensor has an unknown accelerometer scale.");
+    }
+    
+    // This factor converts accelerometer readings to m/s^2
+    double conversionFactor = sensitivity * ACCELEROMETER_OUTPUT_TO_MPS_SQUARED;
+    
+    return new Vector3(
+        accX * conversionFactor,
+        accY * conversionFactor,
+        accZ * conversionFactor
+    );
+  }
+  
+  /**
+   * Converts gyroscope readings to radians per second. Uses the current gyroscope scale setting.
+   * @param gyroX x-axis reading from gyroscope
+   * @param gyroY y-axis reading from gyroscope
+   * @param gyroZ z-axis reading from gyroscope
+   * @return the rotation vector in radians per second
+   */
+  public Vector3 computeAngularAcceleration(int gyroX, int gyroY, int gyroZ) {
+    // Get the gyroscope sensitivity.
+    double sensitivity;
+    switch(gyroScale) {
+    case DPS_245:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS;
+      break;
+    case DPS_500:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS;
+      break;
+    case DPS_2000:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS;
+      break;
+    default:
+      throw new IllegalStateException("Sensor has an unknown gyroscope scale.");
+    }
+    
+    // This factor converts gyroscope readings to radians per second
+    double conversionFactor = sensitivity * ONE_DEGREE_IN_RADIANS;
+    
+    return new Vector3(
+        gyroX * conversionFactor,
+        gyroY * conversionFactor,
+        gyroZ * conversionFactor
+    );
   }
 
 }
