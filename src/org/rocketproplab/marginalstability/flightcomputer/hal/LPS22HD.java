@@ -2,6 +2,8 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import java.io.IOException;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 
 import com.pi4j.io.i2c.I2CDevice;
@@ -55,8 +57,9 @@ public class LPS22HD implements Barometer, PollingSensor {
     try {
       i2cDevice.write(CTRL_REG1, (byte) (ODR_25HZ | LOW_PASS_ENABLE | LOW_PASS_20TH | KEEP_REGISTERS_SYCHONISED_BDU));
     } catch (IOException e) {
-      // TODO report IO Error
-      e.printStackTrace();
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Unable to write from i2cDevice IO Exception";
+      errorReporter.reportError(Errors.LPS22HD_INITIALIZATION_ERROR, e, errorMsg);
     }
   }
 
@@ -112,8 +115,9 @@ public class LPS22HD implements Barometer, PollingSensor {
           + Byte.toUnsignedInt(buffer[0]);
       pressure = rawPressure / (double) SCALING_FACTOR;
     } catch (IOException e) {
-      // TODO Report IO Error
-      e.printStackTrace();
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Unable to read Pressure from i2cDevice IO Exception";
+      errorReporter.reportError(Errors.LPS22HD_PRESSURE_IO_ERROR, e, errorMsg);
     }
     sampleTime = clock.getSystemTime();
   }

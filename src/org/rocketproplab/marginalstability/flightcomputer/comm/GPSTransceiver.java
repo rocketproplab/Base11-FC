@@ -1,5 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 
 /**
@@ -28,8 +30,9 @@ public class GPSTransceiver implements SerialListener {
     if (packet.isValid()) {
       router.recivePacket(packet, PacketSources.GPS);
     } else {
-      System.out.println("Got invalid packet " + data + "!");
-      // TODO report error
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Got invalid packet " + data + "!\"";
+      errorReporter.reportError(errorMsg);
     }
 
   }

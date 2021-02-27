@@ -1,5 +1,8 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
+
 /**
  * A packet for the SCMProtocol to convert between the object and string
  * representation. <br>
@@ -74,8 +77,9 @@ public class SCMPacket {
     try {
       checksum = Integer.parseInt(strChecksum);
     } catch (NumberFormatException exception) {
-      // System.out.println("Unable to parse checksum in " + packet);
-      // TODO report error
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String        errorMsg      = "Unable to parse checksum in " + packet;
+      errorReporter.reportError(null, exception, errorMsg);
       this.isValid = false;
       return;
     }
@@ -84,8 +88,9 @@ public class SCMPacket {
       try {
         this.id = SCMPacketType.valueOf(packetComponents[0]);
       } catch (IllegalArgumentException illegalArg) {
-        // System.out.println("Got bad packet ID (" + packetComponents[0] + ")!");
-        // TODO report error to error reporter
+        ErrorReporter errorReporter = ErrorReporter.getInstance();
+        String        errorMsg      = "Got bad packet ID (" + packetComponents[0] + ")!";
+        errorReporter.reportError(null, illegalArg, errorMsg);
       }
       this.data = packetComponents[1];
       this.validate();
@@ -179,14 +184,13 @@ public class SCMPacket {
       addedASCII += packet.charAt(i);
     }
     int calculatedChecksum = addedASCII % 100;
-    
+
     if (calculatedChecksum < 10) {
-    	packet = packet + "0" + Integer.toString(calculatedChecksum) + ";";
+      packet = packet + "0" + Integer.toString(calculatedChecksum) + ";";
+    } else {
+      packet = packet + Integer.toString(calculatedChecksum) + ";";
     }
-    else {
-    	packet = packet + Integer.toString(calculatedChecksum) + ";";
-    }
-    
+
     return packet;
   }
 

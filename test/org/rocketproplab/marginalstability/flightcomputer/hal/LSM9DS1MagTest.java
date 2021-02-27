@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1Mag.MODE;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1Mag.ODR;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1Mag.PERFORMANCE_XY;
@@ -48,6 +49,22 @@ public class LSM9DS1MagTest {
     sensor.setScale(SCALE.GAUSS_12);
     ctrlReg2M = mockI2C.writeMap.get(Registers.CTRL_REG2_M.getAddress());
     assertEquals((byte) 0b11011111, ctrlReg2M);
+  }
+  
+  @Test
+  public void getScaleReturnsCorrectScale() throws IOException {
+    mockI2C.readMap.put(Registers.CTRL_REG2_M.getAddress(), (byte) 0);
+    assertEquals(sensor.getScale(), SCALE.GAUSS_4);
+    
+    sensor.setScale(SCALE.GAUSS_8);
+    assertEquals(sensor.getScale(), SCALE.GAUSS_8);
+    assertNotEquals(sensor.getScale(), SCALE.GAUSS_4);
+    
+    sensor.setScale(SCALE.GAUSS_12);
+    assertEquals(sensor.getScale(), SCALE.GAUSS_12);
+    
+    sensor.setScale(SCALE.GAUSS_16);
+    assertEquals(sensor.getScale(), SCALE.GAUSS_16);
   }
   
   @Test
@@ -148,8 +165,8 @@ public class LSM9DS1MagTest {
     byte[]     data        = new byte[] { 0, -0x80, 0x12, 0x34, 0x78, 0x56 };
     MagReading reading     = sensor.buildReading(data);
     Vector3 mag            = reading.getMagneticField();
-    Vector3 expectedMag    = new Vector3(-0x8000, 0x3412, 0x5678);
-    assertEquals(expectedMag, mag);
+    int expectedMagReadingX = -0x8000, expectedMagReadingY = 0x3412, expectedMagReadingZ = 0x5678;
+    assertEquals(sensor.computeMagneticField(expectedMagReadingX, expectedMagReadingY, expectedMagReadingZ), mag);
   }
   
   @Test
@@ -161,8 +178,8 @@ public class LSM9DS1MagTest {
     assertTrue(sensor.hasNext());
     MagReading reading     = sensor.getNext();
     Vector3    mag         = reading.getMagneticField();
-    Vector3    expectedMag = new Vector3(-0x8000, 0x3412, 0x5678);
-    assertEquals(expectedMag, mag);
+    int expectedMagReadingX = -0x8000, expectedMagReadingY = 0x3412, expectedMagReadingZ = 0x5678;
+    assertEquals(sensor.computeMagneticField(expectedMagReadingX, expectedMagReadingY, expectedMagReadingZ), mag);
   }
   
   @Test
@@ -181,16 +198,38 @@ public class LSM9DS1MagTest {
     assertTrue(sensor.hasNext());
     MagReading reading     = sensor.getNext();
     Vector3    mag         = reading.getMagneticField();
-    Vector3    expectedMag = new Vector3(-0x8000, 0x3412, 0x5678);
-    assertEquals(expectedMag, mag);
+    int expectedMagReadingX = -0x8000, expectedMagReadingY = 0x3412, expectedMagReadingZ = 0x5678;
+    assertEquals(sensor.computeMagneticField(expectedMagReadingX, expectedMagReadingY, expectedMagReadingZ), mag);
     
     assertTrue(sensor.hasNext());
     reading     = sensor.getNext();
     mag         = reading.getMagneticField();
-    expectedMag = new Vector3(0x3513, 0x5471, 0x1301);
-    assertEquals(expectedMag, mag);
+    expectedMagReadingX = 0x3513; expectedMagReadingY = 0x5471; expectedMagReadingZ = 0x1301;
+    assertEquals(sensor.computeMagneticField(expectedMagReadingX, expectedMagReadingY, expectedMagReadingZ), mag);
     
     assertFalse(sensor.hasNext());
+  }
+  
+  @Test
+  public void computeMagneticFieldReturnsCorrectResult() throws IOException {
+    mockI2C.readMap.put(Registers.CTRL_REG2_M.getAddress(), (byte) 0);
+    int magReadingX = 4547, magReadingY = 18548, magReadingZ = 87;
+    assertEquals(sensor.computeMagneticField(magReadingX, magReadingY, magReadingZ),
+                 new Vector3(magReadingX * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS,
+                     magReadingY * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS,
+                     magReadingZ * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS));
+    
+    sensor.setScale(SCALE.GAUSS_16);
+    assertEquals(sensor.computeMagneticField(magReadingX, magReadingY, magReadingZ),
+        new Vector3(magReadingX * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS,
+            magReadingY * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS,
+            magReadingZ * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS));
+    
+    magReadingX = 32767; magReadingY = 32767; magReadingZ = 32767;
+    assertEquals(sensor.computeMagneticField(magReadingX, magReadingY, magReadingZ),
+        new Vector3(magReadingX * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS,
+            magReadingY * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS,
+            magReadingZ * Settings.LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS));
   }
 
 }
