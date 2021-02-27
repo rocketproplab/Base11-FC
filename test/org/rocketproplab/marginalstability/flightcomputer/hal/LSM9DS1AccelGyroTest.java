@@ -1,6 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -8,6 +9,7 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1AccelGyro.AccelerometerScale;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1AccelGyro.FIFOMode;
 import org.rocketproplab.marginalstability.flightcomputer.hal.LSM9DS1AccelGyro.GyroScale;
@@ -50,6 +52,22 @@ public class LSM9DS1AccelGyroTest {
     ctrlReg6XL = mockI2C.writeMap.get(Registers.CTRL_REG6_XL.getAddress());
     assertEquals((byte) 0b11110111, ctrlReg6XL);
   }
+  
+  @Test
+  public void getAccScaleReturnsCorrectScale() throws IOException {
+    mockI2C.readMap.put(LSM9DS1AccelGyro.Registers.CTRL_REG6_XL.getAddress(), (byte) 0);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_2);
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_4);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_4);
+    assertNotEquals(imu.getAccelerometerScale(), AccelerometerScale.G_2);
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_8);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_8);
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_16);
+    assertEquals(imu.getAccelerometerScale(), AccelerometerScale.G_16);
+  }
 
   @Test
   public void setGyroScaleSetsScaleInREG1G() throws IOException {
@@ -62,6 +80,19 @@ public class LSM9DS1AccelGyroTest {
     imu.setGyroscopeScale(GyroScale.DPS_245);
     ctrlReg1G = mockI2C.writeMap.get(Registers.CTRL_REG1_G.getAddress());
     assertEquals((byte) 0b11100111, ctrlReg1G);
+  }
+  
+  @Test
+  public void getGyroScaleReturnsCorrectScale() throws IOException {
+    mockI2C.readMap.put(LSM9DS1AccelGyro.Registers.CTRL_REG1_G.getAddress(), (byte) 0);
+    assertEquals(imu.getGyroscopeScale(), GyroScale.DPS_245);
+    
+    imu.setGyroscopeScale(GyroScale.DPS_500);
+    assertEquals(imu.getGyroscopeScale(), GyroScale.DPS_500);
+    assertNotEquals(imu.getGyroscopeScale(), GyroScale.DPS_245);
+    
+    imu.setGyroscopeScale(GyroScale.DPS_2000);
+    assertEquals(imu.getGyroscopeScale(), GyroScale.DPS_2000);
   }
 
   @Test
@@ -170,11 +201,11 @@ public class LSM9DS1AccelGyroTest {
     byte[]     data        = new byte[] { 0, -0x80, 0x12, 0x34, 0x78, 0x56, 0, 0, -1, -1, 6, 0 };
     AccelGyroReading reading     = imu.buildReading(data);
     Vector3    acc         = reading.getXYZAcceleration();
-    Vector3    expectedAcc = new Vector3(0, -1, 6);
-    assertEquals(expectedAcc, acc);
+    int expectedAccReadingX = 0, expectedAccReadingY = -1, expectedAccReadingZ = 6;
+    assertEquals(imu.computeAcceleration(expectedAccReadingX, expectedAccReadingY, expectedAccReadingZ), acc);
     Vector3 gyro         = reading.getXYZRotation();
-    Vector3 expectedGyro = new Vector3(-0x8000, 0x3412, 0x5678);
-    assertEquals(expectedGyro, gyro);
+    int expectedGyroReadingX = -0x8000, expectedGyroReadingY = 0x3412, expectedGyroReadingZ = 0x5678;
+    assertEquals(imu.computeAngularAcceleration(expectedGyroReadingX, expectedGyroReadingY, expectedGyroReadingZ), gyro);
   }
 
   @Test
@@ -184,11 +215,11 @@ public class LSM9DS1AccelGyroTest {
     imu.poll();
     AccelGyroReading reading     = imu.getNext();
     Vector3    acc         = reading.getXYZAcceleration();
-    Vector3    expectedAcc = new Vector3(0, -1, 6);
-    assertEquals(expectedAcc, acc);
+    int expectedAccReadingX = 0, expectedAccReadingY = -1, expectedAccReadingZ = 6;
+    assertEquals(imu.computeAcceleration(expectedAccReadingX, expectedAccReadingY, expectedAccReadingZ), acc);
     Vector3 gyro         = reading.getXYZRotation();
-    Vector3 expectedGyro = new Vector3(-0x8000, 0x3412, 0x5678);
-    assertEquals(expectedGyro, gyro);
+    int expectedGyroReadingX = -0x8000, expectedGyroReadingY = 0x3412, expectedGyroReadingZ = 0x5678;
+    assertEquals(imu.computeAngularAcceleration(expectedGyroReadingX, expectedGyroReadingY, expectedGyroReadingZ), gyro);
   }
 
   @Test
@@ -198,11 +229,11 @@ public class LSM9DS1AccelGyroTest {
     imu.poll();
     AccelGyroReading reading     = imu.getNext();
     Vector3    acc         = reading.getXYZAcceleration();
-    Vector3    expectedAcc = new Vector3(0, -1, 6);
-    assertEquals(expectedAcc, acc);
+    int expectedAccReadingX = 0, expectedAccReadingY = -1, expectedAccReadingZ = 6;
+    assertEquals(imu.computeAcceleration(expectedAccReadingX, expectedAccReadingY, expectedAccReadingZ), acc);
     Vector3 gyro         = reading.getXYZRotation();
-    Vector3 expectedGyro = new Vector3(-0x8000, 0x3412, 0x5678);
-    assertEquals(expectedGyro, gyro);
+    int expectedGyroReadingX = -0x8000, expectedGyroReadingY = 0x3412, expectedGyroReadingZ = 0x5678;
+    assertEquals(imu.computeAngularAcceleration(expectedGyroReadingX, expectedGyroReadingY, expectedGyroReadingZ), gyro);
   }
 
   @Test
@@ -213,19 +244,67 @@ public class LSM9DS1AccelGyroTest {
     imu.poll();
     AccelGyroReading reading     = imu.getNext();
     Vector3    acc         = reading.getXYZAcceleration();
-    Vector3    expectedAcc = new Vector3(0, -1, 6);
-    assertEquals(expectedAcc, acc);
+    int expectedAccReadingX = 0, expectedAccReadingY = -1, expectedAccReadingZ = 6;
+    assertEquals(imu.computeAcceleration(expectedAccReadingX, expectedAccReadingY, expectedAccReadingZ), acc);
     Vector3 gyro         = reading.getXYZRotation();
-    Vector3 expectedGyro = new Vector3(-0x8000, 0x3412, 0x5678);
-    assertEquals(expectedGyro, gyro);
+    int expectedGyroReadingX = -0x8000, expectedGyroReadingY = 0x3412, expectedGyroReadingZ = 0x5678;
+    assertEquals(imu.computeAngularAcceleration(expectedGyroReadingX, expectedGyroReadingY, expectedGyroReadingZ), gyro);
+    
     assertTrue(imu.hasNext());
     reading     = imu.getNext();
     acc         = reading.getXYZAcceleration();
-    expectedAcc = new Vector3(0, 0x100, 0);
-    assertEquals(expectedAcc, acc);
+    expectedAccReadingX = 0; expectedAccReadingY = 0x100; expectedAccReadingZ = 0;
+    assertEquals(imu.computeAcceleration(expectedAccReadingX, expectedAccReadingY, expectedAccReadingZ), acc);
     gyro         = reading.getXYZRotation();
-    expectedGyro = new Vector3(0x300, 0x100, 0);
-    assertEquals(expectedGyro, gyro);
+    expectedGyroReadingX = 0x300; expectedGyroReadingY = 0x100; expectedGyroReadingZ = 0;
+    assertEquals(imu.computeAngularAcceleration(expectedGyroReadingX, expectedGyroReadingY, expectedGyroReadingZ), gyro);
+
     assertFalse(imu.hasNext());
+  }
+  
+  @Test
+  public void computeAccelerationReturnsCorrectResult() throws IOException {
+    mockI2C.readMap.put(LSM9DS1AccelGyro.Registers.CTRL_REG6_XL.getAddress(), (byte) 0);
+    int accReadingX = 53, accReadingY = 28135, accReadingZ = 18343;
+    assertEquals(imu.computeAcceleration(accReadingX, accReadingY, accReadingZ),
+                 new Vector3(accReadingX * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_2G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED,
+                     accReadingY * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_2G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED,
+                     accReadingZ * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_2G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED));
+    
+    imu.setAccelerometerScale(AccelerometerScale.G_16);
+    assertEquals(imu.computeAcceleration(accReadingX, accReadingY, accReadingZ),
+        new Vector3(accReadingX * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED,
+            accReadingY * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED,
+            accReadingZ * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED));
+    
+    accReadingX = 32767; accReadingY = 32767; accReadingZ = 32767;
+    assertEquals(imu.computeAcceleration(accReadingX, accReadingY, accReadingZ),
+        new Vector3(accReadingX * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED,
+            accReadingY * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED,
+            accReadingZ * Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G * LSM9DS1AccelGyro.ACCELEROMETER_OUTPUT_TO_MPS_SQUARED));
+  }
+  
+  @Test
+  public void computeAngularAccelerationReturnsCorrectResult() throws IOException {
+    final double ONE_DEGREE_IN_RADIANS  = Math.PI / 180.0;
+    
+    mockI2C.readMap.put(LSM9DS1AccelGyro.Registers.CTRL_REG1_G.getAddress(), (byte) 0);
+    int gyroReadingX = 53, gyroReadingY = 28135, gyroReadingZ = 18343;
+    assertEquals(imu.computeAngularAcceleration(gyroReadingX, gyroReadingY, gyroReadingZ),
+                 new Vector3(gyroReadingX * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS * ONE_DEGREE_IN_RADIANS,
+                     gyroReadingY * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS * ONE_DEGREE_IN_RADIANS,
+                     gyroReadingZ * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS * ONE_DEGREE_IN_RADIANS));
+    
+    imu.setGyroscopeScale(GyroScale.DPS_2000);
+    assertEquals(imu.computeAngularAcceleration(gyroReadingX, gyroReadingY, gyroReadingZ),
+        new Vector3(gyroReadingX * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS * ONE_DEGREE_IN_RADIANS,
+            gyroReadingY * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS * ONE_DEGREE_IN_RADIANS,
+            gyroReadingZ * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS * ONE_DEGREE_IN_RADIANS));
+    
+    gyroReadingX = 32767; gyroReadingY = 32767; gyroReadingZ = 32767;
+    assertEquals(imu.computeAngularAcceleration(gyroReadingX, gyroReadingY, gyroReadingZ),
+        new Vector3(gyroReadingX * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS * ONE_DEGREE_IN_RADIANS,
+            gyroReadingY * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS * ONE_DEGREE_IN_RADIANS,
+            gyroReadingZ * Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS * ONE_DEGREE_IN_RADIANS));
   }
 }
