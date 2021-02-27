@@ -3,6 +3,9 @@ package org.rocketproplab.marginalstability.flightcomputer.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
+
+@Ignore
 public class TestMethods {
 
   public interface Executable {
