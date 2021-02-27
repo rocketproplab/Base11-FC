@@ -31,11 +31,11 @@ public class Settings {
    */
   @UserSetting(comment = "Time threshold needed to exceed to deploy the main chute", units = "s")
   public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 10; // TODO: set time exceeding the threshold needed to
-                                                               // deploy main chute
+                                                                // deploy main chute
 
-  public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
+  public static boolean[] ENGINE_ON_VALVE_STATES = { true, true, true, true, true };
 
-  public static boolean[] ENGINE_ABORT_VALVE_STATES = {true, true, true, true, true};
+  public static boolean[] ENGINE_ABORT_VALVE_STATES = { true, true, true, true, true };
 
   // Unit conversions
 
@@ -53,11 +53,6 @@ public class Settings {
 
   @UserSetting(comment = "Threshold for periodic heart beat signal", units = "s")
   public static double HEARTBEAT_THRESHOLD = 1;
-  
-  @SettingSectionHeader(name = "Statistic Collection")
-  
-  @UserSetting(comment = "Period at which sensores are sampled for statistic reporting.", units = "s")
-  public static double STATISTIC_SENSORE_SAMPLE_RATE = 0.01;
 
   @SettingSectionHeader(name = "PT Quadratic Regression")
 
@@ -80,9 +75,9 @@ public class Settings {
 
   @UserSetting(comment = "Frequency of reference oscillator for the MAX14830, currently a LFXTAL003260 labeled X1 in the schematic.", units = "Hz")
   public static int MAX14830_F_REF = 3686400;
-  
+
   @SettingSectionHeader(name = "LSM9DS1 settings")
-  
+
   public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_2G     = 0.00006103;
   public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_4G     = 0.00012207;
   public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_8G     = 0.00024414;
@@ -202,20 +197,22 @@ public class Settings {
     return fieldNameValueMap;
   }
 
-  protected static void setFieldDoubleArray(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldDoubleArray(Field field, String line)
+      throws IllegalArgumentException, IllegalAccessException {
     line = line.trim().replace("[", "").replace("]", "");
-    String[] newValues = line.split(",");
+    String[] newValues   = line.split(",");
     double[] fieldValues = (double[]) field.get(null);
-    if(newValues.length != fieldValues.length) {
+    if (newValues.length != fieldValues.length) {
       System.err.println("Array length mismatch: " + line);
     }
     int minValid = Math.min(fieldValues.length, newValues.length);
-    for(int i = 0; i<minValid; i++) {
+    for (int i = 0; i < minValid; i++) {
       fieldValues[i] = Double.parseDouble(newValues[i].trim());
     }
   }
 
-  protected static void setFieldDouble(Field field, String line) throws IllegalArgumentException, IllegalAccessException {
+  protected static void setFieldDouble(Field field, String line)
+      throws IllegalArgumentException, IllegalAccessException {
     line = line.trim();
     double value = Double.parseDouble(line);
     field.set(null, value);
@@ -248,12 +245,12 @@ public class Settings {
   public static boolean readSettingsFromConfig(List<String> config, boolean checkOutOfDate) {
     Set<Field>          settingFields     = getSettingFields();
     Map<String, String> fieldNameValueMap = getFieldNameValueMap(config);
-    boolean outOfDate = false;
+    boolean             outOfDate         = false;
     for (Field field : settingFields) {
       String fieldName = getNameFromField(field);
       if (fieldNameValueMap.containsKey(fieldName)) {
         setFieldFromConfigLine(field, fieldNameValueMap.get(fieldName));
-      } else if (checkOutOfDate){
+      } else if (checkOutOfDate) {
         System.err.println("Can't find key for " + fieldName);
         outOfDate = true;
       }
@@ -271,15 +268,15 @@ public class Settings {
   }
 
   public static void readSettings() {
-    String configFileLocation = getSettingsFileLocation();
-    List<String> lines = Collections.emptyList();
+    String       configFileLocation = getSettingsFileLocation();
+    List<String> lines              = Collections.emptyList();
     try {
       lines = Files.readAllLines(Paths.get(configFileLocation));
-    } catch(IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     boolean outOfDate = readSettingsFromConfig(lines);
-    if(!outOfDate) {
+    if (!outOfDate) {
       return;
     }
     String config = getConfigContents();
