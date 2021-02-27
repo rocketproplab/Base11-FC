@@ -2,6 +2,8 @@ package org.rocketproplab.marginalstability.flightcomputer.math;
 
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 import org.rocketproplab.marginalstability.flightcomputer.hal.SamplableSensor;
+import org.rocketproplab.marginalstability.flightcomputer.looper.EventCallback;
+import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 
 /**
@@ -10,7 +12,7 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
  * @author Max
  *
  */
-public class StatisticReporter {
+public class StatisticReporter implements EventCallback {
 
   private Telemetry               telemetry;
   private SCMPacketType           meanType;
@@ -121,6 +123,11 @@ public class StatisticReporter {
    */
   public void setLookbackTime(double time) {
     this.lookbackTime = time;
+  }
+
+  @Override
+  public void onLooperCallback(Object tag, Looper from) {
+    this.report();
   }
 
 }
