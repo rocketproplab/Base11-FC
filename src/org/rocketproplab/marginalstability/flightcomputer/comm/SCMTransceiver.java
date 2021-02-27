@@ -1,5 +1,7 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.SerialPort;
@@ -40,8 +42,9 @@ public class SCMTransceiver implements SerialListener, PacketListener<SCMPacket>
     if (packet.isValid()) {
       router.recivePacket(packet, this.source);
     } else {
-      System.out.println("Got invalid packet " + data + "!");
-      // TODO report error
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Got invalid packet " + data + "!";
+      errorReporter.reportError(null, null, errorMsg);
     }
 
   }
