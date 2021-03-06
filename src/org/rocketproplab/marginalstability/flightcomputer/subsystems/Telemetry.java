@@ -19,15 +19,6 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
  *
  */
 public class Telemetry {
-  private static Telemetry instance;
-
-  public static Telemetry getInstance() {
-    if (instance == null) {
-      instance = new Telemetry(Logger.getLogger("Telemetry"), PacketRouter.getInstance());
-    }
-    return instance;
-  }
-
   public static final int BASE_10            = 10;
   public static final int BASE_16            = 16;
   public static final int MAX_PACKET_BASE_10 = (int) Math.round(Math.pow(BASE_10, SCMPacket.DATA_LENGTH)) - 1;

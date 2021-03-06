@@ -9,19 +9,6 @@ import org.rocketproplab.marginalstability.flightcomputer.hal.AnalogDigitalConve
  * @author Clara Chun, Chi Chow
  */
 public class PTSubsystem {
-  private static PTSubsystem instance;
-
-  /**
-   * Singleton instance of PTSubsystem
-   *
-   * @return a PTSubsystem instance
-   */
-  public static PTSubsystem getInstance() {
-    if (instance == null) {
-      instance = new PTSubsystem(null);
-    }
-    return instance;
-  }
 
   private AnalogDigitalConverter adc;
 

@@ -18,13 +18,6 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  *
  */
 public class ValveStateSubsystem implements PacketListener<SCMPacket> {
-  private static ValveStateSubsystem instance;
-  public static ValveStateSubsystem getInstance() {
-    if(instance == null) {
-      instance = new ValveStateSubsystem(PacketRouter.getInstance());
-    }
-    return instance;
-  }
   
 	private SCMPacket packet;
 	private int[] valveStates = {-1, -1, -1, -1, -1, -1, -1, -1};

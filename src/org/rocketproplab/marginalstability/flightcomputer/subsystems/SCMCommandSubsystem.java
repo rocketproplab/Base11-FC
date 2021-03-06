@@ -19,14 +19,6 @@ import java.util.HashMap;
  */
 public class SCMCommandSubsystem implements Subsystem,
         PacketListener<SCMPacket>, FramedPacketProcessor {
-  private static SCMCommandSubsystem instance;
-
-  public static SCMCommandSubsystem getInstance() {
-    if (instance == null) {
-      instance = new SCMCommandSubsystem();
-    }
-    return instance;
-  }
 
   private Looper looper;
 

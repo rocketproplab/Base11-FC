@@ -3,9 +3,11 @@ package org.rocketproplab.marginalstability.flightcomputer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
@@ -48,9 +50,21 @@ public class FlightComputerTest {
     };
   }
 
+  @After
+  public void afterEach() throws Exception {
+    Field fcInstance = FlightComputer.class.getDeclaredField("instance");
+    fcInstance.setAccessible(true);
+    fcInstance.set(null, null);
+    Field sensorInstance = SensorProvider.class.getDeclaredField("instance");
+    sensorInstance.setAccessible(true);
+    sensorInstance.set(null, null);
+  }
+
   @Test
   public void flightComputerCallsSubsystemUpdateOnTick() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry, null);
+    FlightComputer flightComputer = new FlightComputer.Builder()
+            .withTelemetry(telemetry)
+            .build();
     MockSubsystem  mockSubsystem  = new MockSubsystem();
     flightComputer.registerSubsystem(mockSubsystem);
     flightComputer.tick();
@@ -59,7 +73,9 @@ public class FlightComputerTest {
 
   @Test
   public void flightComputerRecoversFromException() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry, null);
+    FlightComputer flightComputer = new FlightComputer.Builder()
+            .withTelemetry(telemetry)
+            .build();
     MockSubsystem  mockSubsystem  = new MockSubsystem();
     mockSubsystem.throwError = true;
     flightComputer.registerSubsystem(mockSubsystem);
@@ -72,7 +88,9 @@ public class FlightComputerTest {
 
   @Test
   public void flightComputerReportsErrorToTelemetry() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry, null);
+    FlightComputer flightComputer = new FlightComputer.Builder()
+            .withTelemetry(telemetry)
+            .build();
     MockSubsystem  mockSubsystem  = new MockSubsystem();
     mockSubsystem.throwError = true;
     flightComputer.registerSubsystem(mockSubsystem);
@@ -83,7 +101,9 @@ public class FlightComputerTest {
 
   @Test
   public void errorInReportErrorAllowContinuedExecution() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry, null);
+    FlightComputer flightComputer = new FlightComputer.Builder()
+            .withTelemetry(telemetry)
+            .build();
     MockSubsystem  mockSubsystem  = new MockSubsystem();
     mockSubsystem.throwError = true;
     this.throwErrorOnError   = true;
@@ -97,7 +117,9 @@ public class FlightComputerTest {
 
   @Test
   public void errorAllowContinuedExecutionInSameTick() {
-    FlightComputer flightComputer = new FlightComputer(this.telemetry, null);
+    FlightComputer flightComputer = new FlightComputer.Builder()
+            .withTelemetry(telemetry)
+            .build();
     MockSubsystem mockSubsystem1 = new MockSubsystem();
     mockSubsystem1.throwError = true;
     flightComputer.registerSubsystem(mockSubsystem1);

@@ -21,15 +21,6 @@ import java.util.*;
  * @author Chi Chow, Enlil Odisho
  */
 public class Looper {
-  private static Looper mainLooper;
-
-  public static Looper getInstance() {
-    if (mainLooper == null) {
-      mainLooper = new Looper(new Time());
-    }
-    return mainLooper;
-  }
-
   private final Time                          time;
   private final HashMap<Object, GenericEvent> callbackMap;
   /**
