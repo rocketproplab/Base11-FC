@@ -90,7 +90,7 @@ public class FlightComputer {
      * @param args arguments to parse
      * @return command line options for configuration
      */
-    private CommandLine parseArgs(String[] args) {
+    public CommandLine parseArgs(String[] args) {
         Options options = new Options();
 
         Option sensorType = new Option(null, REAL_SENSORS, false, REAL_SENSORS_DESC);

@@ -1,8 +1,5 @@
 package org.rocketproplab.marginalstability.flightcomputer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -13,6 +10,8 @@ import org.junit.Test;
 import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
+
+import static org.junit.Assert.*;
 
 public class FlightComputerTest {
   private Telemetry         telemetry;
@@ -52,6 +51,7 @@ public class FlightComputerTest {
 
   @After
   public void afterEach() throws Exception {
+    // use reflection to reset singleton fields
     Field fcInstance = FlightComputer.class.getDeclaredField("instance");
     fcInstance.setAccessible(true);
     fcInstance.set(null, null);
@@ -128,5 +128,12 @@ public class FlightComputerTest {
     flightComputer.registerSubsystem(mockSubsystem2);
     flightComputer.tick();
     assertTrue(mockSubsystem2.hasUpdateCalled);
+  }
+
+  @Test(expected = Test.None.class)
+  public void runOnGoodArguments() {
+    FlightComputer flightComputer = new FlightComputer.Builder(new String[]{"--real-sensors"})
+            .withTelemetry(telemetry)
+            .build();
   }
 }
