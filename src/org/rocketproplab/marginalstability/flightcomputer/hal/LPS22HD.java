@@ -2,6 +2,8 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 import java.io.IOException;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 
 import com.pi4j.io.i2c.I2CDevice;
@@ -17,7 +19,7 @@ public class LPS22HD implements Barometer, PollingSensor {
 
   private I2CDevice i2cDevice;
   private double    pressure;
-  private long      sampleTime;
+  private double    sampleTime;
   private Time      clock;
 
   private static final byte   ODR_25HZ                      = 0b00110000;
@@ -55,8 +57,9 @@ public class LPS22HD implements Barometer, PollingSensor {
     try {
       i2cDevice.write(CTRL_REG1, (byte) (ODR_25HZ | LOW_PASS_ENABLE | LOW_PASS_20TH | KEEP_REGISTERS_SYCHONISED_BDU));
     } catch (IOException e) {
-      // TODO report IO Error
-      e.printStackTrace();
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Unable to write from i2cDevice IO Exception";
+      errorReporter.reportError(Errors.LPS22HD_INITIALIZATION_ERROR, e, errorMsg);
     }
   }
 
@@ -76,7 +79,6 @@ public class LPS22HD implements Barometer, PollingSensor {
 
   @Override
   public double getLastMeasurementTime() {
-
     if (clock != null) {
       return sampleTime;
     } else {
@@ -92,31 +94,36 @@ public class LPS22HD implements Barometer, PollingSensor {
   /**
    * Read the current pressure form the sensor using a one shot read method.
    * 
-   *                            MSB                     LSB
-   * Complete 24-bit word: | buffer[2] | buffer[1] | buffer[0] |
-   * Registers:            | 0x2A      | 0x29      | 0x28      |
+   * MSB LSB Complete 24-bit word: | buffer[2] | buffer[1] | buffer[0] |
+   * Registers: | 0x2A | 0x29 | 0x28 |
    */
   private void readPressure() {
     // TODO Read at once so we don't read high on sample 1 and low on sample 2. As
     // in if the sample changes while we are reading.
     try {
-      byte[] buffer = {0, 0, 0};
+      byte[] buffer = { 0, 0, 0 };
       i2cDevice.read(REG_PRESSURE_EXTRA_LOW, buffer, 0, 3);
 
       // Out of range if MSB = 1
-      byte mask = (byte)0b10000000;
-      if((buffer[2] & mask) > 0){
+      byte mask = (byte) 0b10000000;
+      if ((buffer[2] & mask) > 0) {
         pressure = -1;
         return;
       }
 
-      int rawPressure = (Byte.toUnsignedInt(buffer[2])<<16) + (Byte.toUnsignedInt(buffer[1])<<8) + Byte.toUnsignedInt(buffer[0]);
-      pressure = rawPressure / (double)SCALING_FACTOR;
+      int rawPressure = (Byte.toUnsignedInt(buffer[2]) << 16) + (Byte.toUnsignedInt(buffer[1]) << 8)
+          + Byte.toUnsignedInt(buffer[0]);
+      pressure = rawPressure / (double) SCALING_FACTOR;
     } catch (IOException e) {
-      // TODO Report IO Error
-      e.printStackTrace();
+      ErrorReporter errorReporter = ErrorReporter.getInstance();
+      String errorMsg = "Unable to read Pressure from i2cDevice IO Exception";
+      errorReporter.reportError(Errors.LPS22HD_PRESSURE_IO_ERROR, e, errorMsg);
     }
-    sampleTime = (long) clock.getSystemTime();
+    sampleTime = clock.getSystemTime();
+  }
+
+  public SamplableSensor<Double> getSamplable() {
+    return new TimeBasedSensorSampler<Double>(this::getPressure, this::getLastMeasurementTime);
   }
 
 }

@@ -8,6 +8,7 @@ import org.rocketproplab.marginalstability.flightcomputer.comm.PacketDirection;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacketType;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Barometer;
+import org.rocketproplab.marginalstability.flightcomputer.hal.SamplableSensor;
 import org.rocketproplab.marginalstability.flightcomputer.hal.Solenoid;
 import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVector3;
@@ -84,6 +85,12 @@ public class TestParachuteSubsystem {
     @Override
     public double getLastMeasurementTime() {
       return 0;
+    }
+
+    @Override
+    public SamplableSensor<Double> getSamplable() {
+      // TODO Auto-generated method stub
+      return null;
     }
   }
 

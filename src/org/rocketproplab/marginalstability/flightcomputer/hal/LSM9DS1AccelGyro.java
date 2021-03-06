@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
 import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 
 import com.pi4j.io.i2c.I2CDevice;
@@ -48,8 +49,11 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   public static final int  FIFO_THRESHOLD_STATUS_POS   = 7;
   public static final int  FIFO_SAMPLES_STORED_MASK    = 0b111111;
 
-  private static final int BYTES_PER_FIFO_LINE = 12;
-  private static final int BITS_PER_BYTE       = 8;
+  private static final int BYTES_PER_FIFO_LINE    = 12;
+  
+  public static final double ACCELEROMETER_OUTPUT_TO_MPS_SQUARED = 9.81;  // factor to multiply acc output by to
+                                                                          // convert sensor output to m/s^2
+  private static final double ONE_DEGREE_IN_RADIANS  = Math.PI / 180.0;
 
   /**
    * All the registers that can be found in the LSM9DS1 imu for the accelerometer
@@ -161,6 +165,11 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       return ACCELEROMETER_SCALE_LSB_POS;
     }
   }
+  /**
+   * The current accelerometer scale the sensor is set to.
+   * Initialize to default value as specified in sensor datasheet.
+   */
+  private AccelerometerScale accelScale = AccelerometerScale.G_2;
 
   public enum GyroScale implements RegisterValue {
     DPS_245,
@@ -182,6 +191,11 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       return GYRO_SCALE_LSB_POS;
     }
   }
+  /**
+   * The current gyroscope scale the sensor is set to.
+   * Initialize to default value as specified in sensor datasheet.
+   */
+  private GyroScale gyroScale = GyroScale.DPS_245;
 
   public enum FIFOMode implements RegisterValue {
     BYPASS,
@@ -241,6 +255,15 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public void setAccelerometerScale(AccelerometerScale scale) throws IOException {
     modifyRegister(Registers.CTRL_REG6_XL, scale);
+    accelScale = scale;
+  }
+  
+  /**
+   * Returns the scale of the accelerometer
+   * @return the set accelerometer scale
+   */
+  public AccelerometerScale getAccelerometerScale() {
+    return accelScale;
   }
 
   /**
@@ -251,6 +274,15 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public void setGyroscopeScale(GyroScale scale) throws IOException {
     modifyRegister(Registers.CTRL_REG1_G, scale);
+    gyroScale = scale;
+  }
+  
+  /**
+   * Returns the scale of the gyroscope
+   * @return the set gyroscope scale
+   */
+  public GyroScale getGyroscopeScale() {
+    return gyroScale;
   }
 
   /**
@@ -422,7 +454,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
 
   /**
    * Parse a set of BYTES_PER_FIFO_LINE bytes into an AccelGyroReading. <br>
-   * TODO Use range to normalize to m/s^2
+   * Use range to normalize to m/s^2
    * 
    * @param data the set of six bytes representing a reading
    * @return the AccelGyroReading which the six bytes belong to.
@@ -437,8 +469,8 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     int yAcc  = results[4];
     int zAcc  = results[5];
 
-    Vector3 gyroVec = new Vector3(xGyro, yGyro, zGyro);
-    Vector3 accVec  = new Vector3(xAcc, yAcc, zAcc);
+    Vector3 gyroVec = computeAngularAcceleration(xGyro, yGyro, zGyro);
+    Vector3 accVec  = computeAcceleration(xAcc, yAcc, zAcc);
     return new AccelGyroReading(accVec, gyroVec);
   }
 
@@ -467,6 +499,77 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   @Override
   public boolean hasNext() {
     return !samples.isEmpty();
+  }
+  
+  /**
+   * Converts accelerometer readings to m/s^2. Uses the current accelerometer scale setting.
+   * @param accX x-axis reading from accelerometer
+   * @param accY y-axis reading from accelerometer
+   * @param accZ z-axis reading from accelerometer
+   * @return the acceleration vector in m/s^2
+   */
+  public Vector3 computeAcceleration(int accX, int accY, int accZ) {
+    // Get the accelerometer sensitivity.
+    double sensitivity;
+    switch(accelScale) {
+    case G_2:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_2G;
+      break;
+    case G_4:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_4G;
+      break;
+    case G_8:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_8G;
+      break;
+    case G_16:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G;
+      break;
+    default:
+      throw new IllegalStateException("Sensor has an unknown accelerometer scale.");
+    }
+    
+    // This factor converts accelerometer readings to m/s^2
+    double conversionFactor = sensitivity * ACCELEROMETER_OUTPUT_TO_MPS_SQUARED;
+    
+    return new Vector3(
+        accX * conversionFactor,
+        accY * conversionFactor,
+        accZ * conversionFactor
+    );
+  }
+  
+  /**
+   * Converts gyroscope readings to radians per second. Uses the current gyroscope scale setting.
+   * @param gyroX x-axis reading from gyroscope
+   * @param gyroY y-axis reading from gyroscope
+   * @param gyroZ z-axis reading from gyroscope
+   * @return the rotation vector in radians per second
+   */
+  public Vector3 computeAngularAcceleration(int gyroX, int gyroY, int gyroZ) {
+    // Get the gyroscope sensitivity.
+    double sensitivity;
+    switch(gyroScale) {
+    case DPS_245:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS;
+      break;
+    case DPS_500:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS;
+      break;
+    case DPS_2000:
+      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS;
+      break;
+    default:
+      throw new IllegalStateException("Sensor has an unknown gyroscope scale.");
+    }
+    
+    // This factor converts gyroscope readings to radians per second
+    double conversionFactor = sensitivity * ONE_DEGREE_IN_RADIANS;
+    
+    return new Vector3(
+        gyroX * conversionFactor,
+        gyroY * conversionFactor,
+        gyroZ * conversionFactor
+    );
   }
 
 }

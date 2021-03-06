@@ -7,7 +7,7 @@ import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
  * IMU at an instant. It consists of an acceleration vector as well as a
  * rotation difference. <br>
  * 
- * The rotation vector specified how many degrees were rotated in the last
+ * The rotation vector specified how many radians were rotated in the last
  * timestep in the local reference frame. <br>
  * The acceleration vector is the acceleration felt by the IMU in the local
  * reference frame in meters / second^2. If the IMU is lying flat on a table it
@@ -33,7 +33,7 @@ public class AccelGyroReading {
   }
 
   /**
-   * Get the rotation delta in the given reference frame in degrees.
+   * Get the rotation delta in the given reference frame in radians.
    * 
    * @return the difference in rotation from the last reading.
    */
