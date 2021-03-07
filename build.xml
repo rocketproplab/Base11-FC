@@ -11,7 +11,6 @@
 		<pathelement location="lib/pi4j-core.jar" />
 		<pathelement location="lib/pi4j-device.jar" />
 		<pathelement location="lib/pi4j-gpio-extension.jar" />
-		<pathelement location="lib/commons-cli-1.4.jar" />
 	</path>
 	<target name="init">
 		<mkdir dir="bin" />

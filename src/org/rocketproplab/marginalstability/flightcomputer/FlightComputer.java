@@ -1,6 +1,5 @@
 package org.rocketproplab.marginalstability.flightcomputer;
 
-import org.apache.commons.cli.*;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
 import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
 import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
@@ -10,12 +9,6 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.*;
 import java.util.logging.Logger;
 
 public class FlightComputer {
-    /**
-     * CLI argument names and descriptions
-     */
-    private static final String REAL_SENSORS = "real-sensors",
-            REAL_SENSORS_DESC = "use real sensors";
-
     private static FlightComputer instance;
 
     /**
@@ -76,36 +69,10 @@ public class FlightComputer {
      * @param args arguments for configuration
      */
     private void initWithArgs(String[] args) {
-        CommandLine cmd = parseArgs(args);
+        ParseCmdLine cmd = new ParseCmdLine(args);
 
         // use real/fake sensors
-        boolean useRealSensors = cmd.hasOption(REAL_SENSORS);
-        sensorProvider = SensorProvider.create(useRealSensors);
-    }
-
-    /**
-     * Defines command line options and possible arguments.
-     * Also prints help and exits if invalid arguments are detected.
-     *
-     * @param args arguments to parse
-     * @return command line options for configuration
-     */
-    public CommandLine parseArgs(String[] args) {
-        Options options = new Options();
-
-        Option sensorType = new Option(null, REAL_SENSORS, false, REAL_SENSORS_DESC);
-        options.addOption(sensorType);
-
-        CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
-        try {
-            return parser.parse(options, args);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            formatter.printHelp("Base11-FC", options);
-            System.exit(1);
-        }
-        return null;
+        sensorProvider = SensorProvider.create(cmd.useRealSensors);
     }
 
     /**
@@ -197,11 +164,75 @@ public class FlightComputer {
 
         /**
          * Customizations set programmatically in the Builder will override defaults and arguments.
+         *
          * @return customized FlightComputer
          */
         public FlightComputer build() {
             if (telemetry != null) fc.telemetry = this.telemetry;
             return fc;
+        }
+    }
+
+    /**
+     * Defines command line options and possible arguments.
+     * Also prints help and exits if invalid arguments are detected.
+     */
+    private static class ParseCmdLine {
+        /**
+         * CLI argument names and descriptions
+         */
+        private static final String
+                HELP = "--help",
+                HELP_DESC = "print help menu",
+                REAL_SENSORS = "--real-sensors",
+                REAL_SENSORS_DESC = "use real sensors";
+
+        /**
+         * Real sensor flag
+         */
+        private boolean useRealSensors = false;
+
+        /**
+         * Constructs a new object to parse CLI arguments
+         *
+         * @param args arguments to parse
+         */
+        private ParseCmdLine(String[] args) {
+            parse(args);
+        }
+
+        /**
+         * Checks arguments against each setting
+         * @param args
+         */
+        private void parse(String[] args) {
+            // help
+            if (args.length == 1 && args[0].equals("--help")) {
+                printHelp();
+                System.exit(0);
+            }
+
+            // settings
+            int i = 0;
+            while (i < args.length) {
+                String arg = args[i];
+                if (arg.equals(REAL_SENSORS)) {
+                    useRealSensors = true;
+                    System.out.println(REAL_SENSORS_DESC);
+                } else {
+                    System.out.println("Invalid argument: " + arg);
+                    printHelp();
+                    System.exit(1);
+                }
+                i++;
+            }
+        }
+
+        private void printHelp() {
+            System.out.println("Usage:\n"
+                    + HELP + ": " + HELP_DESC + "\n"
+                    + REAL_SENSORS + ": " + REAL_SENSORS_DESC
+            );
         }
     }
 }
