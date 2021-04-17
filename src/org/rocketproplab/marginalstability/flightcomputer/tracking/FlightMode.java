@@ -2,9 +2,8 @@ package org.rocketproplab.marginalstability.flightcomputer.tracking;
 
 /**
  * The different states which the rocket can be in while flying
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public enum FlightMode {
 

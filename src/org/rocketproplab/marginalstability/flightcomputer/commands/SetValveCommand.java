@@ -8,11 +8,11 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 
 public class SetValveCommand implements Command {
   private SCMPacket scmpacket;
-  private Valves    valves;
+  private Valves valves;
 
   SetValveCommand(SCMPacket scmpacket, Valves valves) {
     this.scmpacket = scmpacket;
-    this.valves    = valves;
+    this.valves = valves;
   }
 
   @Override
@@ -50,7 +50,7 @@ public class SetValveCommand implements Command {
   private int getValveID() {
     int currentvalve = this.scmpacket.getID().ordinal();
     int initialvalve = SCMPacketType.V0.ordinal();
-    int valveindex   = currentvalve - initialvalve;
+    int valveindex = currentvalve - initialvalve;
     return valveindex;
   }
 

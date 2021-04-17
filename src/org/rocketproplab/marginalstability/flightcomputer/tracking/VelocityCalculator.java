@@ -13,9 +13,9 @@ public class VelocityCalculator implements VelocityListener {
   }
 
   public static Vector3 getVelocity(GPSPacket prevGPSPacket,
-      GPSPacket curGPSPacket) {
+                                    GPSPacket curGPSPacket) {
     double deltaLat = curGPSPacket.getLatitude() - prevGPSPacket.getLatitude();
-    double deltaLon  = curGPSPacket.getLongitude() - prevGPSPacket.getLongitude();
+    double deltaLon = curGPSPacket.getLongitude() - prevGPSPacket.getLongitude();
     double deltaTime = curGPSPacket.getTime() - prevGPSPacket.getTime();
     double angVelocityX = deltaLon / deltaTime;
     double angVelocityY = deltaLat / deltaTime;

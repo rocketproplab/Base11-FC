@@ -8,23 +8,22 @@ import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
 
 /**
  * A class that keeps track of the flight state of the rocket.
- * 
+ * <p>
  * It looks at different characteristics to determine which flight mode we are
  * in.
- * 
+ * <p>
  * We look at the engine activation and shutdown to determine if we are burning
  * or coasting.
- * 
+ * <p>
  * We look at the velocity updates to determine if we are in apogee, falling or
  * landed.
- * 
+ * <p>
  * We look at the parachute deploying to determine if we are in descending.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class FlightState
-    implements EngineEventListener, VelocityListener, ParachuteListener {
+        implements EngineEventListener, VelocityListener, ParachuteListener {
 
   private FlightMode currentFlightMode;
 
@@ -37,7 +36,7 @@ public class FlightState
 
   /**
    * Get the current flight mode which the rocket is in.
-   * 
+   *
    * @return the current flight mode
    */
   public FlightMode getFlightMode() {
@@ -63,7 +62,7 @@ public class FlightState
 
   /**
    * Checks if the rocket should transition into the apogee state
-   * 
+   *
    * @param velocity the current velocity
    */
   private void checkForApogee(Vector3 velocity) {
@@ -78,11 +77,11 @@ public class FlightState
 
   /**
    * Checks if the rocket should transition from apogee to falling
-   * 
+   *
    * @param velocity the current velocity
    */
   private void checkForFalling(Vector3 velocity) {
-    boolean isApogee   = this.currentFlightMode == FlightMode.Apogee;
+    boolean isApogee = this.currentFlightMode == FlightMode.Apogee;
     boolean isCoasting = this.currentFlightMode == FlightMode.Coasting;
     if (!(isApogee || isCoasting)) {
       return;
@@ -95,7 +94,7 @@ public class FlightState
 
   /**
    * Checks if the rocket should transition into the landed state
-   * 
+   *
    * @param velocity the current velocity
    */
   private void checkForLanded(Vector3 velocity) {

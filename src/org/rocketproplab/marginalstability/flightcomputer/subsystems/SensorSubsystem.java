@@ -1,23 +1,22 @@
 package org.rocketproplab.marginalstability.flightcomputer.subsystems;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 import org.rocketproplab.marginalstability.flightcomputer.hal.PollingSensor;
 import org.rocketproplab.marginalstability.flightcomputer.hal.SensorPoller;
 import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * A subsystem to handle ticking the sensors at a fixed rate.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class SensorSubsystem implements Subsystem {
   private List<SensorPoller> sensorPollers;
-  private Time               time;
+  private Time time;
 
   /**
    * Create the subsystem using the given time.
@@ -26,7 +25,7 @@ public class SensorSubsystem implements Subsystem {
    */
   public SensorSubsystem(Time time) {
     this.sensorPollers = Collections.synchronizedList(new ArrayList<>());
-    this.time          = time;
+    this.time = time;
   }
 
   @Override

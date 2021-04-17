@@ -31,11 +31,11 @@ public class Settings {
    */
   @UserSetting(comment = "Time threshold needed to exceed to deploy the main chute", units = "s")
   public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 10; // TODO: set time exceeding the threshold needed to
-                                                                // deploy main chute
+  // deploy main chute
 
-  public static boolean[] ENGINE_ON_VALVE_STATES = { true, true, true, true, true };
+  public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
 
-  public static boolean[] ENGINE_ABORT_VALVE_STATES = { true, true, true, true, true };
+  public static boolean[] ENGINE_ABORT_VALVE_STATES = {true, true, true, true, true};
 
   // Unit conversions
 
@@ -57,16 +57,16 @@ public class Settings {
   @SettingSectionHeader(name = "PT Quadratic Regression")
 
   @UserSetting(comment = "'a' constant for quadratic regression for pressure transducers", units = "hPa / V^2")
-  public static double[] A_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0 };
+  public static double[] A_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+          0.0};
 
   @UserSetting(comment = "'b' constant for quadratic regression for pressure transducers", units = "hPa / V")
-  public static double[] B_PT_CONSTANTS = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0 };
+  public static double[] B_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+          1.0};
 
   @UserSetting(comment = "'c' constant for quadratic regression for pressure transducers", units = "hPa")
-  public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0 };
+  public static double[] C_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+          0.0};
 
   @UserSetting(comment = "Phone number to text position to", units = "1xxxyyyyyyy")
   public static String PHONE_NUMBER = "13150001111";
@@ -78,15 +78,15 @@ public class Settings {
 
   @SettingSectionHeader(name = "LSM9DS1 settings")
 
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_2G     = 0.00006103;
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_4G     = 0.00012207;
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_8G     = 0.00024414;
-  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_16G    = 0.000732;
-  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS     = 0.00875;
-  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS     = 0.0175;
-  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS    = 0.07;
-  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS  = 0.00014;
-  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_8GAUSS  = 0.00029;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_2G = 0.00006103;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_4G = 0.00012207;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_8G = 0.00024414;
+  public static double LSM9DS1_SENSITIVITY_ACCELEROMETER_16G = 0.000732;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS = 0.00875;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS = 0.0175;
+  public static double LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS = 0.07;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_4GAUSS = 0.00014;
+  public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_8GAUSS = 0.00029;
   public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_12GAUSS = 0.00043;
   public static double LSM9DS1_SENSITIVITY_MAGNETOMETER_16GAUSS = 0.00058;
 
@@ -101,8 +101,8 @@ public class Settings {
   }
 
   public static String getConfigContents() {
-    String     result = "";
-    Set<Field> set    = getSettingFields();
+    String result = "";
+    Set<Field> set = getSettingFields();
     for (Field field : set) {
       result += fieldAsString(field) + "\n";
     }
@@ -114,8 +114,8 @@ public class Settings {
     if (field.isAnnotationPresent(SettingSectionHeader.class)) {
 
       String sectionHeader = "# " + field.getAnnotation(SettingSectionHeader.class).name() + " |\n";
-      int    dashLength    = sectionHeader.length() - 2;
-      String delimiter     = "#" + new String(new char[dashLength]).replace('\0', '-') + "\n";
+      int dashLength = sectionHeader.length() - 2;
+      String delimiter = "#" + new String(new char[dashLength]).replace('\0', '-') + "\n";
       result += delimiter + sectionHeader + delimiter + "\n";
     }
 
@@ -168,7 +168,7 @@ public class Settings {
     Set<String> usefulLines = new HashSet<>();
     for (String line : config) {
       String lineWithoutComment = line;
-      int    commentStartIdx    = line.indexOf('#');
+      int commentStartIdx = line.indexOf('#');
       if (commentStartIdx >= 0) {
         lineWithoutComment = line.substring(0, commentStartIdx);
       }
@@ -182,7 +182,7 @@ public class Settings {
   }
 
   protected static Map<String, String> getFieldNameValueMap(List<String> config) {
-    Set<String>         usefulLines       = getUsefulLinesFromConfig(config);
+    Set<String> usefulLines = getUsefulLinesFromConfig(config);
     Map<String, String> fieldNameValueMap = new HashMap<>();
     for (String line : usefulLines) {
       int equalsIndex = line.indexOf('=');
@@ -191,16 +191,16 @@ public class Settings {
         continue;
       }
       String fieldName = line.substring(0, equalsIndex);
-      String value     = line.substring(equalsIndex + 1);
+      String value = line.substring(equalsIndex + 1);
       fieldNameValueMap.put(fieldName.trim(), value);
     }
     return fieldNameValueMap;
   }
 
   protected static void setFieldDoubleArray(Field field, String line)
-      throws IllegalArgumentException, IllegalAccessException {
+          throws IllegalArgumentException, IllegalAccessException {
     line = line.trim().replace("[", "").replace("]", "");
-    String[] newValues   = line.split(",");
+    String[] newValues = line.split(",");
     double[] fieldValues = (double[]) field.get(null);
     if (newValues.length != fieldValues.length) {
       System.err.println("Array length mismatch: " + line);
@@ -212,7 +212,7 @@ public class Settings {
   }
 
   protected static void setFieldDouble(Field field, String line)
-      throws IllegalArgumentException, IllegalAccessException {
+          throws IllegalArgumentException, IllegalAccessException {
     line = line.trim();
     double value = Double.parseDouble(line);
     field.set(null, value);
@@ -243,9 +243,9 @@ public class Settings {
   }
 
   public static boolean readSettingsFromConfig(List<String> config, boolean checkOutOfDate) {
-    Set<Field>          settingFields     = getSettingFields();
+    Set<Field> settingFields = getSettingFields();
     Map<String, String> fieldNameValueMap = getFieldNameValueMap(config);
-    boolean             outOfDate         = false;
+    boolean outOfDate = false;
     for (Field field : settingFields) {
       String fieldName = getNameFromField(field);
       if (fieldNameValueMap.containsKey(fieldName)) {
@@ -268,8 +268,8 @@ public class Settings {
   }
 
   public static void readSettings() {
-    String       configFileLocation = getSettingsFileLocation();
-    List<String> lines              = Collections.emptyList();
+    String configFileLocation = getSettingsFileLocation();
+    List<String> lines = Collections.emptyList();
     try {
       lines = Files.readAllLines(Paths.get(configFileLocation));
     } catch (IOException e) {

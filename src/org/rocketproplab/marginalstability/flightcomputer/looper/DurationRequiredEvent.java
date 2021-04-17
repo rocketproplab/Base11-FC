@@ -10,12 +10,12 @@ import org.rocketproplab.marginalstability.flightcomputer.Time;
  */
 public class DurationRequiredEvent extends GenericEvent {
   private final double durationTrue;
-  private       double sinceTrueTime;
+  private double sinceTrueTime;
 
   public DurationRequiredEvent(
           double durationTrue, EventCondition condition, EventCallback callback, Time time) {
     super(condition, callback, time);
-    this.durationTrue  = durationTrue;
+    this.durationTrue = durationTrue;
     this.sinceTrueTime = Double.NaN;
   }
 

@@ -5,9 +5,8 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
  * to poll a gyroscope and magnetometer on the same chip. <br>
  * <br>
  * Each time the group is polled each sensor gets polled in series.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class PollingGroup implements PollingSensor {
 
@@ -15,7 +14,7 @@ public class PollingGroup implements PollingSensor {
 
   /**
    * Create a new polling group for the given set of sensors.
-   * 
+   *
    * @param pollingSensors the sensors to poll simultaneously
    */
   public PollingGroup(PollingSensor... pollingSensors) {

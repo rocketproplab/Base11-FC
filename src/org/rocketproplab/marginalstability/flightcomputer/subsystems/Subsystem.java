@@ -4,9 +4,8 @@ import org.rocketproplab.marginalstability.flightcomputer.looper.Looper;
 
 /**
  * The basic super class of a subsystem.
- * 
- * @author Max Apodaca, Chi Chow
  *
+ * @author Max Apodaca, Chi Chow
  */
 public interface Subsystem {
 

@@ -1,23 +1,22 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
+import com.pi4j.io.i2c.I2CDevice;
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.Errors;
+import org.rocketproplab.marginalstability.flightcomputer.Settings;
+import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
-import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
-import org.rocketproplab.marginalstability.flightcomputer.Errors;
-import org.rocketproplab.marginalstability.flightcomputer.Settings;
-import org.rocketproplab.marginalstability.flightcomputer.math.Vector3;
-
-import com.pi4j.io.i2c.I2CDevice;
-
 /**
  * The HAL implementation for the LSM9DS1 accelerometer and gyroscope sensors.
  * Datasheet can be found here: <a
  * href=https://www.st.com/resource/en/datasheet/lsm9ds1.pdf>https://www.st.com/resource/en/datasheet/lsm9ds1.pdf</a><br>
- * 
+ * <p>
  * Every time poll is called this sensor will acquire as many samples as
  * possible from the LSM9DS1's internal FIFO buffer. This is done by reading the
  * number of samples in the FIFO and then reading the FIFO output registers
@@ -26,34 +25,33 @@ import com.pi4j.io.i2c.I2CDevice;
  * {@link #getNext()} method. Whether or not the queue is empty can be read
  * using the {@link #hasNext()} method. It is recommended to call
  * {@link #hasNext()} before each call of {@link #getNext()}.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
-  private static final int ODR_MASK                    = 0b111;
-  private static final int ODR_LSB_POS                 = 5;
-  private static final int ACCELEROMETER_SCALE_MASK    = 0b11;
+  private static final int ODR_MASK = 0b111;
+  private static final int ODR_LSB_POS = 5;
+  private static final int ACCELEROMETER_SCALE_MASK = 0b11;
   private static final int ACCELEROMETER_SCALE_LSB_POS = 3;
-  private static final int GYRO_SCALE_MASK             = 0b11;
-  private static final int GYRO_SCALE_LSB_POS          = 3;
-  private static final int FIFO_EN_VAL_MASK            = 0b1;
-  private static final int FIFO_EN_LSB_POS             = 1;
-  private static final int FIFO_MODE_MASK              = 0b111;
-  private static final int FIFO_MODE_LSB_POS           = 5;
-  private static final int FIFO_THRESHOLD_MASK         = 0b11111;
-  private static final int FIFO_THRESHOLD_LSB_POS      = 0;
-  public static final int  FIFO_THRESHOLD_MAX          = 31;
-  public static final int  FIFO_THRESHOLD_MIN          = 0;
-  public static final int  FIFO_OVERRUN_POS            = 6;
-  public static final int  FIFO_THRESHOLD_STATUS_POS   = 7;
-  public static final int  FIFO_SAMPLES_STORED_MASK    = 0b111111;
+  private static final int GYRO_SCALE_MASK = 0b11;
+  private static final int GYRO_SCALE_LSB_POS = 3;
+  private static final int FIFO_EN_VAL_MASK = 0b1;
+  private static final int FIFO_EN_LSB_POS = 1;
+  private static final int FIFO_MODE_MASK = 0b111;
+  private static final int FIFO_MODE_LSB_POS = 5;
+  private static final int FIFO_THRESHOLD_MASK = 0b11111;
+  private static final int FIFO_THRESHOLD_LSB_POS = 0;
+  public static final int FIFO_THRESHOLD_MAX = 31;
+  public static final int FIFO_THRESHOLD_MIN = 0;
+  public static final int FIFO_OVERRUN_POS = 6;
+  public static final int FIFO_THRESHOLD_STATUS_POS = 7;
+  public static final int FIFO_SAMPLES_STORED_MASK = 0b111111;
 
-  private static final int BYTES_PER_FIFO_LINE    = 12;
-  
+  private static final int BYTES_PER_FIFO_LINE = 12;
+
   public static final double ACCELEROMETER_OUTPUT_TO_MPS_SQUARED = 9.81;  // factor to multiply acc output by to
-                                                                          // convert sensor output to m/s^2
-  private static final double ONE_DEGREE_IN_RADIANS  = Math.PI / 180.0;
+  // convert sensor output to m/s^2
+  private static final double ONE_DEGREE_IN_RADIANS = Math.PI / 180.0;
 
   /**
    * All the registers that can be found in the LSM9DS1 imu for the accelerometer
@@ -120,7 +118,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     /**
      * Read the address of a register, this is not necessarily the same as the
      * ordinal and should be used for I2C access.
-     * 
+     *
      * @return the I2C address of the register.
      */
     public int getAddress() {
@@ -165,6 +163,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       return ACCELEROMETER_SCALE_LSB_POS;
     }
   }
+
   /**
    * The current accelerometer scale the sensor is set to.
    * Initialize to default value as specified in sensor datasheet.
@@ -191,6 +190,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       return GYRO_SCALE_LSB_POS;
     }
   }
+
   /**
    * The current gyroscope scale the sensor is set to.
    * Initialize to default value as specified in sensor datasheet.
@@ -225,13 +225,13 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     }
   }
 
-  private I2CDevice              i2c;
+  private I2CDevice i2c;
   private ArrayDeque<AccelGyroReading> samples = new ArrayDeque<>();
 
   /**
    * Create a new LSM9DS1AccelGyro on the given {@link I2CDevice}. There is no
    * validation for the {@link I2CDevice} address.
-   * 
+   *
    * @param device the device to use for I2C communication
    */
   public LSM9DS1AccelGyro(I2CDevice device) {
@@ -240,7 +240,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
 
   /**
    * Sets the output data rate of the sensor
-   * 
+   *
    * @throws IOException if unable to read
    */
   public void setODR(ODR odr) throws IOException {
@@ -249,7 +249,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
 
   /**
    * Sets the scale of the accelerometer
-   * 
+   *
    * @param scale the scale of the accelerometer data
    * @throws IOException if we are unable to access the i2c device
    */
@@ -257,9 +257,10 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     modifyRegister(Registers.CTRL_REG6_XL, scale);
     accelScale = scale;
   }
-  
+
   /**
    * Returns the scale of the accelerometer
+   *
    * @return the set accelerometer scale
    */
   public AccelerometerScale getAccelerometerScale() {
@@ -268,7 +269,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
 
   /**
    * Sets the scale of the Gyroscope
-   * 
+   *
    * @param scale the scale of the gyroscope data
    * @throws IOException if we are unable to access the i2c device
    */
@@ -276,9 +277,10 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     modifyRegister(Registers.CTRL_REG1_G, scale);
     gyroScale = scale;
   }
-  
+
   /**
    * Returns the scale of the gyroscope
+   *
    * @return the set gyroscope scale
    */
   public GyroScale getGyroscopeScale() {
@@ -287,19 +289,19 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
 
   /**
    * Enable or disable the FIFO by setting CTRL_REG9
-   * 
+   *
    * @param enabled whether or not to enable the fifo
    * @throws IOException if we are unable to access the i2c device
    */
   public void setFIFOEnabled(boolean enabled) throws IOException {
     int registerValue = this.i2c.read(Registers.CTRL_REG9.getAddress());
-    int result        = mask(registerValue, enabled ? 1 : 0, FIFO_EN_LSB_POS, FIFO_EN_VAL_MASK);
+    int result = mask(registerValue, enabled ? 1 : 0, FIFO_EN_LSB_POS, FIFO_EN_VAL_MASK);
     this.i2c.write(Registers.CTRL_REG9.getAddress(), (byte) result);
   }
 
   /**
    * Set the FIFOMode to the new mode
-   * 
+   *
    * @param mode the new FIFOMode to use
    * @throws IOException if we are unable to access the i2c device
    */
@@ -309,7 +311,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
 
   /**
    * Set the threshold at which we should signal that the FIFO is full.
-   * 
+   *
    * @param threshold the number of samples at which we start signaling
    * @throws IOException if we are unable to access the i2c device
    */
@@ -321,51 +323,51 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       threshold = FIFO_THRESHOLD_MIN;
     }
     int registerValue = this.i2c.read(Registers.FIFO_CTRL.getAddress());
-    int result        = mask(registerValue, threshold, FIFO_THRESHOLD_LSB_POS, FIFO_THRESHOLD_MASK);
+    int result = mask(registerValue, threshold, FIFO_THRESHOLD_LSB_POS, FIFO_THRESHOLD_MASK);
     this.i2c.write(Registers.FIFO_CTRL.getAddress(), (byte) result);
   }
 
   /**
    * Returns if the FIFO buffer's data has been exceeded. This means that data was
    * lost.
-   * 
+   *
    * @return if the FIFO overflowed
    * @throws IOException if we are unable to access the i2c device
    */
   public boolean hasFIFOOverrun() throws IOException {
     int fifoSRCValue = this.i2c.read(Registers.FIFO_SRC.getAddress());
-    int masked       = (1 << FIFO_OVERRUN_POS) & fifoSRCValue;
+    int masked = (1 << FIFO_OVERRUN_POS) & fifoSRCValue;
     return masked != 0;
   }
 
   /**
    * Are we at the FIFO threshold yet. See {@link #setFIFOThreshold(int)} on how
    * to set the threshold.
-   * 
+   *
    * @return if we are at the FIFO threshold
    * @throws IOException if we are unable to access the i2c device
    */
   public boolean isFIFOThresholdReached() throws IOException {
     int fifoSRCValue = this.i2c.read(Registers.FIFO_SRC.getAddress());
-    int masked       = (1 << FIFO_THRESHOLD_STATUS_POS) & fifoSRCValue;
+    int masked = (1 << FIFO_THRESHOLD_STATUS_POS) & fifoSRCValue;
     return masked != 0;
   }
 
   /**
    * Read how many samples are in the FIFO at the current time.
-   * 
+   *
    * @return the number of samples in the FIFO
    * @throws IOException if we are unable to access the i2c device
    */
   public int getSamplesInFIFO() throws IOException {
     int fifoSRCValue = this.i2c.read(Registers.FIFO_SRC.getAddress());
-    int masked       = FIFO_SAMPLES_STORED_MASK & fifoSRCValue;
+    int masked = FIFO_SAMPLES_STORED_MASK & fifoSRCValue;
     return masked;
   }
 
   /**
    * Write a register value to a register.
-   * 
+   *
    * @param register the register to write to
    * @param value    the value to write, uses all of the values in
    *                 {@link RegisterValue}
@@ -373,7 +375,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   private void modifyRegister(Registers register, RegisterValue value) throws IOException {
     int registerValue = this.i2c.read(register.getAddress());
-    int result        = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
+    int result = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
     this.i2c.write(register.getAddress(), (byte) result);
   }
 
@@ -385,7 +387,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * anding with toMask.<br>
    * <br>
    * <b>Note</b>: No values in newData are masked out.
-   * 
+   *
    * @param toMask    the value to mask
    * @param newData   the value to replace the masked areas of to mask
    * @param lsbPos    how far to the left the masked value is in toMask
@@ -393,9 +395,9 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * @return combination of toMask and newData combined based on valueMask
    */
   private int mask(int toMask, int newData, int lsbPos, int valueMask) {
-    int mask    = valueMask << lsbPos;
+    int mask = valueMask << lsbPos;
     int notMask = ~mask;
-    int result  = newData << lsbPos | (toMask & notMask);
+    int result = newData << lsbPos | (toMask & notMask);
     return result;
   }
 
@@ -422,9 +424,9 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       if (samplesInFIFO == 0) {
         return;
       }
-      int    dataLength  = samplesInFIFO * BYTES_PER_FIFO_LINE;
-      byte[] data        = new byte[dataLength];
-      int    samplesRead = this.i2c.read(Registers.OUT_X_L_G.getAddress(), data, 0, dataLength);
+      int dataLength = samplesInFIFO * BYTES_PER_FIFO_LINE;
+      byte[] data = new byte[dataLength];
+      int samplesRead = this.i2c.read(Registers.OUT_X_L_G.getAddress(), data, 0, dataLength);
       this.parseReadings(data, samplesRead);
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
@@ -437,16 +439,16 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * Take the raw data read and split it into chunks of BYTES_PER_FIFO_LINE bytes
    * to correspond to each IMU reading. Then feed those into
    * {@link #buildReading(byte[])}.
-   * 
+   *
    * @param data      the raw data to parse
    * @param bytesRead how many bytes were read.
    */
   private void parseReadings(byte[] data, int bytesRead) {
     int samplesRead = bytesRead / BYTES_PER_FIFO_LINE;
     for (int i = 0; i < samplesRead; i++) {
-      int        start   = i * BYTES_PER_FIFO_LINE;
-      int        end     = (i + 1) * BYTES_PER_FIFO_LINE;
-      byte[]     samples = Arrays.copyOfRange(data, start, end);
+      int start = i * BYTES_PER_FIFO_LINE;
+      int end = (i + 1) * BYTES_PER_FIFO_LINE;
+      byte[] samples = Arrays.copyOfRange(data, start, end);
       AccelGyroReading reading = this.buildReading(samples);
       this.samples.add(reading);
     }
@@ -455,7 +457,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   /**
    * Parse a set of BYTES_PER_FIFO_LINE bytes into an AccelGyroReading. <br>
    * Use range to normalize to m/s^2
-   * 
+   *
    * @param data the set of six bytes representing a reading
    * @return the AccelGyroReading which the six bytes belong to.
    */
@@ -465,12 +467,12 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     int xGyro = results[0];
     int yGyro = results[1];
     int zGyro = results[2];
-    int xAcc  = results[3];
-    int yAcc  = results[4];
-    int zAcc  = results[5];
+    int xAcc = results[3];
+    int yAcc = results[4];
+    int zAcc = results[5];
 
     Vector3 gyroVec = computeAngularAcceleration(xGyro, yGyro, zGyro);
-    Vector3 accVec  = computeAcceleration(xAcc, yAcc, zAcc);
+    Vector3 accVec = computeAcceleration(xAcc, yAcc, zAcc);
     return new AccelGyroReading(accVec, gyroVec);
   }
 
@@ -478,7 +480,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * Converts the input bytes to shorts where it assumes that the first byte of
    * the tuple is less significant. <br>
    * The array looks like {@code [L,H,L,H, ..., L, H]}.
-   * 
+   *
    * @param data byte array of little-endian shorts
    * @return array of the shorts
    */
@@ -500,9 +502,10 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   public boolean hasNext() {
     return !samples.isEmpty();
   }
-  
+
   /**
    * Converts accelerometer readings to m/s^2. Uses the current accelerometer scale setting.
+   *
    * @param accX x-axis reading from accelerometer
    * @param accY y-axis reading from accelerometer
    * @param accZ z-axis reading from accelerometer
@@ -511,35 +514,36 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   public Vector3 computeAcceleration(int accX, int accY, int accZ) {
     // Get the accelerometer sensitivity.
     double sensitivity;
-    switch(accelScale) {
-    case G_2:
-      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_2G;
-      break;
-    case G_4:
-      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_4G;
-      break;
-    case G_8:
-      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_8G;
-      break;
-    case G_16:
-      sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G;
-      break;
-    default:
-      throw new IllegalStateException("Sensor has an unknown accelerometer scale.");
+    switch (accelScale) {
+      case G_2:
+        sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_2G;
+        break;
+      case G_4:
+        sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_4G;
+        break;
+      case G_8:
+        sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_8G;
+        break;
+      case G_16:
+        sensitivity = Settings.LSM9DS1_SENSITIVITY_ACCELEROMETER_16G;
+        break;
+      default:
+        throw new IllegalStateException("Sensor has an unknown accelerometer scale.");
     }
-    
+
     // This factor converts accelerometer readings to m/s^2
     double conversionFactor = sensitivity * ACCELEROMETER_OUTPUT_TO_MPS_SQUARED;
-    
+
     return new Vector3(
-        accX * conversionFactor,
-        accY * conversionFactor,
-        accZ * conversionFactor
+            accX * conversionFactor,
+            accY * conversionFactor,
+            accZ * conversionFactor
     );
   }
-  
+
   /**
    * Converts gyroscope readings to radians per second. Uses the current gyroscope scale setting.
+   *
    * @param gyroX x-axis reading from gyroscope
    * @param gyroY y-axis reading from gyroscope
    * @param gyroZ z-axis reading from gyroscope
@@ -548,27 +552,27 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   public Vector3 computeAngularAcceleration(int gyroX, int gyroY, int gyroZ) {
     // Get the gyroscope sensitivity.
     double sensitivity;
-    switch(gyroScale) {
-    case DPS_245:
-      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS;
-      break;
-    case DPS_500:
-      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS;
-      break;
-    case DPS_2000:
-      sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS;
-      break;
-    default:
-      throw new IllegalStateException("Sensor has an unknown gyroscope scale.");
+    switch (gyroScale) {
+      case DPS_245:
+        sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_245DPS;
+        break;
+      case DPS_500:
+        sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_500DPS;
+        break;
+      case DPS_2000:
+        sensitivity = Settings.LSM9DS1_SENSITIVITY_GYROSCOPE_2000DPS;
+        break;
+      default:
+        throw new IllegalStateException("Sensor has an unknown gyroscope scale.");
     }
-    
+
     // This factor converts gyroscope readings to radians per second
     double conversionFactor = sensitivity * ONE_DEGREE_IN_RADIANS;
-    
+
     return new Vector3(
-        gyroX * conversionFactor,
-        gyroY * conversionFactor,
-        gyroZ * conversionFactor
+            gyroX * conversionFactor,
+            gyroY * conversionFactor,
+            gyroZ * conversionFactor
     );
   }
 

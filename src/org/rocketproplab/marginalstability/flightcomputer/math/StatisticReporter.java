@@ -8,23 +8,22 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
 
 /**
  * A Class to report statistics to the telemetry subsystem.
- * 
- * @author Max
  *
+ * @author Max
  */
 public class StatisticReporter implements EventCallback {
 
-  private Telemetry               telemetry;
-  private SCMPacketType           meanType;
-  private SCMPacketType           varianceType;
-  private StatisticArray          array;
+  private Telemetry telemetry;
+  private SCMPacketType meanType;
+  private SCMPacketType varianceType;
+  private StatisticArray array;
   private SamplableSensor<Double> sensor;
-  private double                  lookbackTime;
-  private boolean                 reportVaraince;
+  private double lookbackTime;
+  private boolean reportVaraince;
 
   /**
    * Create a new reporter which only reports the mean
-   * 
+   *
    * @param sensor   what sensor to report
    * @param telem    the telemetry to log to
    * @param meanType the packet type to use for the mean
@@ -35,26 +34,26 @@ public class StatisticReporter implements EventCallback {
 
   /**
    * Create a new reporter which logs both mean and variance
-   * 
+   *
    * @param sensor       what sensor to report
    * @param telem        the telemetry to log to
    * @param meanType     the packet type to use for the mean
    * @param varianceType the packet type to use for the variance
    */
   public StatisticReporter(SamplableSensor<Double> sensor, Telemetry telem, SCMPacketType meanType,
-      SCMPacketType varianceType) {
+                           SCMPacketType varianceType) {
     this(sensor, telem, meanType, true, varianceType);
   }
 
   private StatisticReporter(SamplableSensor<Double> sensor, Telemetry telem, SCMPacketType meanType,
-      boolean reportVariance, SCMPacketType varianceType) {
-    this.telemetry      = telem;
-    this.meanType       = meanType;
-    this.array          = new StatisticArray(1);
-    this.sensor         = sensor;
-    this.lookbackTime   = -1;
+                            boolean reportVariance, SCMPacketType varianceType) {
+    this.telemetry = telem;
+    this.meanType = meanType;
+    this.array = new StatisticArray(1);
+    this.sensor = sensor;
+    this.lookbackTime = -1;
     this.reportVaraince = reportVariance;
-    this.varianceType   = varianceType;
+    this.varianceType = varianceType;
   }
 
   /**
@@ -99,7 +98,7 @@ public class StatisticReporter implements EventCallback {
   /**
    * Should we call sample, useful for looper constructions with
    * {@link org.rocketproplab.marginalstability.flightcomputer.looper.Looper#emitIf()}
-   * 
+   *
    * @return if data is ready to be sampled
    */
   public boolean shouldSample() {
@@ -108,7 +107,7 @@ public class StatisticReporter implements EventCallback {
 
   /**
    * Set the maximum number of samples to store.
-   * 
+   *
    * @param size the number of samples to store
    */
   public void setWindowSize(int size) {
@@ -118,7 +117,7 @@ public class StatisticReporter implements EventCallback {
   /**
    * Set the amount of time to look back, by default all samples up to the maximum
    * count are used.
-   * 
+   *
    * @param time how far to look back in seconds
    */
   public void setLookbackTime(double time) {

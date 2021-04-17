@@ -15,13 +15,13 @@ import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightMode;
  */
 public class LandedSMSSubsystem
         implements Subsystem, FlightStateListener, PacketListener<GPSPacket> {
-  public static final  double SMS_INTERVAL = 15.0; // Interval to SMS, in seconds
-  private static final String SMS_FORMAT   = "Landed! https://www.google.com/maps/place/%f+%f";
+  public static final double SMS_INTERVAL = 15.0; // Interval to SMS, in seconds
+  private static final String SMS_FORMAT = "Landed! https://www.google.com/maps/place/%f+%f";
 
-  private String    phoneNumber;
+  private String phoneNumber;
   private SMSSender smsSender;
 
-  private GPSPacket  lastPacket = null;
+  private GPSPacket lastPacket = null;
   private FlightMode flightMode = null;
 
   /**
@@ -32,7 +32,7 @@ public class LandedSMSSubsystem
    */
   public LandedSMSSubsystem(String phoneNumber, SMSSender smsSender) {
     this.phoneNumber = phoneNumber;
-    this.smsSender   = smsSender;
+    this.smsSender = smsSender;
   }
 
   @Override

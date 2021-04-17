@@ -1,51 +1,49 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
-import java.io.IOException;
-
+import com.pi4j.io.i2c.I2CDevice;
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 
-import com.pi4j.io.i2c.I2CDevice;
+import java.io.IOException;
 
 /**
  * The LPS22HD HAL implementation. Refer to the datasheet for specification <a
  * href=https://www.st.com/resource/en/datasheet/lps22hd.pdf>https://www.st.com/resource/en/datasheet/lps22hd.pdf</a>
- * 
- * @author Clara Chun, Max Apodaca
  *
+ * @author Clara Chun, Max Apodaca
  */
 public class LPS22HD implements Barometer, PollingSensor {
 
   private I2CDevice i2cDevice;
-  private double    pressure;
-  private double    sampleTime;
-  private Time      clock;
+  private double pressure;
+  private double sampleTime;
+  private Time clock;
 
-  private static final byte   ODR_25HZ                      = 0b00110000;
-  private static final byte   LOW_PASS_ENABLE               = 0b00001000;
-  private static final byte   LOW_PASS_20TH                 = 0b00000100;
-  private static final byte   KEEP_REGISTERS_SYCHONISED_BDU = 0b00000010;
-  private static final int    CTRL_REG1                     = 0x10;
-  private static final double MINIMUM_RANGE                 = 259;
-  private static final double MAXIMUM_RANGE                 = 1261;
-  private static final double ZERO_TIME                     = 0.0;
-  private static final double SCALING_FACTOR                = 4096;
-  private static final int    REG_PRESSURE_HIGH             = 0x2A;
-  private static final int    REG_PRESSURE_LOW              = 0x29;
-  private static final int    REG_PRESSURE_EXTRA_LOW        = 0x28;
+  private static final byte ODR_25HZ = 0b00110000;
+  private static final byte LOW_PASS_ENABLE = 0b00001000;
+  private static final byte LOW_PASS_20TH = 0b00000100;
+  private static final byte KEEP_REGISTERS_SYCHONISED_BDU = 0b00000010;
+  private static final int CTRL_REG1 = 0x10;
+  private static final double MINIMUM_RANGE = 259;
+  private static final double MAXIMUM_RANGE = 1261;
+  private static final double ZERO_TIME = 0.0;
+  private static final double SCALING_FACTOR = 4096;
+  private static final int REG_PRESSURE_HIGH = 0x2A;
+  private static final int REG_PRESSURE_LOW = 0x29;
+  private static final int REG_PRESSURE_EXTRA_LOW = 0x28;
 
   /**
    * Create a new LPS22HD with the given i2cDevice and time. Time will be used to
    * determine the {@link #getLastMeasurementTime()} return value. <br>
    * The i2cDevice parameter is not checked for a valid address.
-   * 
+   *
    * @param i2cDevice the device which should be used to communicate via i2c
    * @param time      the time to use when reporting measurement time.
    */
   public LPS22HD(I2CDevice i2cDevice, Time time) {
     this.i2cDevice = i2cDevice;
-    this.clock     = time;
+    this.clock = time;
   }
 
   /**
@@ -93,7 +91,7 @@ public class LPS22HD implements Barometer, PollingSensor {
 
   /**
    * Read the current pressure form the sensor using a one shot read method.
-   * 
+   * <p>
    * MSB LSB Complete 24-bit word: | buffer[2] | buffer[1] | buffer[0] |
    * Registers: | 0x2A | 0x29 | 0x28 |
    */
@@ -101,7 +99,7 @@ public class LPS22HD implements Barometer, PollingSensor {
     // TODO Read at once so we don't read high on sample 1 and low on sample 2. As
     // in if the sample changes while we are reading.
     try {
-      byte[] buffer = { 0, 0, 0 };
+      byte[] buffer = {0, 0, 0};
       i2cDevice.read(REG_PRESSURE_EXTRA_LOW, buffer, 0, 3);
 
       // Out of range if MSB = 1
@@ -112,7 +110,7 @@ public class LPS22HD implements Barometer, PollingSensor {
       }
 
       int rawPressure = (Byte.toUnsignedInt(buffer[2]) << 16) + (Byte.toUnsignedInt(buffer[1]) << 8)
-          + Byte.toUnsignedInt(buffer[0]);
+              + Byte.toUnsignedInt(buffer[0]);
       pressure = rawPressure / (double) SCALING_FACTOR;
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();

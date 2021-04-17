@@ -10,8 +10,8 @@ import org.rocketproplab.marginalstability.flightcomputer.Time;
  */
 public class GenericEvent implements EventCallback, EventCondition {
   private final EventCondition condition;
-  private final EventCallback  callback;
-  private final Time           time;
+  private final EventCallback callback;
+  private final Time time;
 
   public GenericEvent(EventCondition condition, EventCallback callback, Time time) {
     this.condition = condition;

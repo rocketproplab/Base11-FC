@@ -8,25 +8,25 @@ import org.rocketproplab.marginalstability.flightcomputer.Settings;
  */
 public class GPSPacket {
 
-  private static final String NEMA_DELIMITER      = ",";
-  private static final int    NEMA_PART_LENGTH    = 15;
-  private static final int    NEMA_TIME_INDEX     = 1;
-  private static final int    NEMA_LAT_INDEX      = 2;
-  private static final int    NEMA_LON_INDEX      = 4;
-  private static final int    NEMA_SV_COUNT_INDEX = 7;
-  private static final int    NEMA_ALTITUDE_INDEX = 9;
+  private static final String NEMA_DELIMITER = ",";
+  private static final int NEMA_PART_LENGTH = 15;
+  private static final int NEMA_TIME_INDEX = 1;
+  private static final int NEMA_LAT_INDEX = 2;
+  private static final int NEMA_LON_INDEX = 4;
+  private static final int NEMA_SV_COUNT_INDEX = 7;
+  private static final int NEMA_ALTITUDE_INDEX = 9;
 
   private boolean valid;
-  private double  latitude;
-  private double  longitude;
-  private double  altitude;
-  private double  time;
-  private int     sVCount;
-  private String  nema;
+  private double latitude;
+  private double longitude;
+  private double altitude;
+  private double time;
+  private int sVCount;
+  private String nema;
 
   /**
    * Create a new GPS Packet based on the NEMA String
-   * 
+   *
    * @param nEMA the nema to make the packet of
    */
   public GPSPacket(String nEMA) {
@@ -36,7 +36,7 @@ public class GPSPacket {
 
   /**
    * Internally parses the NEMA for the packet
-   * 
+   *
    * @param nEMA the nema to assign this packet to
    */
   private void parseNEMA(String nEMA) {
@@ -51,17 +51,17 @@ public class GPSPacket {
     }
     this.valid = true;
 
-    String timeString     = nEMAParts[NEMA_TIME_INDEX];
-    String latString      = nEMAParts[NEMA_LAT_INDEX];
-    String lonString      = nEMAParts[NEMA_LON_INDEX];
-    String sVCountString  = nEMAParts[NEMA_SV_COUNT_INDEX];
+    String timeString = nEMAParts[NEMA_TIME_INDEX];
+    String latString = nEMAParts[NEMA_LAT_INDEX];
+    String lonString = nEMAParts[NEMA_LON_INDEX];
+    String sVCountString = nEMAParts[NEMA_SV_COUNT_INDEX];
     String altitudeString = nEMAParts[NEMA_ALTITUDE_INDEX];
 
-    this.time      = Double.parseDouble(timeString);
-    this.latitude  = Double.parseDouble(latString);
+    this.time = Double.parseDouble(timeString);
+    this.latitude = Double.parseDouble(latString);
     this.longitude = Double.parseDouble(lonString);
-    this.sVCount   = Integer.parseInt(sVCountString);
-    this.altitude  = Double.parseDouble(altitudeString);
+    this.sVCount = Integer.parseInt(sVCountString);
+    this.altitude = Double.parseDouble(altitudeString);
   }
 
   /**
@@ -102,7 +102,7 @@ public class GPSPacket {
   /**
    * Used as debug information for how many satellite vehicles (SVs) are connected
    * to the GPS.
-   * 
+   *
    * @return the number of satellite vehicles connected to the GPS
    */
   public int getSVCount() {
@@ -115,7 +115,7 @@ public class GPSPacket {
       return false;
     }
     GPSPacket other = (GPSPacket) o;
-    boolean   equal = this.valid == other.valid;
+    boolean equal = this.valid == other.valid;
     equal &= (this.latitude - other.latitude) < Settings.EQUALS_EPSILON;
     equal &= (this.longitude - other.longitude) < Settings.EQUALS_EPSILON;
     equal &= (this.altitude - other.altitude) < Settings.EQUALS_EPSILON;

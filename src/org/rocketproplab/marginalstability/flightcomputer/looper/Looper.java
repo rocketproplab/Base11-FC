@@ -21,12 +21,12 @@ import java.util.*;
  * @author Chi Chow, Enlil Odisho
  */
 public class Looper {
-  private final Time                          time;
+  private final Time time;
   private final HashMap<Object, GenericEvent> callbackMap;
   /**
    * List storing all commands that are running.
    */
-  private final ArrayList<Command>            active;
+  private final ArrayList<Command> active;
 
   /**
    * List storing all commands awaiting execution.

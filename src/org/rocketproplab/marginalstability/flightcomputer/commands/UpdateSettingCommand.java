@@ -6,31 +6,37 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 import java.util.Collections;
 
 public class UpdateSettingCommand implements Command {
-    private final String setting;
+  private final String setting;
 
-    UpdateSettingCommand(String setting) {
-        this.setting = setting;
-    }
+  UpdateSettingCommand(String setting) {
+    this.setting = setting;
+  }
 
-    public static UpdateSettingCommand getUpdateSettingCommand(String setting) {
-        return new UpdateSettingCommand(setting);
-    }
+  public static UpdateSettingCommand getUpdateSettingCommand(String setting) {
+    return new UpdateSettingCommand(setting);
+  }
 
-    @Override
-    public boolean isDone() { return true; }
+  @Override
+  public boolean isDone() {
+    return true;
+  }
 
-    @Override
-    public void execute() {
-        Settings.readSettingsFromConfig(Collections.singletonList(setting));
-    }
+  @Override
+  public void execute() {
+    Settings.readSettingsFromConfig(Collections.singletonList(setting));
+  }
 
-    @Override
-    public void start() { }
+  @Override
+  public void start() {
+  }
 
-    @Override
-    public void end() { }
+  @Override
+  public void end() {
+  }
 
-    @Override
-    public Subsystem[] getDependencies() { return new Subsystem[0]; }
+  @Override
+  public Subsystem[] getDependencies() {
+    return new Subsystem[0];
+  }
 
 }

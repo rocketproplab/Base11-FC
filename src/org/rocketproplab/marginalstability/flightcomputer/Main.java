@@ -1,10 +1,5 @@
 package org.rocketproplab.marginalstability.flightcomputer;
 
-import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
-import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.subsystems.*;
-
 /**
  * The main file contains the entry point to the software stack. It is
  * responsible for instantiating the
@@ -44,12 +39,12 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.*;
  * </ul>
  */
 public class Main {
-    public static void main(String[] args) {
-        FlightComputer flightComputer = FlightComputer.create(args);
-        flightComputer.initHighLevelObjects();
+  public static void main(String[] args) {
+    FlightComputer flightComputer = FlightComputer.create(args);
+    flightComputer.initHighLevelObjects();
 
 //    while(true) {
 //      flightComputer.tick();
 //    }
-    }
+  }
 }
