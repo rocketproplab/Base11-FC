@@ -4,15 +4,14 @@ import org.rocketproplab.marginalstability.flightcomputer.math.InterpolatingVect
 
 /**
  * An interface for listening to new position estimations
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public interface PositionListener {
 
   /**
    * Called when new estimate is available
-   * 
+   *
    * @param positionEstimate the new position estimate
    */
   public void onPositionEstimate(InterpolatingVector3 positionEstimate);

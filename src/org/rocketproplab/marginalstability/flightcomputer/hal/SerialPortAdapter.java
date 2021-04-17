@@ -1,15 +1,14 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
+import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
-
 /**
  * A relay for a serial port. Simply buffers a message without any processing.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class SerialPortAdapter implements SerialPort {
 

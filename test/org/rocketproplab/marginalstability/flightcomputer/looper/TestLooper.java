@@ -47,21 +47,6 @@ public class TestLooper {
   }
 
   @Test
-  public void checkSingletonInstance() {
-    // get an instance of command scheduler
-    Looper singletonInstance = Looper.getInstance();
-
-    // instance should never be null
-    assertNotNull(singletonInstance);
-
-    // create a new command scheduler
-    Looper differentScheduler = new Looper(new Time());
-
-    // new command scheduler must be different than singleton instance
-    assertNotEquals(differentScheduler, singletonInstance);
-  }
-
-  @Test
   public void testScheduleSameCommandMultipleTimes() {
     Looper looper = new Looper(new Time());
     DummyCommand command1 = new DummyCommand();

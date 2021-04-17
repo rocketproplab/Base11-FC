@@ -4,9 +4,8 @@ import org.rocketproplab.marginalstability.flightcomputer.Settings;
 
 /**
  * A vector class
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class Vector3 {
 
@@ -54,8 +53,8 @@ public class Vector3 {
     }
     Vector3 otherVector = (Vector3) other;
     return (Math.abs(this.x - otherVector.x) < Settings.EQUALS_EPSILON) &&
-           (Math.abs(this.y - otherVector.y) < Settings.EQUALS_EPSILON) &&
-           (Math.abs(this.z - otherVector.z) < Settings.EQUALS_EPSILON);
+            (Math.abs(this.y - otherVector.y) < Settings.EQUALS_EPSILON) &&
+            (Math.abs(this.z - otherVector.z) < Settings.EQUALS_EPSILON);
   }
 
   @Override

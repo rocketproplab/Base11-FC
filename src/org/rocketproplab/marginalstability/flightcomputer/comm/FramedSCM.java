@@ -1,9 +1,9 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
+import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
+
 import java.util.LinkedList;
 import java.util.Queue;
-
-import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 
 /**
  * A message to handle the framing of extra long SCM packets. The format for an
@@ -26,11 +26,11 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  * @author Max Apodaca
  */
 public class FramedSCM implements PacketListener<SCMPacket> {
-  private Queue<String>            outputQueue;
-  private String                   activeString;
-  private int                      frameLength;
-  private PacketRelay              sCMOutput;
-  private FramedPacketProcessor    framedPacketOutput;
+  private Queue<String>         outputQueue;
+  private String                activeString;
+  private int                   frameLength;
+  private PacketRelay           sCMOutput;
+  private FramedPacketProcessor framedPacketOutput;
 
   /**
    * Create a new SCM de-framer. SCMOutput is used to send replied to incoming SCM
@@ -105,7 +105,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
       activeString += SCMmessagesplit[0];
       frameLength  = Integer.parseInt(activeString);
       activeString = SCMmessagesplit[1];
-      // TODO Similar to XS, where if the frameLength is still less than 0 or 
+      // TODO Similar to XS, where if the frameLength is still less than 0 or
       // does not split into several indices
     } else if (lengthofframeleft < incomingPacket.getData().length()) {
       activeString += incomingPacket.getData().substring(0, lengthofframeleft);

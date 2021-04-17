@@ -27,7 +27,7 @@ public class SetValveCommand implements Command {
       valves.setValve(getValveID(), valveState);
     } catch (IllegalArgumentException dataOnOffException) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Data from SCMPacket was not On or Off. Data was actually: " + scmpacket.getData();
+      String        errorMsg      = "Data from SCMPacket was not On or Off. Data was actually: " + scmpacket.getData();
       errorReporter.reportError(null, dataOnOffException, errorMsg);
     }
   }

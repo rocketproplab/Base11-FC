@@ -1,29 +1,26 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-
+import com.pi4j.io.spi.SpiDevice;
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.Settings;
 
-import com.pi4j.io.spi.SpiDevice;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * A class that implements the SPI protocol for the MAX14830, it contains the
  * code to emit serial port events to any listeners listening to ports provided
  * by the MAX14830.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class MAX14830 implements PollingSensor {
 
   /**
    * The list of ports which we can access on the MAX14830
-   * 
-   * @author Max Apodaca
    *
+   * @author Max Apodaca
    */
   public enum Port {
     UART0,
@@ -34,9 +31,8 @@ public class MAX14830 implements PollingSensor {
 
   /**
    * The list of registers found on the MAX14830
-   * 
-   * @author Max Apodaca
    *
+   * @author Max Apodaca
    */
   public enum Registers {
     // FIFO DATA
@@ -120,7 +116,7 @@ public class MAX14830 implements PollingSensor {
   /**
    * Create the MAX14830 and initialize the event handlers with
    * {@link SerialPortAdapter}. TODO Use chipselect via gpio
-   * 
+   *
    * @param spi the Spi device to use, no validation is done
    */
   public MAX14830(SpiDevice spi) {
@@ -140,7 +136,7 @@ public class MAX14830 implements PollingSensor {
   /**
    * Read the length of the transmit buffer for a given port. This will return how
    * many bytes can currently be written.
-   * 
+   *
    * @param port which of the four uart channels to read from
    * @return the number of free bytes in the FIFO buffer
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
@@ -154,7 +150,7 @@ public class MAX14830 implements PollingSensor {
   /**
    * Read the receive buffer length for a given port. This reports the number of
    * bytes in the receive buffer that can be currently read.
-   * 
+   *
    * @param port which of the four uart channels to read for.
    * @return the number of bytes that can be read from the given FIFO buffer.
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
@@ -179,13 +175,13 @@ public class MAX14830 implements PollingSensor {
    * above 0x1F (31) are currently not supported as they are read in a different
    * way.</li>
    * </ul>
-   * 
+   *
    * @param command the command to write
    * @return -1 on failure or the value of the register
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
   private int readRegister(byte command) throws IOException {
-    byte[] data     = { command, 0 };
+    byte[] data     = {command, 0};
     byte[] readData = this.spi.write(data);
     if (readData.length < 2) {
       return -1;
@@ -204,7 +200,7 @@ public class MAX14830 implements PollingSensor {
    * {@link #getTXBufferLen(Port)} and therefore it is possible to loose data if
    * too many bytes are sent.. If there are too few bytes in the
    * {@link #uartBufferArray} then the remaining bytes are written.
-   * 
+   *
    * @param port      Which UART channel to use
    * @param charCount how many bytes to write at most
    * @return how many bytes were actually written.
@@ -230,7 +226,7 @@ public class MAX14830 implements PollingSensor {
   /**
    * Try to read from the RX FIFO buffer for the specified UART channel. This
    * method does not check if the buffer actually has enough data.
-   * 
+   *
    * @param port      which channel to read from
    * @param charCount how many characters to read
    * @return the characters as a byte stream.
@@ -247,7 +243,7 @@ public class MAX14830 implements PollingSensor {
   /**
    * Get a serial port interface compatible representation of the given port. This
    * can be used as any other serial port would be.
-   * 
+   *
    * @param port which UART interface to use
    * @return the serial port created for the UART interface.
    */
@@ -257,7 +253,7 @@ public class MAX14830 implements PollingSensor {
 
   /**
    * Queue the string to be written to the specified port as soon as possible.
-   * 
+   *
    * @param port which UART interface to write to
    * @param data the string to write. Will wait until previous stirngs have been
    *             written.
@@ -269,7 +265,7 @@ public class MAX14830 implements PollingSensor {
 
   /**
    * Get the string buffer acting as a queue for the given port.
-   * 
+   *
    * @param port which UART buffer to select.
    * @return the string buffer acting as a queue
    */
@@ -284,7 +280,7 @@ public class MAX14830 implements PollingSensor {
    * The length is cached to prevent unnecessary calls to
    * {@link #getTXBufferLen(Port)}. If we see that there is enough space from the
    * last call to {@link #getTXBufferLen(Port)} we write to it.
-   * 
+   *
    * @param port   Which port to select
    * @param length How many characters to write, must be &gt;=  0
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
@@ -306,7 +302,7 @@ public class MAX14830 implements PollingSensor {
   /**
    * Read from the given port and call the SerilPort callbacks. Length must be
    * smaller or equal to the number of bytes in the RX FIFO.
-   * 
+   *
    * @param port   which port to read
    * @param length how many bytes to read, passed directly to
    *               {@link #readFromRxFifo(Port, int)}
@@ -325,7 +321,7 @@ public class MAX14830 implements PollingSensor {
    * the data.<br>
    * Then check if we have data to receive in the RX buffer. If so receive it and
    * emit events.
-   * 
+   *
    * @param port which UART port to read
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
@@ -349,7 +345,7 @@ public class MAX14830 implements PollingSensor {
       }
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Unable to access /dev/spix.x via Pi4J";
+      String        errorMsg      = "Unable to access /dev/spix.x via Pi4J";
       errorReporter.reportError(Errors.MAX14830_IO_ERROR, e, errorMsg);
     }
 
@@ -363,8 +359,8 @@ public class MAX14830 implements PollingSensor {
    * {@link Settings#MAX14830_F_REF}. All math is integer math so fREF must be an
    * integer multiple of 16 * BaudRate or the actual baud rate will differ from the
    * requested.
-   * 
-   * @param port the UART channel to use
+   *
+   * @param port     the UART channel to use
    * @param baudrate the baud rate in baud
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
@@ -378,7 +374,7 @@ public class MAX14830 implements PollingSensor {
     byte   command              = (byte) (uartSelect | WRITE | Registers.BRGConfig.address());
     byte   leastSignificantBits = (byte) (d & 0xFF);
     byte   mostSignificantBits  = (byte) ((d >> BITS_PER_BYTE) & 0xFF);
-    byte[] data                 = { command, 0, leastSignificantBits, mostSignificantBits };
+    byte[] data                 = {command, 0, leastSignificantBits, mostSignificantBits};
     this.spi.write(data);
 
   }

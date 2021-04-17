@@ -1,19 +1,18 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
-import org.rocketproplab.marginalstability.flightcomputer.Errors;
 
 /**
  * A packet for the SCMProtocol to convert between the object and string
  * representation. <br>
  * The Simple Checksum Messaging (SCM) protocol consists of three sections. The
  * id, data and checksum organized as a plaintext string. <br>
- * 
+ *
  * <pre>
  * {@code | Id | Data  | Checksum |}
  * {@code   AA , BBBBB ,    FF    ;}
  * </pre>
- * 
+ * <p>
  * An example of a heartbeat packet would be {@code HB,12345,81;} where the ID
  * is HB, data is 12345 and checksum is 81. <br>
  * The checksum is calculated by summing the char code of each character up the
@@ -21,9 +20,8 @@ import org.rocketproplab.marginalstability.flightcomputer.Errors;
  * a character sequence from 00 to 99 and then a semicolon is appended. See
  * {@link #calculateChecksum(String)} for implementation details of the checksum
  * algorithm.
- * 
- * @author Daniel Walder, Max Apodaca
  *
+ * @author Daniel Walder, Max Apodaca
  */
 public class SCMPacket {
 
@@ -38,7 +36,7 @@ public class SCMPacket {
 
   /**
    * Constructor that passes the packet into it's components
-   * 
+   *
    * @param packet the packet to be processed
    */
   public SCMPacket(String packet) {
@@ -47,7 +45,7 @@ public class SCMPacket {
 
   /**
    * Create a new packet based off of the ID and data
-   * 
+   *
    * @param id   the id of the packet
    * @param data the data which the packet holds
    */
@@ -60,7 +58,7 @@ public class SCMPacket {
   /**
    * Takes the packet assigns its id and data to the instance variables Also calls
    * verifyChecksum to confirm packet accuracy
-   * 
+   *
    * @param packet the received packet to work with
    */
   private void parsepacket(String packet) {
@@ -123,7 +121,7 @@ public class SCMPacket {
 
   /**
    * Helper method for verifyChecksum for calculating the strChecksum
-   * 
+   *
    * @param packet the packet in question
    * @return the checksum of the packet
    */
@@ -143,7 +141,7 @@ public class SCMPacket {
   /**
    * Gets the ID of this packet. Only valid if {@link SCMPacket#isValid()} returns
    * true.
-   * 
+   *
    * @return the id of the packet
    */
   public SCMPacketType getID() {
@@ -153,7 +151,7 @@ public class SCMPacket {
   /**
    * Get the data in this packet. Only valid if {@link SCMPacket#isValid()}
    * returns true.
-   * 
+   *
    * @return the data in this packet
    */
   public String getData() {
@@ -162,7 +160,7 @@ public class SCMPacket {
 
   /**
    * Get whether or not this packet is valid. If invalid nothing is guarantee.
-   * 
+   *
    * @return if the data in the packet is valid
    */
   public boolean isValid() {
@@ -172,7 +170,7 @@ public class SCMPacket {
   /**
    * Encodes id and data into a packet string. Will attempt to encode even with an
    * invalid state.
-   * 
+   *
    * @return the packet as String
    */
   @Override

@@ -7,19 +7,17 @@ import java.util.List;
 
 /**
  * A ring buffer that allows you to iterate based on time
- * 
- * @author Max Apodaca
  *
  * @param <E> The type which the buffer is of
+ * @author Max Apodaca
  */
 public class TimedRingBuffer<E> implements Iterable<E> {
 
   /**
    * An iterator for the ring buffer, will iterate section of ring buffer in
    * increasing add time.
-   * 
-   * @author Max Apodaca
    *
+   * @author Max Apodaca
    */
   public class RingBufferIterator implements Iterator<E>, Iterable<E> {
     private Iterator<E> sublistIterator;
@@ -28,7 +26,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
     /**
      * Create a new ring buffer iterator that will iterate the first iterator then
      * the second
-     * 
+     *
      * @param sublistIterator     first iterator to iterate
      * @param nextSublistIterator next iterator to iterate
      */
@@ -66,7 +64,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
   /**
    * Create a new timed ring buffer with the given capacity
-   * 
+   *
    * @param capacity how many elements to store at most
    */
   public TimedRingBuffer(int capacity) {
@@ -78,7 +76,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
   /**
    * Add a new element to the buffer and specifies the time
-   * 
+   *
    * @param value the element to add
    * @param time  the time at which the element was added, must be greater than or
    *              equal to the previous time
@@ -96,7 +94,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
   /**
    * Get how many elements are in the buffer
-   * 
+   *
    * @return the number of elements in the buffer
    */
   public int size() {
@@ -105,7 +103,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
   /**
    * Get an iterator for the whole buffer. Iterates in increasing time
-   * 
+   *
    * @return an iterator for the whole buffer
    */
   public RingBufferIterator get() {
@@ -121,7 +119,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
   /**
    * Takes the mathematical definition of modulo so that -1 mod 5 = 4
-   * 
+   *
    * @param numerator the numerator in the modulo division
    * @param divisor   the divisor in the modulo division
    * @return numerator modulo divisor
@@ -138,12 +136,12 @@ public class TimedRingBuffer<E> implements Iterable<E> {
    * Get the most recent n elements from the ring buffer. If n is larger than the
    * number of elements all the elements are returned. The elements are iterated
    * in increasing order of time.
-   * 
+   * <p>
    * Returns size if n > size.
-   * 
-   * @throws IndexOutOfBoundsException if n < 0.
+   *
    * @param n the number of elements to get
    * @return an iterator for the most recent n elements
+   * @throws IndexOutOfBoundsException if n < 0.
    */
   public RingBufferIterator get(int n) {
     if (n < 0) {
@@ -169,7 +167,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
   /**
    * Get an iterator for the elements within the last pastTime seconds.
-   * 
+   *
    * @param pastTime how far in the past to look
    * @return an iterator for the elements added within the last pastTime seconds.
    */

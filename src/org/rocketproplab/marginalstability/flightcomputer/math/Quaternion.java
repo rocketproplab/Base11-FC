@@ -2,9 +2,8 @@ package org.rocketproplab.marginalstability.flightcomputer.math;
 
 /**
  * Quaternion class.
- * 
- * @author Enlil Odisho
  *
+ * @author Enlil Odisho
  */
 public class Quaternion {
 
@@ -29,7 +28,7 @@ public class Quaternion {
 
   /**
    * Adds two quaternions together.
-   * 
+   *
    * @param other Quaternion to add to this quaternion.
    * @return Result of addition.
    */
@@ -44,7 +43,7 @@ public class Quaternion {
 
   /**
    * Subtracts another quaternion from this quaternion.
-   * 
+   *
    * @param other The quaternion to subtract.
    * @return Result of subtraction.
    */
@@ -59,22 +58,22 @@ public class Quaternion {
 
   /**
    * Multiplies this quaternion with another quaternion.
-   * 
+   *
    * @param other Quaternion to multiply with this quaternion.
    * @return Result of multiplication.
    */
   public Quaternion multiply(Quaternion other) {
     Quaternion result = new Quaternion();
-    result.w = this.w*other.w - this.x*other.x - this.y*other.y - this.z*other.z;
-    result.x = this.w*other.x + this.x*other.w + this.y*other.z - this.z*other.y;
-    result.y = this.w*other.y - this.x*other.z + this.y*other.w + this.z*other.x;
-    result.z = this.w*other.z + this.x*other.y - this.y*other.x + this.z*other.w;
+    result.w = this.w * other.w - this.x * other.x - this.y * other.y - this.z * other.z;
+    result.x = this.w * other.x + this.x * other.w + this.y * other.z - this.z * other.y;
+    result.y = this.w * other.y - this.x * other.z + this.y * other.w + this.z * other.x;
+    result.z = this.w * other.z + this.x * other.y - this.y * other.x + this.z * other.w;
     return result;
   }
 
   /**
    * Scale this quaternion by multiplying it with a scalar.
-   * 
+   *
    * @param scalar to multiply with quaternion.
    * @return Result of multiplication.
    */
@@ -104,15 +103,15 @@ public class Quaternion {
    */
   public Quaternion inverse() {
     double magnitude = this.getMagnitude();
-    return this.conjugate().multiply(1.0 / (magnitude*magnitude));
+    return this.conjugate().multiply(1.0 / (magnitude * magnitude));
   }
 
   /**
    * @return the magnitude of this quaternion
    */
   public double getMagnitude() {
-    return Math.sqrt(this.w*this.w + this.x*this.x + this.y*this.y + 
-                     this.z*this.z);
+    return Math.sqrt(this.w * this.w + this.x * this.x + this.y * this.y +
+            this.z * this.z);
   }
 
   /**
@@ -151,9 +150,9 @@ public class Quaternion {
     final double EQUAL_TOLERANCE = 0.00001; // TODO may need adjusting
     Quaternion   otherQuaternion = (Quaternion) other;
     return (Math.abs(this.w - otherQuaternion.w) < EQUAL_TOLERANCE) &&
-           (Math.abs(this.x - otherQuaternion.x) < EQUAL_TOLERANCE) &&
-           (Math.abs(this.y - otherQuaternion.y) < EQUAL_TOLERANCE) &&
-           (Math.abs(this.z - otherQuaternion.z) < EQUAL_TOLERANCE);
+            (Math.abs(this.x - otherQuaternion.x) < EQUAL_TOLERANCE) &&
+            (Math.abs(this.y - otherQuaternion.y) < EQUAL_TOLERANCE) &&
+            (Math.abs(this.z - otherQuaternion.z) < EQUAL_TOLERANCE);
   }
 
   @Override

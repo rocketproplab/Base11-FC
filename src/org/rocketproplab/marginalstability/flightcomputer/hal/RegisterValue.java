@@ -5,9 +5,8 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
  * {@link #getValueMask()} returns a bitmask of what section of the register
  * should be read and the {@link #getValueLSBPos()} method returns how many bits
  * to the left of the LSB the LSB of the value is.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public interface RegisterValue {
 
@@ -16,7 +15,7 @@ public interface RegisterValue {
    * cover the specified value. <br>
    * For instance a register with three values aabbbccc would mean that value a
    * has a mask of 0b11000000;
-   * 
+   *
    * @return the mask for this value for its register
    */
   public int getValueMask();
@@ -28,9 +27,9 @@ public interface RegisterValue {
    * value b would be 3 as the LSB of b is three bits to the left of the LSB of
    * the register as a whole. The LSBPos of c would be 0 and the LSBPos of a would
    * be 6.
-   * 
+   *
    * @return how many bits to the left of the register's LSB the LSB of the value
-   *         is
+   * is
    */
   public int getValueLSBPos();
 
@@ -45,9 +44,9 @@ public interface RegisterValue {
    * must be ordered correctly to yield a correct return value for ordinal. If the
    * enum has 2 members A_0 and A_1 and A_0 should have value 0 then A_0 must be
    * the first element in the enum.
-   * 
+   *
    * @return the value of this value
    */
   public int ordinal();
-  
+
 }

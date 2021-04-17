@@ -23,15 +23,7 @@ import java.util.List;
 public class ParachuteSubsystem
         implements FlightStateListener, PositionListener, Subsystem {
 
-  private static final String             MAIN_CHUTE_TAG = "MainChute";
-  private static       ParachuteSubsystem instance;
-
-  public static ParachuteSubsystem getInstance() {
-    if (instance == null) {
-      instance = new ParachuteSubsystem(null, null, null, null);
-    }
-    return instance;
-  }
+  private static final String MAIN_CHUTE_TAG = "MainChute";
 
   private Solenoid             mainChute;
   private Solenoid             drogueChute;
@@ -81,8 +73,8 @@ public class ParachuteSubsystem
 
   private boolean shouldMainChuteOpenByPressure() {
     Vector3 currentPos = this.position.getAt(time.getSystemTime());
-    boolean b1 = currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT;
-    boolean b2 = barometer.getPressure() < Settings.MAIN_CHUTE_PRESSURE;
+    boolean b1         = currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT;
+    boolean b2         = barometer.getPressure() < Settings.MAIN_CHUTE_PRESSURE;
     return b1 && b2;
 //    return currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT &&
 //            barometer.getPressure() >= Settings.MAIN_CHUTE_PRESSURE;
@@ -128,12 +120,12 @@ public class ParachuteSubsystem
   /**
    * Attempt to open the main chute
    *
-   * @return    if the deployment was successful
+   * @return if the deployment was successful
    */
   public boolean attemptMainChuteOpen() {
     /* TODO: Find a better way to check if the drogue chute is currently open,
         and if the main chute deployed successfully */
-    if(drogueChute.isActive())
+    if (drogueChute.isActive())
       mainChuteOpen();
     else {
       return false;
@@ -145,7 +137,7 @@ public class ParachuteSubsystem
   /**
    * Attempt to open the drogue chute
    *
-   * @return    if the deployment was successful
+   * @return if the deployment was successful
    */
   public boolean attemptDrogueChuteOpen() {
     drogueChuteOpen();

@@ -30,7 +30,7 @@ public class TestPTSubsystem {
 
   @Test(expected = NullPointerException.class)
   public void nullADCInDefaultInstance() {
-    PTSubsystem ptSubsystem = PTSubsystem.getInstance();
+    PTSubsystem ptSubsystem = new PTSubsystem(null);
     ptSubsystem.getPTValue(PTSubsystem.ChannelIndex.CH0);
   }
 

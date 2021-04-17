@@ -1,19 +1,17 @@
 package org.rocketproplab.marginalstability.flightcomputer.hal;
 
-import java.io.IOException;
-
+import com.pi4j.io.i2c.I2CDevice;
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
 import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.Time;
 
-import com.pi4j.io.i2c.I2CDevice;
+import java.io.IOException;
 
 /**
  * The LPS22HD HAL implementation. Refer to the datasheet for specification <a
  * href=https://www.st.com/resource/en/datasheet/lps22hd.pdf>https://www.st.com/resource/en/datasheet/lps22hd.pdf</a>
- * 
- * @author Clara Chun, Max Apodaca
  *
+ * @author Clara Chun, Max Apodaca
  */
 public class LPS22HD implements Barometer, PollingSensor {
 
@@ -39,7 +37,7 @@ public class LPS22HD implements Barometer, PollingSensor {
    * Create a new LPS22HD with the given i2cDevice and time. Time will be used to
    * determine the {@link #getLastMeasurementTime()} return value. <br>
    * The i2cDevice parameter is not checked for a valid address.
-   * 
+   *
    * @param i2cDevice the device which should be used to communicate via i2c
    * @param time      the time to use when reporting measurement time.
    */
@@ -58,7 +56,7 @@ public class LPS22HD implements Barometer, PollingSensor {
       i2cDevice.write(CTRL_REG1, (byte) (ODR_25HZ | LOW_PASS_ENABLE | LOW_PASS_20TH | KEEP_REGISTERS_SYCHONISED_BDU));
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Unable to write from i2cDevice IO Exception";
+      String        errorMsg      = "Unable to write from i2cDevice IO Exception";
       errorReporter.reportError(Errors.LPS22HD_INITIALIZATION_ERROR, e, errorMsg);
     }
   }
@@ -93,7 +91,7 @@ public class LPS22HD implements Barometer, PollingSensor {
 
   /**
    * Read the current pressure form the sensor using a one shot read method.
-   * 
+   * <p>
    * MSB LSB Complete 24-bit word: | buffer[2] | buffer[1] | buffer[0] |
    * Registers: | 0x2A | 0x29 | 0x28 |
    */
@@ -101,7 +99,7 @@ public class LPS22HD implements Barometer, PollingSensor {
     // TODO Read at once so we don't read high on sample 1 and low on sample 2. As
     // in if the sample changes while we are reading.
     try {
-      byte[] buffer = { 0, 0, 0 };
+      byte[] buffer = {0, 0, 0};
       i2cDevice.read(REG_PRESSURE_EXTRA_LOW, buffer, 0, 3);
 
       // Out of range if MSB = 1
@@ -112,11 +110,11 @@ public class LPS22HD implements Barometer, PollingSensor {
       }
 
       int rawPressure = (Byte.toUnsignedInt(buffer[2]) << 16) + (Byte.toUnsignedInt(buffer[1]) << 8)
-          + Byte.toUnsignedInt(buffer[0]);
+              + Byte.toUnsignedInt(buffer[0]);
       pressure = rawPressure / (double) SCALING_FACTOR;
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Unable to read Pressure from i2cDevice IO Exception";
+      String        errorMsg      = "Unable to read Pressure from i2cDevice IO Exception";
       errorReporter.reportError(Errors.LPS22HD_PRESSURE_IO_ERROR, e, errorMsg);
     }
     sampleTime = clock.getSystemTime();

@@ -31,11 +31,11 @@ public class Settings {
    */
   @UserSetting(comment = "Time threshold needed to exceed to deploy the main chute", units = "s")
   public static double MAIN_CHUTE_PRESSURE_TIME_THRESHOLD = 10; // TODO: set time exceeding the threshold needed to
-                                                                // deploy main chute
+  // deploy main chute
 
-  public static boolean[] ENGINE_ON_VALVE_STATES = { true, true, true, true, true };
+  public static boolean[] ENGINE_ON_VALVE_STATES = {true, true, true, true, true};
 
-  public static boolean[] ENGINE_ABORT_VALVE_STATES = { true, true, true, true, true };
+  public static boolean[] ENGINE_ABORT_VALVE_STATES = {true, true, true, true, true};
 
   // Unit conversions
 
@@ -57,16 +57,16 @@ public class Settings {
   @SettingSectionHeader(name = "PT Quadratic Regression")
 
   @UserSetting(comment = "'a' constant for quadratic regression for pressure transducers", units = "hPa / V^2")
-  public static double[] A_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0 };
+  public static double[] A_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+          0.0};
 
   @UserSetting(comment = "'b' constant for quadratic regression for pressure transducers", units = "hPa / V")
-  public static double[] B_PT_CONSTANTS = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0 };
+  public static double[] B_PT_CONSTANTS = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+          1.0};
 
   @UserSetting(comment = "'c' constant for quadratic regression for pressure transducers", units = "hPa")
-  public static double[] C_PT_CONSTANTS = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0 };
+  public static double[] C_PT_CONSTANTS = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+          0.0};
 
   @UserSetting(comment = "Phone number to text position to", units = "1xxxyyyyyyy")
   public static String PHONE_NUMBER = "13150001111";
@@ -198,7 +198,7 @@ public class Settings {
   }
 
   protected static void setFieldDoubleArray(Field field, String line)
-      throws IllegalArgumentException, IllegalAccessException {
+          throws IllegalArgumentException, IllegalAccessException {
     line = line.trim().replace("[", "").replace("]", "");
     String[] newValues   = line.split(",");
     double[] fieldValues = (double[]) field.get(null);
@@ -212,7 +212,7 @@ public class Settings {
   }
 
   protected static void setFieldDouble(Field field, String line)
-      throws IllegalArgumentException, IllegalAccessException {
+          throws IllegalArgumentException, IllegalAccessException {
     line = line.trim();
     double value = Double.parseDouble(line);
     field.set(null, value);

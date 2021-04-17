@@ -9,20 +9,19 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
  * This is the Heartbeat Command class that implements the Command interface.
  * The main capabilities of this class includes checking the start time and
  * sending a periodic "heartbeat" signal every second.
- * 
- * @author Hemanth Battu
  *
+ * @author Hemanth Battu
  */
 public class HeartbeatCommand implements Command {
   private static final Subsystem[] EMPTY_ARRAY = {};
-  private int                      HBcounter;
-  private double                   startTime;
-  private Time                     time;
-  private Telemetry                telemetry;
+  private              int         HBcounter;
+  private              double      startTime;
+  private              Time        time;
+  private              Telemetry   telemetry;
 
   /**
    * Creates a new HeartbeatCommand object using Time and Telemetry objects.
-   * 
+   *
    * @param time      the Time object to use for checking time
    * @param telemetry the Telemetry object used to send heartbeat
    */
@@ -33,7 +32,7 @@ public class HeartbeatCommand implements Command {
 
   /**
    * Setter method to set the start time.
-   * 
+   *
    * @param startTime input to set start time with
    */
   private void setStartTime(double startTime) {
@@ -62,7 +61,7 @@ public class HeartbeatCommand implements Command {
       }
     } else {
       if (currentTime
-          - startTime >= ((HBcounter + 1) * (Settings.HEARTBEAT_THRESHOLD))) {
+              - startTime >= ((HBcounter + 1) * (Settings.HEARTBEAT_THRESHOLD))) {
         telemetry.sendHeartbeat();
         HBcounter += 1;
       }

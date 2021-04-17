@@ -2,9 +2,8 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
 
 /**
  * A class to poll a {@link PollingSensor} at a fixed rate.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class SensorPoller {
 
@@ -16,7 +15,7 @@ public class SensorPoller {
   /**
    * Initialize a sensor poller that will poll the given sensor every rate
    * seconds.
-   * 
+   *
    * @param sensor the sensor to poll
    * @param rate   the rate at which to poll in seconds
    */
@@ -29,7 +28,7 @@ public class SensorPoller {
 
   /**
    * Update the poller, if enough time has passed the sensor will be polled.
-   * 
+   *
    * @param time the current time in seconds
    */
   public void update(double time) {
@@ -46,7 +45,7 @@ public class SensorPoller {
 
   /**
    * Determine if we should poll the sensor at this time
-   * 
+   *
    * @param time the current time
    * @return if the sensor needs to be polled
    */

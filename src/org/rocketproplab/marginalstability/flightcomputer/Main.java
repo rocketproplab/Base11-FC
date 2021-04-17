@@ -1,10 +1,5 @@
 package org.rocketproplab.marginalstability.flightcomputer;
 
-import org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter;
-import org.rocketproplab.marginalstability.flightcomputer.comm.PacketSources;
-import org.rocketproplab.marginalstability.flightcomputer.comm.SCMPacket;
-import org.rocketproplab.marginalstability.flightcomputer.subsystems.*;
-
 /**
  * The main file contains the entry point to the software stack. It is
  * responsible for instantiating the
@@ -14,7 +9,7 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.*;
  * Subsystems}, and registering subsystems with the
  * {@link org.rocketproplab.marginalstability.flightcomputer.comm.PacketRouter
  * Packet Router}.
- * 
+ * <p>
  * The application is split up into three main sections.
  * <ul>
  * <li><b>Subsystems</b> are classes which hold state for a particular part of
@@ -44,47 +39,12 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.*;
  * </ul>
  */
 public class Main {
-
   public static void main(String[] args) {
-    Time           time           = new Time();
-    FlightComputer flightComputer = new FlightComputer(Telemetry.getInstance(), time);
-    Main.registerSubsystems(flightComputer);
-    Main.registerPacketListeners();
+    FlightComputer flightComputer = FlightComputer.create(args);
+    flightComputer.initHighLevelObjects();
 
 //    while(true) {
 //      flightComputer.tick();
 //    }
   }
-
-  private static void registerSubsystems(FlightComputer flightComputer) {
-    Telemetry telemetry = Telemetry.getInstance();
-
-    telemetry.logInfo(Info.INIT_SUBSYSTEMS_START);
-
-    flightComputer.registerSubsystem(ParachuteSubsystem.getInstance());
-    ValveStateSubsystem.getInstance();
-
-    SensorSubsystem sensorSubsystem = new SensorSubsystem(flightComputer.getTime());
-    Main.addSensors(sensorSubsystem);
-    flightComputer.registerSubsystem(sensorSubsystem);
-
-    SCMCommandSubsystem scmCommandSubsystem = SCMCommandSubsystem.getInstance();
-    flightComputer.registerSubsystem(scmCommandSubsystem); // TODO: should listen to PacketRouter
-
-    telemetry.logInfo(Info.FINISH_SUBSYSTEM_START);
-  }
-
-  private static void addSensors(SensorSubsystem sensorSubsystem) {
-    Telemetry telemetry = Telemetry.getInstance();
-
-    telemetry.logInfo(Info.DONE_CREATING_SENSORS);
-  }
-
-  private static void registerPacketListeners() {
-    PacketRouter packetRouter = PacketRouter.getInstance();
-
-    packetRouter.addListener(ValveStateSubsystem.getInstance(), SCMPacket.class,
-        PacketSources.EngineControllerUnit);
-  }
-
 }

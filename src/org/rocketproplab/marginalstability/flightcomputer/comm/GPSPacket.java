@@ -26,7 +26,7 @@ public class GPSPacket {
 
   /**
    * Create a new GPS Packet based on the NEMA String
-   * 
+   *
    * @param nEMA the nema to make the packet of
    */
   public GPSPacket(String nEMA) {
@@ -36,7 +36,7 @@ public class GPSPacket {
 
   /**
    * Internally parses the NEMA for the packet
-   * 
+   *
    * @param nEMA the nema to assign this packet to
    */
   private void parseNEMA(String nEMA) {
@@ -102,7 +102,7 @@ public class GPSPacket {
   /**
    * Used as debug information for how many satellite vehicles (SVs) are connected
    * to the GPS.
-   * 
+   *
    * @return the number of satellite vehicles connected to the GPS
    */
   public int getSVCount() {

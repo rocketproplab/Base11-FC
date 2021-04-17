@@ -5,20 +5,20 @@ public enum SCMPacketType {
    * Change the state of the valves, each index in data is a 1 or 0 that
    * Specifies valve 0-4.
    */
-  V0("Valve State"), 
-  
+  V0("Valve State"),
+
   /**
    * Change the state of the valves, each index in data is a 1 or 0 that
    * Specifies valve 5-7.
    */
   V1("Valve State"),
-  
-  V2("Valve State"), 
-  
-  V3("Valve State"), 
-  
+
+  V2("Valve State"),
+
+  V3("Valve State"),
+
   HB("HB"), // TODO fill this packet in
-  
+
 
   /**
    * Position of the GPS x coordinate. Bits are hex integer value (m)
@@ -99,12 +99,12 @@ public enum SCMPacketType {
    * Reading of pressure transducer 4. Bits are integer value (PSI)
    */
   P4("Pressure Transducer 4"),
-  
+
   /**
    * Reading of pressure transducer 5. Bits are integer value (PSI)
    */
   P5("Pressure Transducer 5"),
-  
+
   /**
    * Reading of pressure transducer 6. Bits are integer value (PSI)
    */
@@ -114,47 +114,47 @@ public enum SCMPacketType {
    * Reading of pressure transducer 7. Bits are integer value (PSI)
    */
   P7("Pressure Transducer 7"),
-  
+
   /**
    * Reading of pressure transducer 8. Bits are integer value (PSI)
    */
   P8("Pressure Transducer 8"),
-  
+
   /**
    * Reading of pressure transducer 9. Bits are integer value (PSI)
    */
   P9("Pressure Transducer 9"),
-  
+
   /**
    * Reading of pressure transducer 10. Bits are integer value (PSI)
    */
   PA("Pressure Transducer 10"),
-  
+
   /**
    * Reading of pressure transducer 11. Bits are integer value (PSI)
    */
   PB("Pressure Transducer 11"),
-  
+
   /**
    * Reading of pressure transducer 12. Bits are integer value (PSI)
    */
   PC("Pressure Transducer 12"),
-  
+
   /**
    * Reading of pressure transducer 13. Bits are integer value (PSI)
    */
   PD("Pressure Transducer 13"),
-  
+
   /**
    * Reading of pressure transducer 14. Bits are integer value (PSI)
    */
   PE("Pressure Transducer 14"),
-  
+
   /**
    * Reading of pressure transducer 15. Bits are integer value (PSI)
    */
   PF("Pressure Transducer 15"),
-  
+
   /**
    * Error. The bits are the error code
    */
@@ -164,37 +164,37 @@ public enum SCMPacketType {
    * Warning. The bits are the warning code
    */
   WA("Warning"), VS("VS"),
-  
+
   /**
    * Drogue Chute Deploy
    */
   DD("Drogue Chute Deploy"),
-  
+
   /**
    * Main Chute Deploy
    */
   MD("Main Chute Deploy"),
-  
+
   /**
    * A packet to indicate the start of an extra long transmission, @see {@link FramedSCM}
    */
   XS("Start extra long transmission"),
-  
+
   /**
    * Indicates data for the extra long transmission, @see {@link FramedSCM}
    */
   X0("Extra long data frame zero"),
-  
+
   /**
    * Indicates data for the extra long transmission, @see {@link FramedSCM}
    */
   X1("Extra long data frame one"),
-  
+
   /**
    * Acknowledges the receipt of the {@link #X0} packet
    */
   XA("Extra long ack to X0"),
-  
+
   /**
    * Acknowledges the receipt of the {@link #X1} packet
    */
@@ -205,7 +205,7 @@ public enum SCMPacketType {
   /**
    * Create a new SCMPacketType enum element with the appropriate name to print
    * when relevant
-   * 
+   *
    * @param name the full name of the packet type
    */
   SCMPacketType(String name) {
@@ -214,6 +214,7 @@ public enum SCMPacketType {
 
   /**
    * Returns the human readable name of the packet type
+   *
    * @return the human readable name of this packet type
    */
   public String getName() {

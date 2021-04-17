@@ -1,7 +1,6 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
 import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
-import org.rocketproplab.marginalstability.flightcomputer.Errors;
 import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 import org.rocketproplab.marginalstability.flightcomputer.hal.SerialPort;
@@ -13,9 +12,8 @@ import org.rocketproplab.marginalstability.flightcomputer.hal.SerialPort;
  * chunk it will notify the packet router of the new packet. It uses the
  * specified source for this as we can have multiple SCM packet sources. See
  * {@link PacketSources} for more info about packet sources.
- * 
- * @author Max Apodaca, Antonio
  *
+ * @author Max Apodaca, Antonio
  */
 public class SCMTransceiver implements SerialListener, PacketListener<SCMPacket> {
   private SerialPort    serialPort;
@@ -25,7 +23,7 @@ public class SCMTransceiver implements SerialListener, PacketListener<SCMPacket>
   /**
    * Create a new SCM Transceiver that will use this serial port to send and
    * receive data.
-   * 
+   *
    * @param serialPort The serial port to send data to
    * @param router     the router to use to route packets
    * @param source     where the SCM is connected to
@@ -43,7 +41,7 @@ public class SCMTransceiver implements SerialListener, PacketListener<SCMPacket>
       router.recivePacket(packet, this.source);
     } else {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Got invalid packet " + data + "!";
+      String        errorMsg      = "Got invalid packet " + data + "!";
       errorReporter.reportError(null, null, errorMsg);
     }
 

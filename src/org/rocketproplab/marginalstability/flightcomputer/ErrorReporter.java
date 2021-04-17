@@ -1,8 +1,8 @@
 package org.rocketproplab.marginalstability.flightcomputer;
 
-import java.io.PrintStream;
-
 import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
+
+import java.io.PrintStream;
 
 /**
  * A class to report errors which are encountered during the operation of the
@@ -13,9 +13,8 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
  * along with a copy of that print stream writing to stderr. That was
  * interactive applications can report errors instantly while all errors will be
  * recorded.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class ErrorReporter {
 
@@ -23,7 +22,7 @@ public class ErrorReporter {
 
   /**
    * Instantiate the singleton if not already and return it.
-   * 
+   *
    * @return A singleton of type ErrorReporter
    */
   public static ErrorReporter getInstance() {
@@ -36,7 +35,7 @@ public class ErrorReporter {
   /**
    * Sets the singleton in case you want to output to a particular stream. This
    * should be called before any calls to {@link #getInstance()}.
-   * 
+   *
    * @param reporter the new singleton
    */
   public static void setInstance(ErrorReporter reporter) {
@@ -57,7 +56,7 @@ public class ErrorReporter {
   /**
    * Error reporter that should print to the given print stream and send telemetry
    * to the given telemetry.
-   * 
+   *
    * @param stream    the stream to print to
    * @param telemetry the telemetry object to use to send telemetry.
    */
@@ -112,7 +111,7 @@ public class ErrorReporter {
    * Reports a given error, exception and extra info. The String gets sent to the
    * printstream along with the exception if present. The Errors enum gets
    * reported to telemetry. All parameters may be null.
-   * 
+   *
    * @param error     What error should be reported to the telemetry, may be null.
    * @param exception What exception caused the error, may be null.
    * @param extraInfo Additional useful text related to the error, may be null.
@@ -122,7 +121,7 @@ public class ErrorReporter {
       stream.print(extraInfo);
       stream.print("\n");
     }
-    
+
     if (error != null) {
       stream.print(error);
       stream.print("\n");
@@ -130,7 +129,7 @@ public class ErrorReporter {
         telemetry.reportError(error);
       }
     }
-    
+
     if (exception != null) {
       exception.printStackTrace(stream);
     }

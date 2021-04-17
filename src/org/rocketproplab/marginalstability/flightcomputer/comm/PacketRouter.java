@@ -1,11 +1,10 @@
 package org.rocketproplab.marginalstability.flightcomputer.comm;
 
+import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
+import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
-import org.rocketproplab.marginalstability.flightcomputer.Errors;
-import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
 
 /**
  * Routes packets of any type to their destination. <br>
@@ -19,19 +18,10 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  * class of the object) and source. See
  * {@link #dispatchPacket(Object, PacketSources, PacketDirection)} for more
  * information.
- * 
- * @author Max Apodaca
  *
+ * @author Max Apodaca
  */
 public class PacketRouter implements PacketRelay {
-  private static PacketRouter instance;
-
-  public static PacketRouter getInstance() {
-    if (instance == null) {
-      instance = new PacketRouter();
-    }
-    return instance;
-  }
 
   private HashMap<LookupTuple, ArrayList<PacketListener<?>>> listenerMap;
 
@@ -49,7 +39,7 @@ public class PacketRouter implements PacketRelay {
 
   /**
    * Send a packet to all of the receivers
-   * 
+   *
    * @param o      the packet which is being sent (must be of packet type)
    * @param source
    */
@@ -61,12 +51,12 @@ public class PacketRouter implements PacketRelay {
    * Dispatch a packet with the given direction to all of the appropriate
    * listeners. The packet listeners are looked up based off of a combination
    * between the direction and class hash.
-   * 
+   *
    * @param o         The packet to be transmitted
    * @param source    the sender of the packet
    * @param direction what direction the packet is being sent in
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void dispatchPacket(Object o, PacketSources source, PacketDirection direction) {
     try {
       LookupTuple lookup = new LookupTuple(o.getClass(), source);
@@ -77,7 +67,7 @@ public class PacketRouter implements PacketRelay {
       }
     } catch (ClassCastException classExecption) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Packet " + o + " is not of suitable type";
+      String        errorMsg      = "Packet " + o + " is not of suitable type";
       errorReporter.reportError(null, classExecption, errorMsg);
     }
 
@@ -86,7 +76,7 @@ public class PacketRouter implements PacketRelay {
   /**
    * Add a listener for a specific type of packet. Note that the listeners are
    * mapped using the hash of the Class object associated with that packet.
-   * 
+   *
    * @param listener the packet listener listening to this packet
    * @param type     the class which will be hashed to make lookup easier
    * @param source   what source to listen from
@@ -102,9 +92,8 @@ public class PacketRouter implements PacketRelay {
 
   /**
    * A class to get a nice hash code for the lookup map
-   * 
-   * @author Max Apodaca
    *
+   * @author Max Apodaca
    */
   private class LookupTuple {
 
@@ -112,7 +101,7 @@ public class PacketRouter implements PacketRelay {
 
     /**
      * Create a new LookupTuple for the type and source
-     * 
+     *
      * @param type   the type of packet to look for
      * @param source the origin of the packet
      */
