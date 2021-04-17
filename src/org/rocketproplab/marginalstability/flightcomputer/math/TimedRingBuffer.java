@@ -57,10 +57,10 @@ public class TimedRingBuffer<E> implements Iterable<E> {
 
   }
 
-  private int capacity;
-  private int insertPointer;
+  private int          capacity;
+  private int          insertPointer;
   private ArrayList<E> elements;
-  private double[] times;
+  private double[]     times;
 
   /**
    * Create a new timed ring buffer with the given capacity

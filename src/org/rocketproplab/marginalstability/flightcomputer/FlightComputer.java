@@ -45,7 +45,7 @@ public class FlightComputer {
   private final Looper looper;
 
   private PacketRouter packetRouter = new PacketRouter();
-  private Telemetry telemetry = new Telemetry(Logger.getLogger("Telemetry"), packetRouter);
+  private Telemetry    telemetry    = new Telemetry(Logger.getLogger("Telemetry"), packetRouter);
 
   /**
    * Providers to provide singleton objects to higher level management objects.
@@ -132,7 +132,7 @@ public class FlightComputer {
    * Builder class to create FlightComputer objects with more customization.
    */
   public static class Builder {
-    private Telemetry telemetry;
+    private       Telemetry      telemetry;
     private final FlightComputer fc;
 
     /**
@@ -182,9 +182,9 @@ public class FlightComputer {
      * CLI argument names and descriptions
      */
     private static final String
-            HELP = "--help",
-            HELP_DESC = "print help menu",
-            REAL_SENSORS = "--real-sensors",
+            HELP              = "--help",
+            HELP_DESC         = "print help menu",
+            REAL_SENSORS      = "--real-sensors",
             REAL_SENSORS_DESC = "use real sensors";
 
     /**

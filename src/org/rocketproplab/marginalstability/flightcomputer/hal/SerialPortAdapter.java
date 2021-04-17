@@ -13,7 +13,7 @@ import java.util.Set;
 public class SerialPortAdapter implements SerialPort {
 
   private Set<SerialListener> listeners;
-  private SerialListener writeListener;
+  private SerialListener      writeListener;
 
   public SerialPortAdapter(SerialListener writeListener) {
     this.listeners     = new HashSet<>();

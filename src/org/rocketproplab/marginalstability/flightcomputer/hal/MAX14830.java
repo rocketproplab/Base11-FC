@@ -100,18 +100,18 @@ public class MAX14830 implements PollingSensor {
 
   private static final String CHARSET = "US-ASCII";
 
-  private static final int UART_SELECT_LSB_IDX = 5;
-  private static final byte WRITE = -0x80;
-  private static final int BYTE_MSB_VALUE = 128;
-  private static final int BITS_PER_BYTE = 8;
+  private static final int  UART_SELECT_LSB_IDX = 5;
+  private static final byte WRITE               = -0x80;
+  private static final int  BYTE_MSB_VALUE      = 128;
+  private static final int  BITS_PER_BYTE       = 8;
 
   private static final int TX_BUFFER_SIZE = 128;
 
-  private SpiDevice spi;
-  private StringBuffer[] uartBufferArray;
+  private SpiDevice           spi;
+  private StringBuffer[]      uartBufferArray;
   private SerialPortAdapter[] serialPortArray;
-  private int[] txFifoLengths;
-  private Charset charset;
+  private int[]               txFifoLengths;
+  private Charset             charset;
 
   /**
    * Create the MAX14830 and initialize the event handlers with

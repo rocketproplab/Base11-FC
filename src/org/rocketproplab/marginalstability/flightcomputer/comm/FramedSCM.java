@@ -26,10 +26,10 @@ import java.util.Queue;
  * @author Max Apodaca
  */
 public class FramedSCM implements PacketListener<SCMPacket> {
-  private Queue<String> outputQueue;
-  private String activeString;
-  private int frameLength;
-  private PacketRelay sCMOutput;
+  private Queue<String>         outputQueue;
+  private String                activeString;
+  private int                   frameLength;
+  private PacketRelay           sCMOutput;
   private FramedPacketProcessor framedPacketOutput;
 
   /**

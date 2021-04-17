@@ -25,14 +25,14 @@ import org.rocketproplab.marginalstability.flightcomputer.ErrorReporter;
  */
 public class SCMPacket {
 
-  public static final int LAST_THREE_CHARS = 3;
-  public static final int NUM_CHARS_PACKET = 12;
+  public static final int LAST_THREE_CHARS      = 3;
+  public static final int NUM_CHARS_PACKET      = 12;
   public static final int NUM_COMPONENTS_PACKET = 3;
-  public static final int DATA_LENGTH = 5;
+  public static final int DATA_LENGTH           = 5;
 
   private SCMPacketType id;
-  private String data;
-  private boolean isValid;
+  private String        data;
+  private boolean       isValid;
 
   /**
    * Constructor that passes the packet into it's components

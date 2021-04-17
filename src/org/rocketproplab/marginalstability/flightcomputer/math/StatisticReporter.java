@@ -13,13 +13,13 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Telemetry;
  */
 public class StatisticReporter implements EventCallback {
 
-  private Telemetry telemetry;
-  private SCMPacketType meanType;
-  private SCMPacketType varianceType;
-  private StatisticArray array;
+  private Telemetry               telemetry;
+  private SCMPacketType           meanType;
+  private SCMPacketType           varianceType;
+  private StatisticArray          array;
   private SamplableSensor<Double> sensor;
-  private double lookbackTime;
-  private boolean reportVaraince;
+  private double                  lookbackTime;
+  private boolean                 reportVaraince;
 
   /**
    * Create a new reporter which only reports the mean

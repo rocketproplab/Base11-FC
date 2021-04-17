@@ -46,9 +46,9 @@ public class TimeBasedSensorSampler<E> implements SamplableSensor<E> {
   }
 
   private GetNewDataFunction<E> newDataFunction;
-  private LastReadTimeFunction lastReadTimeFunction;
-  private double lastTime;
-  private boolean firstRequest;
+  private LastReadTimeFunction  lastReadTimeFunction;
+  private double                lastTime;
+  private boolean               firstRequest;
 
   /**
    * Create a new sampler the samples the given data function

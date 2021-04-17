@@ -43,7 +43,7 @@ public class ErrorReporter {
   }
 
   private PrintStream stream;
-  private Telemetry telemetry;
+  private Telemetry   telemetry;
 
   /**
    * No arg constructor that should print to stderr and not send telemetry.

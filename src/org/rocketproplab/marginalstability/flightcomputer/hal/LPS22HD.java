@@ -16,22 +16,22 @@ import java.io.IOException;
 public class LPS22HD implements Barometer, PollingSensor {
 
   private I2CDevice i2cDevice;
-  private double pressure;
-  private double sampleTime;
-  private Time clock;
+  private double    pressure;
+  private double    sampleTime;
+  private Time      clock;
 
-  private static final byte ODR_25HZ = 0b00110000;
-  private static final byte LOW_PASS_ENABLE = 0b00001000;
-  private static final byte LOW_PASS_20TH = 0b00000100;
-  private static final byte KEEP_REGISTERS_SYCHONISED_BDU = 0b00000010;
-  private static final int CTRL_REG1 = 0x10;
-  private static final double MINIMUM_RANGE = 259;
-  private static final double MAXIMUM_RANGE = 1261;
-  private static final double ZERO_TIME = 0.0;
-  private static final double SCALING_FACTOR = 4096;
-  private static final int REG_PRESSURE_HIGH = 0x2A;
-  private static final int REG_PRESSURE_LOW = 0x29;
-  private static final int REG_PRESSURE_EXTRA_LOW = 0x28;
+  private static final byte   ODR_25HZ                      = 0b00110000;
+  private static final byte   LOW_PASS_ENABLE               = 0b00001000;
+  private static final byte   LOW_PASS_20TH                 = 0b00000100;
+  private static final byte   KEEP_REGISTERS_SYCHONISED_BDU = 0b00000010;
+  private static final int    CTRL_REG1                     = 0x10;
+  private static final double MINIMUM_RANGE                 = 259;
+  private static final double MAXIMUM_RANGE                 = 1261;
+  private static final double ZERO_TIME                     = 0.0;
+  private static final double SCALING_FACTOR                = 4096;
+  private static final int    REG_PRESSURE_HIGH             = 0x2A;
+  private static final int    REG_PRESSURE_LOW              = 0x29;
+  private static final int    REG_PRESSURE_EXTRA_LOW        = 0x28;
 
   /**
    * Create a new LPS22HD with the given i2cDevice and time. Time will be used to

@@ -25,12 +25,12 @@ public class ParachuteSubsystem
 
   private static final String MAIN_CHUTE_TAG = "MainChute";
 
-  private Solenoid mainChute;
-  private Solenoid drogueChute;
+  private Solenoid             mainChute;
+  private Solenoid             drogueChute;
   private InterpolatingVector3 position;
-  private Time time;
-  private Barometer barometer;
-  private Looper looper;
+  private Time                 time;
+  private Barometer            barometer;
+  private Looper               looper;
 
   private List<ParachuteListener> parachuteListeners;
 

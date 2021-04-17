@@ -8,7 +8,7 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 
 public class SetValveCommand implements Command {
   private SCMPacket scmpacket;
-  private Valves valves;
+  private Valves    valves;
 
   SetValveCommand(SCMPacket scmpacket, Valves valves) {
     this.scmpacket = scmpacket;

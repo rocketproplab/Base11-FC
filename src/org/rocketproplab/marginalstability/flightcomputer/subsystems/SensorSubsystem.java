@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class SensorSubsystem implements Subsystem {
   private List<SensorPoller> sensorPollers;
-  private Time time;
+  private Time               time;
 
   /**
    * Create the subsystem using the given time.

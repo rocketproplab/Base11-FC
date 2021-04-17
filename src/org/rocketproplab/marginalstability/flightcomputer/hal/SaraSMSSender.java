@@ -8,10 +8,10 @@ import org.rocketproplab.marginalstability.flightcomputer.events.SerialListener;
 public class SaraSMSSender implements SMSSender, SerialListener {
 
   SerialPort saraSerialPort;
-  String phoneNumber;
-  String at;
-  String message;
-  int messageIndex;
+  String     phoneNumber;
+  String     at;
+  String     message;
+  int        messageIndex;
   private PacketRouter router;
   GPSPacket packet;
 

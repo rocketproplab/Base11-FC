@@ -24,23 +24,23 @@ import java.util.ArrayDeque;
  * @author Enlil Odisho
  */
 public class LSM9DS1Mag implements PollingSensor, Magnetometer {
-  private static final int ODR_MASK = 0b111;
-  private static final int ODR_LSB_POS = 2;
-  private static final int SCALE_MASK = 0b11;
-  private static final int SCALE_LSB_POS = 5;
-  private static final int MODE_MASK = 0b11;
-  private static final int MODE_LSB_POS = 0;
-  private static final int PERFORMANCE_MASK = 0b11;
-  private static final int PERFORMANCE_XY_LSB_POS = 5;
-  private static final int PERFORMANCE_Z_LSB_POS = 2;
-  private static final int TEMP_COMPENSATE_MASK = 0b1;
-  private static final int TEMP_COMPENSATE_POS = 7;
-  private static final int BLOCK_DATA_UPDATE_MASK = 0b1;
-  private static final int BLOCK_DATA_UPDATE_POS = 6;
+  private static final int ODR_MASK                   = 0b111;
+  private static final int ODR_LSB_POS                = 2;
+  private static final int SCALE_MASK                 = 0b11;
+  private static final int SCALE_LSB_POS              = 5;
+  private static final int MODE_MASK                  = 0b11;
+  private static final int MODE_LSB_POS               = 0;
+  private static final int PERFORMANCE_MASK           = 0b11;
+  private static final int PERFORMANCE_XY_LSB_POS     = 5;
+  private static final int PERFORMANCE_Z_LSB_POS      = 2;
+  private static final int TEMP_COMPENSATE_MASK       = 0b1;
+  private static final int TEMP_COMPENSATE_POS        = 7;
+  private static final int BLOCK_DATA_UPDATE_MASK     = 0b1;
+  private static final int BLOCK_DATA_UPDATE_POS      = 6;
   private static final int NEW_XYZ_DATA_AVAILABLE_POS = 3;
 
   private static final int BYTES_PER_SAMPLE = 6;
-  private static final int BITS_PER_BYTE = 8;
+  private static final int BITS_PER_BYTE    = 8;
 
   /**
    * All the registers that can be found in the LSM9DS1 imu for the magnetometer
@@ -185,7 +185,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
     }
   }
 
-  private I2CDevice i2c;
+  private I2CDevice              i2c;
   private ArrayDeque<MagReading> samples = new ArrayDeque<>();
 
   /**

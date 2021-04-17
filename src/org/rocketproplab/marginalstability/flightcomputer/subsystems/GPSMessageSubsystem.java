@@ -8,10 +8,10 @@ import org.rocketproplab.marginalstability.flightcomputer.tracking.FlightState;
 
 public class GPSMessageSubsystem implements PacketListener {
 
-  String message;
-  double lastTime;
-  double thisTime;
-  GPSPacket packet;
+  String      message;
+  double      lastTime;
+  double      thisTime;
+  GPSPacket   packet;
   FlightState currentState;
 
   private static final double TIME_BETWEEN = 0;

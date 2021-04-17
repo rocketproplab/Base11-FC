@@ -9,7 +9,7 @@ import org.rocketproplab.marginalstability.flightcomputer.subsystems.Subsystem;
 
 public class OpenDrogueChuteCommand implements Command {
   private ParachuteSubsystem parachuteSubsystem;
-  private PacketRelay relay;
+  private PacketRelay        relay;
 
   private OpenDrogueChuteCommand(ParachuteSubsystem parachuteSubsystem, PacketRelay relay) {
     this.parachuteSubsystem = parachuteSubsystem;

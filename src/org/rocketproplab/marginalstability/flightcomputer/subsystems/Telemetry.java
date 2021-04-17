@@ -17,21 +17,21 @@ import java.util.logging.Logger;
  * @author Max Apodaca
  */
 public class Telemetry {
-  public static final int BASE_10 = 10;
-  public static final int BASE_16 = 16;
+  public static final int BASE_10            = 10;
+  public static final int BASE_16            = 16;
   public static final int MAX_PACKET_BASE_10 = (int) Math.round(Math.pow(BASE_10, SCMPacket.DATA_LENGTH)) - 1;
   public static final int MAX_PACKET_BASE_16 = (int) Math.round(Math.pow(BASE_16, SCMPacket.DATA_LENGTH)) - 1;
 
   public static final int MIN_PACKET_BASE_10 = (int) -Math.round(Math.pow(BASE_10, SCMPacket.DATA_LENGTH - 1)) + 1;
   public static final int MIN_PACKET_BASE_16 = (int) -Math.round(Math.pow(BASE_16, SCMPacket.DATA_LENGTH - 1)) + 1;
 
-  public static final String INFINITY = "INF  ";
-  public static final String NEG_INFINITY = "-INF ";
-  private static final String INT_FORMAT = "%0" + SCMPacket.DATA_LENGTH + "d";
-  private static final String HEX_FORMAT = "%0" + SCMPacket.DATA_LENGTH + "x";
+  public static final  String INFINITY      = "INF  ";
+  public static final  String NEG_INFINITY  = "-INF ";
+  private static final String INT_FORMAT    = "%0" + SCMPacket.DATA_LENGTH + "d";
+  private static final String HEX_FORMAT    = "%0" + SCMPacket.DATA_LENGTH + "x";
   private static final String DOUBLE_FORMAT = "%0" + SCMPacket.DATA_LENGTH + "f";
 
-  private Logger logger;
+  private Logger      logger;
   private PacketRelay relay;
 
   /**

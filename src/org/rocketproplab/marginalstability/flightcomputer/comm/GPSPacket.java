@@ -8,21 +8,21 @@ import org.rocketproplab.marginalstability.flightcomputer.Settings;
  */
 public class GPSPacket {
 
-  private static final String NEMA_DELIMITER = ",";
-  private static final int NEMA_PART_LENGTH = 15;
-  private static final int NEMA_TIME_INDEX = 1;
-  private static final int NEMA_LAT_INDEX = 2;
-  private static final int NEMA_LON_INDEX = 4;
-  private static final int NEMA_SV_COUNT_INDEX = 7;
-  private static final int NEMA_ALTITUDE_INDEX = 9;
+  private static final String NEMA_DELIMITER      = ",";
+  private static final int    NEMA_PART_LENGTH    = 15;
+  private static final int    NEMA_TIME_INDEX     = 1;
+  private static final int    NEMA_LAT_INDEX      = 2;
+  private static final int    NEMA_LON_INDEX      = 4;
+  private static final int    NEMA_SV_COUNT_INDEX = 7;
+  private static final int    NEMA_ALTITUDE_INDEX = 9;
 
   private boolean valid;
-  private double latitude;
-  private double longitude;
-  private double altitude;
-  private double time;
-  private int sVCount;
-  private String nema;
+  private double  latitude;
+  private double  longitude;
+  private double  altitude;
+  private double  time;
+  private int     sVCount;
+  private String  nema;
 
   /**
    * Create a new GPS Packet based on the NEMA String

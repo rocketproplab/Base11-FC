@@ -13,11 +13,11 @@ import org.rocketproplab.marginalstability.flightcomputer.events.PacketListener;
  */
 public class ValveStateSubsystem implements PacketListener<SCMPacket> {
 
-  private SCMPacket packet;
-  private int[] valveStates = {-1, -1, -1, -1, -1, -1, -1, -1};
-  private String data;
+  private SCMPacket     packet;
+  private int[]         valveStates = {-1, -1, -1, -1, -1, -1, -1, -1};
+  private String        data;
   private SCMPacketType id;
-  private PacketRelay relay;
+  private PacketRelay   relay;
 
   public ValveStateSubsystem(PacketRelay relay) {
     this.relay = relay;

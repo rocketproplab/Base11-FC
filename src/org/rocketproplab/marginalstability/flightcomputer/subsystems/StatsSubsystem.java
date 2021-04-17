@@ -19,8 +19,8 @@ import java.util.List;
 public class StatsSubsystem implements Subsystem {
 
   private List<StatisticReporter> reporters;
-  private Telemetry telemetry;
-  private Looper looper;
+  private Telemetry               telemetry;
+  private Looper                  looper;
 
   public StatsSubsystem(Telemetry telemetry) {
     this.reporters = new ArrayList<>();

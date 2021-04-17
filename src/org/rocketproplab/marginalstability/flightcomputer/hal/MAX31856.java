@@ -14,16 +14,16 @@ import java.io.IOException;
 public class MAX31856 implements Thermocouple, PollingSensor {
 
   private SpiDevice spi;
-  private double temp;
-  private long sampleTime;
-  private Time clock;
+  private double    temp;
+  private long      sampleTime;
+  private Time      clock;
 
-  private static final byte REG_TC_TEMP = 0x0C;
-  private static final double ZERO_TIME = 0.0;
+  private static final byte   REG_TC_TEMP    = 0x0C;
+  private static final double ZERO_TIME      = 0.0;
   private static final double SCALING_FACTOR = 128.0;
-  private static final double MINIMUM_RANGE = -200.0;
-  private static final double MAXIMUM_RANGE = 1372.0;
-  private static final double TEMP_ERROR = 2048.0;
+  private static final double MINIMUM_RANGE  = -200.0;
+  private static final double MAXIMUM_RANGE  = 1372.0;
+  private static final double TEMP_ERROR     = 2048.0;
 
   /**
    * Create instance of MAX31856 with given SpiDevice. Time will be used to

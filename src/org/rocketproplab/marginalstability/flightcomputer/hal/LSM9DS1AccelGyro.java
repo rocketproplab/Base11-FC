@@ -29,29 +29,29 @@ import java.util.Arrays;
  * @author Max Apodaca
  */
 public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
-  private static final int ODR_MASK = 0b111;
-  private static final int ODR_LSB_POS = 5;
-  private static final int ACCELEROMETER_SCALE_MASK = 0b11;
+  private static final int ODR_MASK                    = 0b111;
+  private static final int ODR_LSB_POS                 = 5;
+  private static final int ACCELEROMETER_SCALE_MASK    = 0b11;
   private static final int ACCELEROMETER_SCALE_LSB_POS = 3;
-  private static final int GYRO_SCALE_MASK = 0b11;
-  private static final int GYRO_SCALE_LSB_POS = 3;
-  private static final int FIFO_EN_VAL_MASK = 0b1;
-  private static final int FIFO_EN_LSB_POS = 1;
-  private static final int FIFO_MODE_MASK = 0b111;
-  private static final int FIFO_MODE_LSB_POS = 5;
-  private static final int FIFO_THRESHOLD_MASK = 0b11111;
-  private static final int FIFO_THRESHOLD_LSB_POS = 0;
-  public static final int FIFO_THRESHOLD_MAX = 31;
-  public static final int FIFO_THRESHOLD_MIN = 0;
-  public static final int FIFO_OVERRUN_POS = 6;
-  public static final int FIFO_THRESHOLD_STATUS_POS = 7;
-  public static final int FIFO_SAMPLES_STORED_MASK = 0b111111;
+  private static final int GYRO_SCALE_MASK             = 0b11;
+  private static final int GYRO_SCALE_LSB_POS          = 3;
+  private static final int FIFO_EN_VAL_MASK            = 0b1;
+  private static final int FIFO_EN_LSB_POS             = 1;
+  private static final int FIFO_MODE_MASK              = 0b111;
+  private static final int FIFO_MODE_LSB_POS           = 5;
+  private static final int FIFO_THRESHOLD_MASK         = 0b11111;
+  private static final int FIFO_THRESHOLD_LSB_POS      = 0;
+  public static final  int FIFO_THRESHOLD_MAX          = 31;
+  public static final  int FIFO_THRESHOLD_MIN          = 0;
+  public static final  int FIFO_OVERRUN_POS            = 6;
+  public static final  int FIFO_THRESHOLD_STATUS_POS   = 7;
+  public static final  int FIFO_SAMPLES_STORED_MASK    = 0b111111;
 
   private static final int BYTES_PER_FIFO_LINE = 12;
 
-  public static final double ACCELEROMETER_OUTPUT_TO_MPS_SQUARED = 9.81;  // factor to multiply acc output by to
+  public static final  double ACCELEROMETER_OUTPUT_TO_MPS_SQUARED = 9.81;  // factor to multiply acc output by to
   // convert sensor output to m/s^2
-  private static final double ONE_DEGREE_IN_RADIANS = Math.PI / 180.0;
+  private static final double ONE_DEGREE_IN_RADIANS               = Math.PI / 180.0;
 
   /**
    * All the registers that can be found in the LSM9DS1 imu for the accelerometer
@@ -225,7 +225,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     }
   }
 
-  private I2CDevice i2c;
+  private I2CDevice                    i2c;
   private ArrayDeque<AccelGyroReading> samples = new ArrayDeque<>();
 
   /**

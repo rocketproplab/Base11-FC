@@ -16,8 +16,8 @@ import org.rocketproplab.marginalstability.flightcomputer.hal.SerialPort;
  * @author Max Apodaca, Antonio
  */
 public class SCMTransceiver implements SerialListener, PacketListener<SCMPacket> {
-  private SerialPort serialPort;
-  private PacketRouter router;
+  private SerialPort    serialPort;
+  private PacketRouter  router;
   private PacketSources source;
 
   /**

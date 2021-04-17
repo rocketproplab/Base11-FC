@@ -22,7 +22,7 @@ public class StatisticArray {
   }
 
   private TimedRingBuffer<Double> samples;
-  private StatisticValidator validator;
+  private StatisticValidator      validator;
 
   /**
    * Create a new empty array

@@ -7,9 +7,9 @@ package org.rocketproplab.marginalstability.flightcomputer.hal;
  */
 public class SensorPoller {
 
-  private double pollingRate;
-  private double nextPollTime;
-  private boolean hasPolled;
+  private double        pollingRate;
+  private double        nextPollTime;
+  private boolean       hasPolled;
   private PollingSensor sensor;
 
   /**
