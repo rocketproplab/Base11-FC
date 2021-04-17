@@ -148,7 +148,7 @@ public class Quaternion {
       return false;
     }
     final double EQUAL_TOLERANCE = 0.00001; // TODO may need adjusting
-    Quaternion otherQuaternion = (Quaternion) other;
+    Quaternion   otherQuaternion = (Quaternion) other;
     return (Math.abs(this.w - otherQuaternion.w) < EQUAL_TOLERANCE) &&
             (Math.abs(this.x - otherQuaternion.x) < EQUAL_TOLERANCE) &&
             (Math.abs(this.y - otherQuaternion.y) < EQUAL_TOLERANCE) &&

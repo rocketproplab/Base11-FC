@@ -40,11 +40,11 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * @param framedOutput the callback to output framed packets to
    */
   public FramedSCM(PacketRelay sCMOutput, FramedPacketProcessor framedOutput) {
-    this.outputQueue = new LinkedList<String>();
-    this.activeString = "";
-    this.frameLength = -1;
+    this.outputQueue   = new LinkedList<String>();
+    this.activeString  = "";
+    this.frameLength   = -1;
     framedPacketOutput = framedOutput;
-    this.sCMOutput = sCMOutput;
+    this.sCMOutput     = sCMOutput;
   }
 
   @Override
@@ -73,15 +73,15 @@ public class FramedSCM implements PacketListener<SCMPacket> {
    * @return the packet to reply with
    */
   protected SCMPacket processNextPacket(SCMPacket incomingPacket) {
-    boolean completed = (activeString.length() == frameLength);
+    boolean   completed    = (activeString.length() == frameLength);
     SCMPacket returnpacket = new SCMPacket(SCMPacketType.XB, "     ");
-    String finalmessage = "";
+    String    finalmessage = "";
     if (!incomingPacket.isValid()) {
       return null;
     }
     if (incomingPacket.getID() == SCMPacketType.XS) {
       returnpacket = processXSPacket(incomingPacket);
-      completed = false;
+      completed    = false;
     } else if (incomingPacket.getID() == SCMPacketType.X0) {
       returnpacket = processX0Packet(incomingPacket);
 
@@ -103,7 +103,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
     if (frameLength == -1) {
       String[] SCMmessagesplit = incomingPacket.getData().split("\\|");
       activeString += SCMmessagesplit[0];
-      frameLength = Integer.parseInt(activeString);
+      frameLength  = Integer.parseInt(activeString);
       activeString = SCMmessagesplit[1];
       // TODO Similar to XS, where if the frameLength is still less than 0 or
       // does not split into several indices
@@ -135,7 +135,7 @@ public class FramedSCM implements PacketListener<SCMPacket> {
     } else {
       String getint = incomingPacket.getData();
       activeString = "" + Integer.parseInt(getint);
-      frameLength = -1;
+      frameLength  = -1;
     }
 
     return new SCMPacket(SCMPacketType.XB, "     ");

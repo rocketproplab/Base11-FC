@@ -20,10 +20,10 @@ public class SensorPoller {
    * @param rate   the rate at which to poll in seconds
    */
   public SensorPoller(PollingSensor sensor, double rate) {
-    this.pollingRate = rate;
+    this.pollingRate  = rate;
     this.nextPollTime = -Double.MAX_VALUE;
-    this.hasPolled = false;
-    this.sensor = sensor;
+    this.hasPolled    = false;
+    this.sensor       = sensor;
   }
 
   /**
@@ -39,7 +39,7 @@ public class SensorPoller {
 
     if (!this.hasPolled) {
       this.nextPollTime = time + this.pollingRate;
-      this.hasPolled = true;
+      this.hasPolled    = true;
     }
   }
 

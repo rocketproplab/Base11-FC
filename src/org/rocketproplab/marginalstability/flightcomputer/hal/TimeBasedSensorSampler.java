@@ -57,15 +57,15 @@ public class TimeBasedSensorSampler<E> implements SamplableSensor<E> {
    * @param lastReadTimeFunction used to get the time of the latest datum
    */
   public TimeBasedSensorSampler(GetNewDataFunction<E> newDataFunction, LastReadTimeFunction lastReadTimeFunction) {
-    this.newDataFunction = newDataFunction;
+    this.newDataFunction      = newDataFunction;
     this.lastReadTimeFunction = lastReadTimeFunction;
-    this.lastTime = 0;
-    this.firstRequest = true;
+    this.lastTime             = 0;
+    this.firstRequest         = true;
   }
 
   @Override
   public boolean hasNewData() {
-    double lastRead = this.lastReadTimeFunction.getLastMeasurementTime() - lastTime;
+    double  lastRead       = this.lastReadTimeFunction.getLastMeasurementTime() - lastTime;
     boolean hasReachedTime = lastRead > EPSILON;
     return this.firstRequest || hasReachedTime;
   }
@@ -73,7 +73,7 @@ public class TimeBasedSensorSampler<E> implements SamplableSensor<E> {
   @Override
   public E getNewData() {
     this.firstRequest = false;
-    this.lastTime = this.lastReadTimeFunction.getLastMeasurementTime();
+    this.lastTime     = this.lastReadTimeFunction.getLastMeasurementTime();
     return this.newDataFunction.getNewData();
   }
 

@@ -12,7 +12,7 @@ public class EngineSubsystem {
   private Set<EngineEventListener> listeners;
 
   EngineSubsystem(Valves valves) {
-    this.valves = valves;
+    this.valves    = valves;
     this.listeners = new HashSet<>();
   }
 

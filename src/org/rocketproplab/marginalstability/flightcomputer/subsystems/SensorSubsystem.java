@@ -25,7 +25,7 @@ public class SensorSubsystem implements Subsystem {
    */
   public SensorSubsystem(Time time) {
     this.sensorPollers = Collections.synchronizedList(new ArrayList<>());
-    this.time = time;
+    this.time          = time;
   }
 
   @Override

@@ -36,7 +36,7 @@ public class SCMCommandSubsystem implements Subsystem,
    * Creates a new SCMCommandSubsystem
    */
   public SCMCommandSubsystem() {
-    SCMMap = new HashMap<>();
+    SCMMap       = new HashMap<>();
     framedSCMMap = new HashMap<>();
   }
 
@@ -88,7 +88,7 @@ public class SCMCommandSubsystem implements Subsystem,
    */
   @Override
   public void processFramedPacket(String framedPacket) {
-    String data = extractFramedSCMData(framedPacket);
+    String                  data    = extractFramedSCMData(framedPacket);
     FramedSCMCommandFactory factory = framedSCMMap.get(data);
     if (factory != null) {
       Command commandToSchedule = factory.getCommandByFramedSCM(data);

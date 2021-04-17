@@ -101,8 +101,8 @@ public class Settings {
   }
 
   public static String getConfigContents() {
-    String result = "";
-    Set<Field> set = getSettingFields();
+    String     result = "";
+    Set<Field> set    = getSettingFields();
     for (Field field : set) {
       result += fieldAsString(field) + "\n";
     }
@@ -114,8 +114,8 @@ public class Settings {
     if (field.isAnnotationPresent(SettingSectionHeader.class)) {
 
       String sectionHeader = "# " + field.getAnnotation(SettingSectionHeader.class).name() + " |\n";
-      int dashLength = sectionHeader.length() - 2;
-      String delimiter = "#" + new String(new char[dashLength]).replace('\0', '-') + "\n";
+      int    dashLength    = sectionHeader.length() - 2;
+      String delimiter     = "#" + new String(new char[dashLength]).replace('\0', '-') + "\n";
       result += delimiter + sectionHeader + delimiter + "\n";
     }
 
@@ -168,7 +168,7 @@ public class Settings {
     Set<String> usefulLines = new HashSet<>();
     for (String line : config) {
       String lineWithoutComment = line;
-      int commentStartIdx = line.indexOf('#');
+      int    commentStartIdx    = line.indexOf('#');
       if (commentStartIdx >= 0) {
         lineWithoutComment = line.substring(0, commentStartIdx);
       }
@@ -182,7 +182,7 @@ public class Settings {
   }
 
   protected static Map<String, String> getFieldNameValueMap(List<String> config) {
-    Set<String> usefulLines = getUsefulLinesFromConfig(config);
+    Set<String>         usefulLines       = getUsefulLinesFromConfig(config);
     Map<String, String> fieldNameValueMap = new HashMap<>();
     for (String line : usefulLines) {
       int equalsIndex = line.indexOf('=');
@@ -191,7 +191,7 @@ public class Settings {
         continue;
       }
       String fieldName = line.substring(0, equalsIndex);
-      String value = line.substring(equalsIndex + 1);
+      String value     = line.substring(equalsIndex + 1);
       fieldNameValueMap.put(fieldName.trim(), value);
     }
     return fieldNameValueMap;
@@ -200,7 +200,7 @@ public class Settings {
   protected static void setFieldDoubleArray(Field field, String line)
           throws IllegalArgumentException, IllegalAccessException {
     line = line.trim().replace("[", "").replace("]", "");
-    String[] newValues = line.split(",");
+    String[] newValues   = line.split(",");
     double[] fieldValues = (double[]) field.get(null);
     if (newValues.length != fieldValues.length) {
       System.err.println("Array length mismatch: " + line);
@@ -243,9 +243,9 @@ public class Settings {
   }
 
   public static boolean readSettingsFromConfig(List<String> config, boolean checkOutOfDate) {
-    Set<Field> settingFields = getSettingFields();
+    Set<Field>          settingFields     = getSettingFields();
     Map<String, String> fieldNameValueMap = getFieldNameValueMap(config);
-    boolean outOfDate = false;
+    boolean             outOfDate         = false;
     for (Field field : settingFields) {
       String fieldName = getNameFromField(field);
       if (fieldNameValueMap.containsKey(fieldName)) {
@@ -268,8 +268,8 @@ public class Settings {
   }
 
   public static void readSettings() {
-    String configFileLocation = getSettingsFileLocation();
-    List<String> lines = Collections.emptyList();
+    String       configFileLocation = getSettingsFileLocation();
+    List<String> lines              = Collections.emptyList();
     try {
       lines = Files.readAllLines(Paths.get(configFileLocation));
     } catch (IOException e) {

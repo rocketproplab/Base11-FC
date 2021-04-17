@@ -32,7 +32,7 @@ public class LandedSMSSubsystem
    */
   public LandedSMSSubsystem(String phoneNumber, SMSSender smsSender) {
     this.phoneNumber = phoneNumber;
-    this.smsSender = smsSender;
+    this.smsSender   = smsSender;
   }
 
   @Override

@@ -266,7 +266,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    */
   public void setTemperatureCompensationEnabled(boolean enabled) throws IOException {
     int registerValue = this.i2c.read(Registers.CTRL_REG1_M.getAddress());
-    int result = mask(registerValue, enabled ? 1 : 0, TEMP_COMPENSATE_POS, TEMP_COMPENSATE_MASK);
+    int result        = mask(registerValue, enabled ? 1 : 0, TEMP_COMPENSATE_POS, TEMP_COMPENSATE_MASK);
     this.i2c.write(Registers.CTRL_REG1_M.getAddress(), (byte) result);
   }
 
@@ -279,7 +279,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    */
   public void setBlockDataUpdateUntilAllReadEnabled(boolean enabled) throws IOException {
     int registerValue = this.i2c.read(Registers.CTRL_REG5_M.getAddress());
-    int result = mask(registerValue, enabled ? 1 : 0, BLOCK_DATA_UPDATE_POS, BLOCK_DATA_UPDATE_MASK);
+    int result        = mask(registerValue, enabled ? 1 : 0, BLOCK_DATA_UPDATE_POS, BLOCK_DATA_UPDATE_MASK);
     this.i2c.write(Registers.CTRL_REG5_M.getAddress(), (byte) result);
   }
 
@@ -289,7 +289,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    */
   public boolean isNewXYZDataAvailable() throws IOException {
     int statusRegValue = this.i2c.read(Registers.STATUS_REG_M.getAddress());
-    int masked = (1 << NEW_XYZ_DATA_AVAILABLE_POS) & statusRegValue;
+    int masked         = (1 << NEW_XYZ_DATA_AVAILABLE_POS) & statusRegValue;
     return masked != 0;
   }
 
@@ -303,7 +303,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    */
   private void modifyRegister(Registers register, RegisterValue value) throws IOException {
     int registerValue = this.i2c.read(register.getAddress());
-    int result = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
+    int result        = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
     this.i2c.write(register.getAddress(), (byte) result);
   }
 
@@ -323,9 +323,9 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    * @return combination of toMask and newData combined based on valueMask
    */
   private int mask(int toMask, int newData, int lsbPos, int valueMask) {
-    int mask = valueMask << lsbPos;
+    int mask    = valueMask << lsbPos;
     int notMask = ~mask;
-    int result = newData << lsbPos | (toMask & notMask);
+    int result  = newData << lsbPos | (toMask & notMask);
     return result;
   }
 
@@ -343,12 +343,12 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
       if (!isNewXYZDataAvailable()) {
         return;
       }
-      int dataLength = BYTES_PER_SAMPLE;
-      byte[] data = new byte[dataLength];
-      int bytesRead = this.i2c.read(Registers.OUT_X_L_M.getAddress(), data, 0, dataLength);
+      int    dataLength = BYTES_PER_SAMPLE;
+      byte[] data       = new byte[dataLength];
+      int    bytesRead  = this.i2c.read(Registers.OUT_X_L_M.getAddress(), data, 0, dataLength);
       if (bytesRead != BYTES_PER_SAMPLE) {
         ErrorReporter errorReporter = ErrorReporter.getInstance();
-        String errorMsg = "Incorrect number of bytes for magnetometer read from IMU.";
+        String        errorMsg      = "Incorrect number of bytes for magnetometer read from IMU.";
         errorReporter.reportError(Errors.IMU_IO_ERROR, errorMsg);
         return;
       }
@@ -356,7 +356,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
       this.samples.add(reading);
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Unable to read from IMU IO Exception";
+      String        errorMsg      = "Unable to read from IMU IO Exception";
       errorReporter.reportError(Errors.IMU_IO_ERROR, e, errorMsg);
     }
   }
@@ -389,7 +389,7 @@ public class LSM9DS1Mag implements PollingSensor, Magnetometer {
    */
   private int[] getData(byte[] data) {
     ByteBuffer byteBuffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-    int[] results = new int[data.length / 2];
+    int[]      results    = new int[data.length / 2];
     for (int i = 0; i < data.length / 2; i++) {
       results[i] = byteBuffer.getShort(i * 2); // i * 2 = index of low byte
     }

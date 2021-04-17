@@ -58,7 +58,7 @@ public class FlightComputer {
    * @param args arguments to configure FlightComputer settings
    */
   private FlightComputer(String[] args) {
-    this.time = new Time();
+    this.time   = new Time();
     this.looper = new Looper(this.time);
     initWithArgs(args);
   }

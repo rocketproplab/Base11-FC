@@ -295,7 +295,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public void setFIFOEnabled(boolean enabled) throws IOException {
     int registerValue = this.i2c.read(Registers.CTRL_REG9.getAddress());
-    int result = mask(registerValue, enabled ? 1 : 0, FIFO_EN_LSB_POS, FIFO_EN_VAL_MASK);
+    int result        = mask(registerValue, enabled ? 1 : 0, FIFO_EN_LSB_POS, FIFO_EN_VAL_MASK);
     this.i2c.write(Registers.CTRL_REG9.getAddress(), (byte) result);
   }
 
@@ -323,7 +323,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       threshold = FIFO_THRESHOLD_MIN;
     }
     int registerValue = this.i2c.read(Registers.FIFO_CTRL.getAddress());
-    int result = mask(registerValue, threshold, FIFO_THRESHOLD_LSB_POS, FIFO_THRESHOLD_MASK);
+    int result        = mask(registerValue, threshold, FIFO_THRESHOLD_LSB_POS, FIFO_THRESHOLD_MASK);
     this.i2c.write(Registers.FIFO_CTRL.getAddress(), (byte) result);
   }
 
@@ -336,7 +336,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public boolean hasFIFOOverrun() throws IOException {
     int fifoSRCValue = this.i2c.read(Registers.FIFO_SRC.getAddress());
-    int masked = (1 << FIFO_OVERRUN_POS) & fifoSRCValue;
+    int masked       = (1 << FIFO_OVERRUN_POS) & fifoSRCValue;
     return masked != 0;
   }
 
@@ -349,7 +349,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public boolean isFIFOThresholdReached() throws IOException {
     int fifoSRCValue = this.i2c.read(Registers.FIFO_SRC.getAddress());
-    int masked = (1 << FIFO_THRESHOLD_STATUS_POS) & fifoSRCValue;
+    int masked       = (1 << FIFO_THRESHOLD_STATUS_POS) & fifoSRCValue;
     return masked != 0;
   }
 
@@ -361,7 +361,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   public int getSamplesInFIFO() throws IOException {
     int fifoSRCValue = this.i2c.read(Registers.FIFO_SRC.getAddress());
-    int masked = FIFO_SAMPLES_STORED_MASK & fifoSRCValue;
+    int masked       = FIFO_SAMPLES_STORED_MASK & fifoSRCValue;
     return masked;
   }
 
@@ -375,7 +375,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   private void modifyRegister(Registers register, RegisterValue value) throws IOException {
     int registerValue = this.i2c.read(register.getAddress());
-    int result = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
+    int result        = mask(registerValue, value.ordinal(), value.getValueLSBPos(), value.getValueMask());
     this.i2c.write(register.getAddress(), (byte) result);
   }
 
@@ -395,9 +395,9 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    * @return combination of toMask and newData combined based on valueMask
    */
   private int mask(int toMask, int newData, int lsbPos, int valueMask) {
-    int mask = valueMask << lsbPos;
+    int mask    = valueMask << lsbPos;
     int notMask = ~mask;
-    int result = newData << lsbPos | (toMask & notMask);
+    int result  = newData << lsbPos | (toMask & notMask);
     return result;
   }
 
@@ -424,13 +424,13 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
       if (samplesInFIFO == 0) {
         return;
       }
-      int dataLength = samplesInFIFO * BYTES_PER_FIFO_LINE;
-      byte[] data = new byte[dataLength];
-      int samplesRead = this.i2c.read(Registers.OUT_X_L_G.getAddress(), data, 0, dataLength);
+      int    dataLength  = samplesInFIFO * BYTES_PER_FIFO_LINE;
+      byte[] data        = new byte[dataLength];
+      int    samplesRead = this.i2c.read(Registers.OUT_X_L_G.getAddress(), data, 0, dataLength);
       this.parseReadings(data, samplesRead);
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Unable to read from IMU IO Exception";
+      String        errorMsg      = "Unable to read from IMU IO Exception";
       errorReporter.reportError(Errors.IMU_IO_ERROR, e, errorMsg);
     }
   }
@@ -446,9 +446,9 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
   private void parseReadings(byte[] data, int bytesRead) {
     int samplesRead = bytesRead / BYTES_PER_FIFO_LINE;
     for (int i = 0; i < samplesRead; i++) {
-      int start = i * BYTES_PER_FIFO_LINE;
-      int end = (i + 1) * BYTES_PER_FIFO_LINE;
-      byte[] samples = Arrays.copyOfRange(data, start, end);
+      int              start   = i * BYTES_PER_FIFO_LINE;
+      int              end     = (i + 1) * BYTES_PER_FIFO_LINE;
+      byte[]           samples = Arrays.copyOfRange(data, start, end);
       AccelGyroReading reading = this.buildReading(samples);
       this.samples.add(reading);
     }
@@ -467,12 +467,12 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
     int xGyro = results[0];
     int yGyro = results[1];
     int zGyro = results[2];
-    int xAcc = results[3];
-    int yAcc = results[4];
-    int zAcc = results[5];
+    int xAcc  = results[3];
+    int yAcc  = results[4];
+    int zAcc  = results[5];
 
     Vector3 gyroVec = computeAngularAcceleration(xGyro, yGyro, zGyro);
-    Vector3 accVec = computeAcceleration(xAcc, yAcc, zAcc);
+    Vector3 accVec  = computeAcceleration(xAcc, yAcc, zAcc);
     return new AccelGyroReading(accVec, gyroVec);
   }
 
@@ -486,7 +486,7 @@ public class LSM9DS1AccelGyro implements PollingSensor, AccelerometerGyroscope {
    */
   private int[] getData(byte[] data) {
     ByteBuffer byteBuffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-    int[] results = new int[data.length / 2];
+    int[]      results    = new int[data.length / 2];
     for (int i = 0; i < data.length / 2; i++) {
       results[i] = byteBuffer.getShort(i * 2); // i * 2 = index of low byte
     }

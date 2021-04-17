@@ -33,9 +33,9 @@ public class MAX31856 implements Thermocouple, PollingSensor {
    * @param time the time to use when reporting measurement time.
    */
   public MAX31856(SpiDevice spi, Time time) {
-    this.spi = spi;
+    this.spi   = spi;
     this.clock = time;
-    this.temp = TEMP_ERROR;
+    this.temp  = TEMP_ERROR;
   }
 
   @Override
@@ -84,7 +84,7 @@ public class MAX31856 implements Thermocouple, PollingSensor {
    * @throws IOException
    */
   private void readTemp() throws IOException {
-    byte[] data = {REG_TC_TEMP, 0, 0, 0};
+    byte[] data     = {REG_TC_TEMP, 0, 0, 0};
     byte[] readData = this.spi.write(data);
     if (readData.length < 4) {
       return;
@@ -94,7 +94,7 @@ public class MAX31856 implements Thermocouple, PollingSensor {
     byte sign = 0;
     byte mask = (byte) 0b10000000;
     if ((readData[1] & mask) != 0) {
-      sign = 1;
+      sign        = 1;
       readData[1] = (byte) ~readData[1];
       readData[2] = (byte) ~readData[2];
       readData[3] = (byte) ~readData[3];

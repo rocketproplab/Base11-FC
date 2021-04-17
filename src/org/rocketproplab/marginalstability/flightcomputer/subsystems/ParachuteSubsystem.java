@@ -43,10 +43,10 @@ public class ParachuteSubsystem
    */
   public ParachuteSubsystem(Solenoid mainChute, Solenoid drogueChute,
                             Time time, Barometer barometer) {
-    this.mainChute = mainChute;
-    this.drogueChute = drogueChute;
-    this.time = time;
-    this.barometer = barometer;
+    this.mainChute          = mainChute;
+    this.drogueChute        = drogueChute;
+    this.time               = time;
+    this.barometer          = barometer;
     this.parachuteListeners = new ArrayList<>();
   }
 
@@ -73,8 +73,8 @@ public class ParachuteSubsystem
 
   private boolean shouldMainChuteOpenByPressure() {
     Vector3 currentPos = this.position.getAt(time.getSystemTime());
-    boolean b1 = currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT;
-    boolean b2 = barometer.getPressure() < Settings.MAIN_CHUTE_PRESSURE;
+    boolean b1         = currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT;
+    boolean b2         = barometer.getPressure() < Settings.MAIN_CHUTE_PRESSURE;
     return b1 && b2;
 //    return currentPos.getZ() < Settings.MAIN_CHUTE_HEIGHT &&
 //            barometer.getPressure() >= Settings.MAIN_CHUTE_PRESSURE;

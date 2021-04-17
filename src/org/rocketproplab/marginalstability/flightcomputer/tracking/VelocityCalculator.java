@@ -14,15 +14,15 @@ public class VelocityCalculator implements VelocityListener {
 
   public static Vector3 getVelocity(GPSPacket prevGPSPacket,
                                     GPSPacket curGPSPacket) {
-    double deltaLat = curGPSPacket.getLatitude() - prevGPSPacket.getLatitude();
-    double deltaLon = curGPSPacket.getLongitude() - prevGPSPacket.getLongitude();
-    double deltaTime = curGPSPacket.getTime() - prevGPSPacket.getTime();
+    double deltaLat     = curGPSPacket.getLatitude() - prevGPSPacket.getLatitude();
+    double deltaLon     = curGPSPacket.getLongitude() - prevGPSPacket.getLongitude();
+    double deltaTime    = curGPSPacket.getTime() - prevGPSPacket.getTime();
     double angVelocityX = deltaLon / deltaTime;
     double angVelocityY = deltaLat / deltaTime;
-    int radiusEarth = 6378100;
-    double velocityX = angVelocityX * radiusEarth;
-    double velocityY = angVelocityY * radiusEarth;
-    double velocityZ = curGPSPacket.getAltitude() - prevGPSPacket.getAltitude();
+    int    radiusEarth  = 6378100;
+    double velocityX    = angVelocityX * radiusEarth;
+    double velocityY    = angVelocityY * radiusEarth;
+    double velocityZ    = curGPSPacket.getAltitude() - prevGPSPacket.getAltitude();
     return new Vector3(velocityX, velocityY, velocityZ);
 
   }

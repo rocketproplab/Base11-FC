@@ -67,7 +67,7 @@ public class PacketRouter implements PacketRelay {
       }
     } catch (ClassCastException classExecption) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Packet " + o + " is not of suitable type";
+      String        errorMsg      = "Packet " + o + " is not of suitable type";
       errorReporter.reportError(null, classExecption, errorMsg);
     }
 

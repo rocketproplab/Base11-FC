@@ -31,7 +31,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
      * @param nextSublistIterator next iterator to iterate
      */
     private RingBufferIterator(Iterator<E> sublistIterator, Iterator<E> nextSublistIterator) {
-      this.sublistIterator = sublistIterator;
+      this.sublistIterator     = sublistIterator;
       this.nextSublistIterator = nextSublistIterator;
     }
 
@@ -68,10 +68,10 @@ public class TimedRingBuffer<E> implements Iterable<E> {
    * @param capacity how many elements to store at most
    */
   public TimedRingBuffer(int capacity) {
-    this.capacity = capacity;
+    this.capacity      = capacity;
     this.insertPointer = 0;
-    this.elements = new ArrayList<E>(capacity);
-    this.times = new double[capacity];
+    this.elements      = new ArrayList<E>(capacity);
+    this.times         = new double[capacity];
   }
 
   /**
@@ -110,10 +110,10 @@ public class TimedRingBuffer<E> implements Iterable<E> {
     if (this.size() < this.capacity) {
       return new RingBufferIterator(this.elements.iterator(), Collections.emptyIterator());
     }
-    int elementsSize = this.elements.size();
-    List<E> sublistA = this.elements.subList(this.insertPointer, elementsSize);
-    List<E> sublistB = this.elements.subList(0, this.insertPointer);
-    RingBufferIterator result = new RingBufferIterator(sublistA.iterator(), sublistB.iterator());
+    int                elementsSize = this.elements.size();
+    List<E>            sublistA     = this.elements.subList(this.insertPointer, elementsSize);
+    List<E>            sublistB     = this.elements.subList(0, this.insertPointer);
+    RingBufferIterator result       = new RingBufferIterator(sublistA.iterator(), sublistB.iterator());
     return result;
   }
 
@@ -154,7 +154,7 @@ public class TimedRingBuffer<E> implements Iterable<E> {
       return new RingBufferIterator(Collections.emptyIterator(), Collections.emptyIterator());
     }
     int start = this.trueMod(this.insertPointer - n, this.capacity);
-    int end = this.insertPointer;
+    int end   = this.insertPointer;
     if (start < end) {
       List<E> sublistA = this.elements.subList(start, end);
       return new RingBufferIterator(sublistA.iterator(), Collections.emptyIterator());
@@ -172,11 +172,11 @@ public class TimedRingBuffer<E> implements Iterable<E> {
    * @return an iterator for the elements added within the last pastTime seconds.
    */
   public RingBufferIterator get(double pastTime) {
-    int numberToGet = 1;
-    double firstTime = this.times[this.trueMod(this.insertPointer - 1, this.capacity)];
+    int    numberToGet = 1;
+    double firstTime   = this.times[this.trueMod(this.insertPointer - 1, this.capacity)];
     for (numberToGet = 1; numberToGet < this.size(); numberToGet++) {
-      int index = this.insertPointer - numberToGet - 1;
-      int modIndex = this.trueMod(index, this.capacity);
+      int    index     = this.insertPointer - numberToGet - 1;
+      int    modIndex  = this.trueMod(index, this.capacity);
       double timeDelta = firstTime - this.times[modIndex];
 
       if (timeDelta > pastTime) {

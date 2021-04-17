@@ -14,7 +14,7 @@ public class ScheduledConditionEvent extends GenericEvent {
   public ScheduledConditionEvent(
           double interval, EventCondition condition, EventCallback callback, Time time) {
     super(condition, callback, time);
-    this.interval = interval;
+    this.interval    = interval;
     this.lastInvoked = Double.NaN;
   }
 

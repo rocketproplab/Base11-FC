@@ -28,7 +28,7 @@ public class StatisticArray {
    * Create a new empty array
    */
   public StatisticArray(int maxCount) {
-    this.samples = new TimedRingBuffer<>(maxCount);
+    this.samples   = new TimedRingBuffer<>(maxCount);
     this.validator = array -> true;
   }
 
@@ -83,8 +83,8 @@ public class StatisticArray {
    * @return the mean of the samples returned by the iterator
    */
   private double getMean(TimedRingBuffer<Double>.RingBufferIterator iterator) {
-    double sum = 0;
-    int sampleCount = 0;
+    double sum         = 0;
+    int    sampleCount = 0;
     for (double sample : iterator) {
       sum += sample;
       sampleCount++;
@@ -121,7 +121,7 @@ public class StatisticArray {
    * @return the variance of the samples taken in the previous seconds
    */
   public double getVariance(double previousSeconds) {
-    double mean = this.getMean(previousSeconds);
+    double                                     mean     = this.getMean(previousSeconds);
     TimedRingBuffer<Double>.RingBufferIterator iterator = this.samples.get(previousSeconds);
     return this.getVariance(mean, iterator);
   }
@@ -149,8 +149,8 @@ public class StatisticArray {
    * @return the variance of the samples
    */
   private double getVariance(double mean, TimedRingBuffer<Double>.RingBufferIterator iterator) {
-    double sumSquared = 0;
-    int samplesCounted = 0;
+    double sumSquared     = 0;
+    int    samplesCounted = 0;
     for (double sample : iterator) {
       sumSquared += Math.pow(sample - mean, 2);
       samplesCounted++;

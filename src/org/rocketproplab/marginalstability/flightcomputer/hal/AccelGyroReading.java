@@ -27,7 +27,7 @@ public class AccelGyroReading {
    * @param rotation
    */
   public AccelGyroReading(Vector3 acc, Vector3 rotation) {
-    this.acc = acc;
+    this.acc      = acc;
     this.rotation = rotation;
   }
 

@@ -15,8 +15,8 @@ public class GenericEvent implements EventCallback, EventCondition {
 
   public GenericEvent(EventCondition condition, EventCallback callback, Time time) {
     this.condition = condition;
-    this.callback = callback;
-    this.time = time;
+    this.callback  = callback;
+    this.time      = time;
   }
 
   @Override

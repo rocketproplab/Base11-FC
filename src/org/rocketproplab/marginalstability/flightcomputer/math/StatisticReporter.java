@@ -47,13 +47,13 @@ public class StatisticReporter implements EventCallback {
 
   private StatisticReporter(SamplableSensor<Double> sensor, Telemetry telem, SCMPacketType meanType,
                             boolean reportVariance, SCMPacketType varianceType) {
-    this.telemetry = telem;
-    this.meanType = meanType;
-    this.array = new StatisticArray(1);
-    this.sensor = sensor;
-    this.lookbackTime = -1;
+    this.telemetry      = telem;
+    this.meanType       = meanType;
+    this.array          = new StatisticArray(1);
+    this.sensor         = sensor;
+    this.lookbackTime   = -1;
     this.reportVaraince = reportVariance;
-    this.varianceType = varianceType;
+    this.varianceType   = varianceType;
   }
 
   /**

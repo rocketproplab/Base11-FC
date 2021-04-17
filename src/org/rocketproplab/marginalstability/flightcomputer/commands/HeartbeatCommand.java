@@ -26,7 +26,7 @@ public class HeartbeatCommand implements Command {
    * @param telemetry the Telemetry object used to send heartbeat
    */
   public HeartbeatCommand(Time time, Telemetry telemetry) {
-    this.time = time;
+    this.time      = time;
     this.telemetry = telemetry;
   }
 

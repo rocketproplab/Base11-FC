@@ -17,8 +17,8 @@ public class SaraSMSSender implements SMSSender, SerialListener {
 
   public SaraSMSSender(SerialPort saraSerialPort) {
     this.saraSerialPort = saraSerialPort;
-    messageIndex = 0;
-    router = new PacketRouter(); //should this be set to a specific packet router?
+    messageIndex        = 0;
+    router              = new PacketRouter(); //should this be set to a specific packet router?
 
     saraSerialPort.write("AT\n");
     saraSerialPort.write("AT+CMGF=1\n");
@@ -44,7 +44,7 @@ public class SaraSMSSender implements SMSSender, SerialListener {
 
   @Override //this re
   public void onSerialData(String data) {
-    int index = data.indexOf(",");
+    int    index   = data.indexOf(",");
     String subData = data.substring(index + 1);
 
     packet = new GPSPacket(subData);

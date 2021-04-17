@@ -61,7 +61,7 @@ public class ErrorReporter {
    * @param telemetry the telemetry object to use to send telemetry.
    */
   public ErrorReporter(PrintStream stream, Telemetry telemetry) {
-    this.stream = stream;
+    this.stream    = stream;
     this.telemetry = telemetry;
   }
 

@@ -50,7 +50,7 @@ public class SCMPacket {
    * @param data the data which the packet holds
    */
   public SCMPacket(SCMPacketType id, String data) {
-    this.id = id;
+    this.id   = id;
     this.data = data;
     this.validate();
   }
@@ -76,7 +76,7 @@ public class SCMPacket {
       checksum = Integer.parseInt(strChecksum);
     } catch (NumberFormatException exception) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Unable to parse checksum in " + packet;
+      String        errorMsg      = "Unable to parse checksum in " + packet;
       errorReporter.reportError(null, exception, errorMsg);
       this.isValid = false;
       return;
@@ -87,7 +87,7 @@ public class SCMPacket {
         this.id = SCMPacketType.valueOf(packetComponents[0]);
       } catch (IllegalArgumentException illegalArg) {
         ErrorReporter errorReporter = ErrorReporter.getInstance();
-        String errorMsg = "Got bad packet ID (" + packetComponents[0] + ")!";
+        String        errorMsg      = "Got bad packet ID (" + packetComponents[0] + ")!";
         errorReporter.reportError(null, illegalArg, errorMsg);
       }
       this.data = packetComponents[1];

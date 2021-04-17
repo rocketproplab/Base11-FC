@@ -12,7 +12,7 @@ public class SetValveCommand implements Command {
 
   SetValveCommand(SCMPacket scmpacket, Valves valves) {
     this.scmpacket = scmpacket;
-    this.valves = valves;
+    this.valves    = valves;
   }
 
   @Override
@@ -27,7 +27,7 @@ public class SetValveCommand implements Command {
       valves.setValve(getValveID(), valveState);
     } catch (IllegalArgumentException dataOnOffException) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Data from SCMPacket was not On or Off. Data was actually: " + scmpacket.getData();
+      String        errorMsg      = "Data from SCMPacket was not On or Off. Data was actually: " + scmpacket.getData();
       errorReporter.reportError(null, dataOnOffException, errorMsg);
     }
   }
@@ -50,7 +50,7 @@ public class SetValveCommand implements Command {
   private int getValveID() {
     int currentvalve = this.scmpacket.getID().ordinal();
     int initialvalve = SCMPacketType.V0.ordinal();
-    int valveindex = currentvalve - initialvalve;
+    int valveindex   = currentvalve - initialvalve;
     return valveindex;
   }
 

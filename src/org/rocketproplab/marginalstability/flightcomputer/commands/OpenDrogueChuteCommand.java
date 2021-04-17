@@ -13,7 +13,7 @@ public class OpenDrogueChuteCommand implements Command {
 
   private OpenDrogueChuteCommand(ParachuteSubsystem parachuteSubsystem, PacketRelay relay) {
     this.parachuteSubsystem = parachuteSubsystem;
-    this.relay = relay;
+    this.relay              = relay;
   }
 
   @Override

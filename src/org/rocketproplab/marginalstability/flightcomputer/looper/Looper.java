@@ -45,10 +45,10 @@ public class Looper {
    * @param time the time all events in this Looper will use.
    */
   public Looper(Time time) {
-    this.time = time;
-    callbackMap = new HashMap<>();
-    active = new ArrayList<>();
-    queue = new ArrayList<>();
+    this.time      = time;
+    callbackMap    = new HashMap<>();
+    active         = new ArrayList<>();
+    queue          = new ArrayList<>();
     busySubsystems = new HashMap<>();
   }
 
@@ -72,8 +72,8 @@ public class Looper {
     Iterator<Map.Entry<Object, GenericEvent>> entryIterator = callbackMap.entrySet().iterator();
     while (entryIterator.hasNext()) {
       Map.Entry<Object, GenericEvent> entry = entryIterator.next();
-      Object tag = entry.getKey();
-      GenericEvent event = entry.getValue();
+      Object                          tag   = entry.getKey();
+      GenericEvent                    event = entry.getValue();
       try {
         if (event.shouldEmit()) {
           event.onLooperCallback(tag, this);
@@ -103,7 +103,7 @@ public class Looper {
     Iterator<Command> queueIterator = queue.iterator();
     while (queueIterator.hasNext()) {
       // Get next command in queue and it's dependencies.
-      Command command = queueIterator.next();
+      Command         command      = queueIterator.next();
       List<Subsystem> dependencies = Arrays.asList(command.getDependencies());
 
       // Check if command has no dependencies that are in-use.

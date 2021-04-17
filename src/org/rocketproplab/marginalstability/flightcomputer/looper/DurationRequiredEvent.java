@@ -15,7 +15,7 @@ public class DurationRequiredEvent extends GenericEvent {
   public DurationRequiredEvent(
           double durationTrue, EventCondition condition, EventCallback callback, Time time) {
     super(condition, callback, time);
-    this.durationTrue = durationTrue;
+    this.durationTrue  = durationTrue;
     this.sinceTrueTime = Double.NaN;
   }
 

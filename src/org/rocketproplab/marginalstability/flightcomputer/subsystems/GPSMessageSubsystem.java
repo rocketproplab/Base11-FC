@@ -17,13 +17,13 @@ public class GPSMessageSubsystem implements PacketListener {
   private static final double TIME_BETWEEN = 0;
 
   public GPSMessageSubsystem() {
-    lastTime = 0;
-    thisTime = 0;
+    lastTime     = 0;
+    thisTime     = 0;
     currentState = new FlightState();
   }
 
   public String createMessage() {
-    double latitude = this.packet.getLatitude();
+    double latitude  = this.packet.getLatitude();
     double longitude = this.packet.getLongitude();
 
     message = "The longitude is: " + longitude + "\nThe latitude"

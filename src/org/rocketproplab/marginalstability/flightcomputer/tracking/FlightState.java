@@ -81,7 +81,7 @@ public class FlightState
    * @param velocity the current velocity
    */
   private void checkForFalling(Vector3 velocity) {
-    boolean isApogee = this.currentFlightMode == FlightMode.Apogee;
+    boolean isApogee   = this.currentFlightMode == FlightMode.Apogee;
     boolean isCoasting = this.currentFlightMode == FlightMode.Coasting;
     if (!(isApogee || isCoasting)) {
       return;

@@ -30,8 +30,8 @@ public class SCMTransceiver implements SerialListener, PacketListener<SCMPacket>
    */
   public SCMTransceiver(SerialPort serialPort, PacketRouter router, PacketSources source) {
     this.serialPort = serialPort;
-    this.router = router;
-    this.source = source;
+    this.router     = router;
+    this.source     = source;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class SCMTransceiver implements SerialListener, PacketListener<SCMPacket>
       router.recivePacket(packet, this.source);
     } else {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Got invalid packet " + data + "!";
+      String        errorMsg      = "Got invalid packet " + data + "!";
       errorReporter.reportError(null, null, errorMsg);
     }
 

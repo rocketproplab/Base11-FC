@@ -29,7 +29,7 @@ public class GPSTransceiver implements SerialListener {
       router.recivePacket(packet, PacketSources.GPS);
     } else {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Got invalid packet " + data + "!\"";
+      String        errorMsg      = "Got invalid packet " + data + "!\"";
       errorReporter.reportError(errorMsg);
     }
 

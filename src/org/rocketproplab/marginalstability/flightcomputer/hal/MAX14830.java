@@ -120,13 +120,13 @@ public class MAX14830 implements PollingSensor {
    * @param spi the Spi device to use, no validation is done
    */
   public MAX14830(SpiDevice spi) {
-    this.spi = spi;
+    this.spi             = spi;
     this.uartBufferArray = new StringBuffer[Port.values().length];
     this.serialPortArray = new SerialPortAdapter[Port.values().length];
-    this.txFifoLengths = new int[Port.values().length];
+    this.txFifoLengths   = new int[Port.values().length];
     for (int i = 0; i < Port.values().length; i++) {
       this.uartBufferArray[i] = new StringBuffer();
-      this.txFifoLengths[i] = TX_BUFFER_SIZE;
+      this.txFifoLengths[i]   = TX_BUFFER_SIZE;
       final Port port = Port.values()[i];
       this.serialPortArray[i] = new SerialPortAdapter(message -> this.writeToPort(port, message));
     }
@@ -142,8 +142,8 @@ public class MAX14830 implements PollingSensor {
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
   protected int getTXBufferLen(Port port) throws IOException {
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | Registers.TxFIFOLvl.address());
+    int  uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte command    = (byte) (uartSelect | Registers.TxFIFOLvl.address());
     return this.readRegister(command);
   }
 
@@ -156,8 +156,8 @@ public class MAX14830 implements PollingSensor {
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
   protected int getRXBufferLen(Port port) throws IOException {
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | Registers.RxFIFOLvl.address());
+    int  uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte command    = (byte) (uartSelect | Registers.RxFIFOLvl.address());
     return this.readRegister(command);
   }
 
@@ -181,7 +181,7 @@ public class MAX14830 implements PollingSensor {
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
   private int readRegister(byte command) throws IOException {
-    byte[] data = {command, 0};
+    byte[] data     = {command, 0};
     byte[] readData = this.spi.write(data);
     if (readData.length < 2) {
       return -1;
@@ -213,10 +213,10 @@ public class MAX14830 implements PollingSensor {
 
     String first = stringBuffer.substring(0, readCount);
     stringBuffer.delete(0, readCount);
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | WRITE | Registers.THR.address());
-    byte[] data = first.getBytes(this.charset);
-    byte[] toWrite = new byte[data.length + 1];
+    int    uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte   command    = (byte) (uartSelect | WRITE | Registers.THR.address());
+    byte[] data       = first.getBytes(this.charset);
+    byte[] toWrite    = new byte[data.length + 1];
     toWrite[0] = command;
     System.arraycopy(data, 0, toWrite, 1, data.length);
     this.spi.write(toWrite);
@@ -233,9 +233,9 @@ public class MAX14830 implements PollingSensor {
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
   protected byte[] readFromRxFifo(Port port, int charCount) throws IOException {
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | Registers.RHR.address());
-    byte[] zeros = new byte[charCount + 1];
+    int    uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte   command    = (byte) (uartSelect | Registers.RHR.address());
+    byte[] zeros      = new byte[charCount + 1];
     zeros[0] = command;
     return this.spi.write(zeros);
   }
@@ -289,7 +289,7 @@ public class MAX14830 implements PollingSensor {
     int spaceLeft = TX_BUFFER_SIZE - this.txFifoLengths[port.ordinal()];
     if (spaceLeft < length) {
       int txBufferLen = this.getTXBufferLen(port);
-      spaceLeft = TX_BUFFER_SIZE - txBufferLen;
+      spaceLeft                          = TX_BUFFER_SIZE - txBufferLen;
       this.txFifoLengths[port.ordinal()] = txBufferLen;
     }
 
@@ -309,10 +309,10 @@ public class MAX14830 implements PollingSensor {
    * @throws IOException if we are unable to access /dev/spix.x via Pi4J
    */
   private void readFromPort(Port port, int length) throws IOException {
-    byte[] byteMessage = this.readFromRxFifo(port, length);
-    String unprocessedMessage = new String(byteMessage, this.charset);
-    String message = unprocessedMessage.substring(1);
-    SerialPortAdapter serialPort = this.serialPortArray[port.ordinal()];
+    byte[]            byteMessage        = this.readFromRxFifo(port, length);
+    String            unprocessedMessage = new String(byteMessage, this.charset);
+    String            message            = unprocessedMessage.substring(1);
+    SerialPortAdapter serialPort         = this.serialPortArray[port.ordinal()];
     serialPort.newMessage(message);
   }
 
@@ -327,7 +327,7 @@ public class MAX14830 implements PollingSensor {
    */
   private void pollPort(Port port) throws IOException {
     StringBuffer buffer = this.selectBuffer(port);
-    int length = buffer.length();
+    int          length = buffer.length();
     if (length != 0) {
       this.writeToPort(port, length);
     }
@@ -345,7 +345,7 @@ public class MAX14830 implements PollingSensor {
       }
     } catch (IOException e) {
       ErrorReporter errorReporter = ErrorReporter.getInstance();
-      String errorMsg = "Unable to access /dev/spix.x via Pi4J";
+      String        errorMsg      = "Unable to access /dev/spix.x via Pi4J";
       errorReporter.reportError(Errors.MAX14830_IO_ERROR, e, errorMsg);
     }
 
@@ -370,11 +370,11 @@ public class MAX14830 implements PollingSensor {
     if (baudrate > 0) {
       d = Settings.MAX14830_F_REF / (16 * baudrate);
     }
-    int uartSelect = port.ordinal() << UART_SELECT_LSB_IDX;
-    byte command = (byte) (uartSelect | WRITE | Registers.BRGConfig.address());
-    byte leastSignificantBits = (byte) (d & 0xFF);
-    byte mostSignificantBits = (byte) ((d >> BITS_PER_BYTE) & 0xFF);
-    byte[] data = {command, 0, leastSignificantBits, mostSignificantBits};
+    int    uartSelect           = port.ordinal() << UART_SELECT_LSB_IDX;
+    byte   command              = (byte) (uartSelect | WRITE | Registers.BRGConfig.address());
+    byte   leastSignificantBits = (byte) (d & 0xFF);
+    byte   mostSignificantBits  = (byte) ((d >> BITS_PER_BYTE) & 0xFF);
+    byte[] data                 = {command, 0, leastSignificantBits, mostSignificantBits};
     this.spi.write(data);
 
   }

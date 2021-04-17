@@ -16,7 +16,7 @@ public class SerialPortAdapter implements SerialPort {
   private SerialListener writeListener;
 
   public SerialPortAdapter(SerialListener writeListener) {
-    this.listeners = new HashSet<>();
+    this.listeners     = new HashSet<>();
     this.writeListener = writeListener;
   }
 

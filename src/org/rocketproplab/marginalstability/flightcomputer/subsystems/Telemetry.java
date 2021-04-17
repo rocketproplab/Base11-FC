@@ -43,7 +43,7 @@ public class Telemetry {
    */
   public Telemetry(Logger logger, PacketRelay relay) {
     this.logger = logger;
-    this.relay = relay;
+    this.relay  = relay;
   }
 
   /**
@@ -54,8 +54,8 @@ public class Telemetry {
    */
   public void reportTelemetry(SCMPacketType type, double data) {
     String dataString = String.format(DOUBLE_FORMAT, data).toUpperCase();
-    int toPrint = Math.min(dataString.length(), SCMPacket.DATA_LENGTH);
-    int padLen = (SCMPacket.DATA_LENGTH - toPrint);
+    int    toPrint    = Math.min(dataString.length(), SCMPacket.DATA_LENGTH);
+    int    padLen     = (SCMPacket.DATA_LENGTH - toPrint);
 
     dataString = dataString.substring(0, toPrint);
     if (padLen > 0) {
@@ -133,8 +133,8 @@ public class Telemetry {
    * Send the heartbeat to the command box
    */
   public void sendHeartbeat() {
-    String dataString = "00000";
-    SCMPacket packet = new SCMPacket(SCMPacketType.HB, dataString);
+    String    dataString = "00000";
+    SCMPacket packet     = new SCMPacket(SCMPacketType.HB, dataString);
     this.relay.sendPacket(packet, PacketSources.CommandBox);
   }
 

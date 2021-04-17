@@ -13,7 +13,7 @@ public class OpenMainChuteCommand implements Command {
 
   private OpenMainChuteCommand(ParachuteSubsystem parachuteSubsystem, PacketRelay relay) {
     this.parachuteSubsystem = parachuteSubsystem;
-    this.relay = relay;
+    this.relay              = relay;
   }
 
   @Override

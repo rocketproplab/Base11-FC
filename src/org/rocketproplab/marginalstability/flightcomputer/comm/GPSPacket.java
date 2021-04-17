@@ -51,17 +51,17 @@ public class GPSPacket {
     }
     this.valid = true;
 
-    String timeString = nEMAParts[NEMA_TIME_INDEX];
-    String latString = nEMAParts[NEMA_LAT_INDEX];
-    String lonString = nEMAParts[NEMA_LON_INDEX];
-    String sVCountString = nEMAParts[NEMA_SV_COUNT_INDEX];
+    String timeString     = nEMAParts[NEMA_TIME_INDEX];
+    String latString      = nEMAParts[NEMA_LAT_INDEX];
+    String lonString      = nEMAParts[NEMA_LON_INDEX];
+    String sVCountString  = nEMAParts[NEMA_SV_COUNT_INDEX];
     String altitudeString = nEMAParts[NEMA_ALTITUDE_INDEX];
 
-    this.time = Double.parseDouble(timeString);
-    this.latitude = Double.parseDouble(latString);
+    this.time      = Double.parseDouble(timeString);
+    this.latitude  = Double.parseDouble(latString);
     this.longitude = Double.parseDouble(lonString);
-    this.sVCount = Integer.parseInt(sVCountString);
-    this.altitude = Double.parseDouble(altitudeString);
+    this.sVCount   = Integer.parseInt(sVCountString);
+    this.altitude  = Double.parseDouble(altitudeString);
   }
 
   /**
@@ -115,7 +115,7 @@ public class GPSPacket {
       return false;
     }
     GPSPacket other = (GPSPacket) o;
-    boolean equal = this.valid == other.valid;
+    boolean   equal = this.valid == other.valid;
     equal &= (this.latitude - other.latitude) < Settings.EQUALS_EPSILON;
     equal &= (this.longitude - other.longitude) < Settings.EQUALS_EPSILON;
     equal &= (this.altitude - other.altitude) < Settings.EQUALS_EPSILON;
